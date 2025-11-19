@@ -50,6 +50,7 @@ class SupportCards(commands.Cog):
 
         embed.add_field(name="Character ID", value=card.chara_id, inline=True)
 
+        embed.set_image(url=card.image_url)
         embed.set_footer(text="Uma Musume Pretty Derby • Support Cards")
         await interaction.followup.send(embed=embed)
 
