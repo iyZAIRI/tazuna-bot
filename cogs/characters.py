@@ -232,18 +232,35 @@ class CardDetailView(discord.ui.View):
         if card.card_title:
             embed.add_field(name="Card", value=f"{card.rarity_stars} {card.card_title}", inline=False)
 
-        # Skills
-        if card.skills:
-            skills_text = ""
-            for skill in card.skills:
-                skills_text += f"{skill.rank_emoji} {skill.skill_name}\n"
+        # Separate skills into innate (rank 0) and awakening (rank 2-5)
+        innate_skills = [s for s in card.skills if s.need_rank == 0]
+        awakening_skills = [s for s in card.skills if s.need_rank > 0]
+
+        # Innate Skills (unlocked by default)
+        if innate_skills:
+            innate_text = ""
+            for skill in innate_skills:
+                innate_text += f"🔓 {skill.skill_name}\n"
 
             embed.add_field(
-                name=f"✨ Available Skills ({len(card.skills)})",
-                value=skills_text,
+                name=f"✨ Innate Skills ({len(innate_skills)})",
+                value=innate_text,
                 inline=False
             )
-        else:
+
+        # Awakening Skills (requires bond levels)
+        if awakening_skills:
+            awakening_text = ""
+            for skill in awakening_skills:
+                awakening_text += f"{skill.rank_emoji} {skill.skill_name}\n"
+
+            embed.add_field(
+                name=f"⭐ Awakening Skills ({len(awakening_skills)})",
+                value=awakening_text,
+                inline=False
+            )
+
+        if not card.skills:
             embed.add_field(
                 name="✨ Available Skills",
                 value="No skills found for this card.",
