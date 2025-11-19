@@ -4,11 +4,34 @@ A Discord bot for the Uma Musume Pretty Derby English Global Release! This bot p
 
 ## ✨ Features
 
-- **Character Information**: Look up Uma Musume characters and their details
-- **Character List**: Browse all available characters
-- **Gacha Simulator**: Simulate gacha rolls (1-10 pulls)
-- **Random Character**: Get a random Uma Musume
-- **Bot Information**: Check bot stats and latency
+### Character System
+- **Character Database**: 119+ characters from the game database
+- **Character Cards**: View all card variants and rarities
+- **Character Search**: Search by name (English/Japanese support)
+- **Running Styles**: See character running styles and talents
+
+### Skills System
+- **Skill Database**: 1,847+ skills with detailed information
+- **Skill Search**: Find skills by name or category
+- **Top Skills**: View highest-rated skills
+- **Skill Categories**: Speed, Stamina, Position, and more
+
+### Support Cards
+- **Support Card Database**: 329+ support cards
+- **Card Types**: Speed, Stamina, Power, Guts, Wisdom, Friend
+- **SSR Listing**: Filter by rarity
+- **Character Support**: Find all supports for a character
+
+### Races
+- **Race Database**: 500+ races from the game
+- **Grade Filtering**: G1, G2, G3, Open, Pre-Open
+- **Distance Categories**: Sprint, Mile, Middle, Long
+- **Ground Types**: Turf and Dirt races
+
+### Database Features
+- **Real Game Data**: Uses actual game database (master.mdb)
+- **EN/JP Support**: Works with both English and Japanese databases
+- **Database Explorer**: Explore 574 tables via Discord commands
 
 ## 📋 Prerequisites
 
@@ -68,15 +91,34 @@ You should see output indicating the bot has logged in successfully!
 - `!invite` - Get bot invite link
 - `!help` - Show all available commands
 
-### Uma Musume Commands
-- `!character <name>` or `!uma <name>` - Look up a character
-  - Example: `!character Special Week`
-- `!list` or `!characters` - List all available characters
-- `!random` or `!randomuma` - Get a random character
-- `!gacha [1-10]` or `!roll [1-10]` - Simulate gacha rolls
-  - Example: `!gacha 10` for a 10-pull
+### Character Commands
+- `!character <name>` - Look up character information
+- `!list [page]` - List all characters (paginated)
+- `!random` - Get a random character
+- `!search <query>` - Search for characters
+- `!ssr` - List all SSR characters
 
-### Database Commands (requires master.mdb)
+### Skill Commands
+- `!skill <name>` - Look up skill information
+- `!skills [rarity]` - List skills by rarity (1-3)
+- `!searchskill <query>` - Search for skills
+- `!topskills [limit]` - Show top skills by grade value
+
+### Support Card Commands
+- `!support <name>` - Look up support card
+- `!supports [type]` - List support cards by type
+  - Types: speed, stamina, power, guts, wisdom, friend
+- `!ssrsupports` - List all SSR support cards
+- `!searchsupport <query>` - Search for support cards
+
+### Race Commands
+- `!race <name>` - Look up race information
+- `!races [grade]` - List races by grade (1-5)
+  - 1=Pre-Open, 2=Open, 3=G3, 4=G2, 5=G1
+- `!g1races` - List all G1 races
+- `!searchrace <query>` - Search for races
+
+### Database Commands
 - `!dbstatus` - Check database connection status
 - `!dbtables [search]` - List all database tables
 - `!dbschema <table>` - Show table structure
@@ -112,11 +154,27 @@ tazuna-bot/
 ├── .env               # Environment variables (not in git)
 ├── .env.example       # Example environment file
 ├── .gitignore         # Git ignore rules
-├── cogs/              # Command modules
+├── cogs/              # Command modules (Discord commands)
 │   ├── __init__.py
 │   ├── general.py     # General bot commands
-│   ├── umamusume.py   # Uma Musume specific commands
-│   └── database.py    # Database exploration commands
+│   ├── characters.py  # Character commands
+│   ├── skills.py      # Skill commands
+│   ├── support_cards.py # Support card commands
+│   ├── races.py       # Race commands
+│   ├── database.py    # Database exploration commands
+│   └── umamusume.py   # Legacy commands (deprecated)
+├── models/            # Data models (game entities)
+│   ├── __init__.py
+│   ├── character.py   # Character & CharacterCard models
+│   ├── skill.py       # Skill model
+│   ├── support_card.py # SupportCard model
+│   └── race.py        # Race model
+├── managers/          # Data managers (business logic)
+│   ├── __init__.py
+│   ├── character_manager.py    # Character data management
+│   ├── skill_manager.py        # Skill data management
+│   ├── support_card_manager.py # Support card management
+│   └── race_manager.py         # Race data management
 ├── utils/             # Utility scripts
 │   ├── __init__.py
 │   ├── download_masterdb.py  # Download master.mdb from GitHub
