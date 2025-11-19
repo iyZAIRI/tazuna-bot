@@ -22,8 +22,14 @@ class CardSelectorView(discord.ui.View):
 
         # Add a button for each card (limit to 25 buttons total - Discord limit)
         for idx, card in enumerate(character.cards[:25]):
-            # Create button label with card number (e.g., "1. ★★★ 🎯")
-            label = f"{idx + 1}. {card.rarity_stars} {card.running_style_emoji}"
+            # Create button label with card title if available
+            if card.card_title:
+                # Truncate title if too long (Discord button label limit is 80 chars)
+                title = card.card_title[:50] if len(card.card_title) > 50 else card.card_title
+                label = f"{card.rarity_stars} {title}"
+            else:
+                label = f"{idx + 1}. {card.rarity_stars} {card.running_style_emoji}"
+
             button = discord.ui.Button(
                 label=label,
                 style=discord.ButtonStyle.primary,
@@ -46,6 +52,10 @@ class CardSelectorView(discord.ui.View):
             embed.add_field(name="Rarity", value=card.rarity_stars, inline=True)
             embed.add_field(name="Running Style", value=f"{card.running_style_emoji} {card.running_style_name}", inline=True)
             embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
+
+            # Card title
+            if card.card_title:
+                embed.add_field(name="Card Title", value=card.card_title, inline=False)
 
             # Bonuses (compact format)
             bonuses_text = (

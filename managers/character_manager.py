@@ -99,11 +99,13 @@ class CharacterManager:
                 cr_default.proper_running_style_sashi as apt_style_late,
                 cr_default.proper_running_style_oikomi as apt_style_end_closer,
                 cr_default.proper_ground_turf as apt_ground_turf,
-                cr_default.proper_ground_dirt as apt_ground_dirt
+                cr_default.proper_ground_dirt as apt_ground_dirt,
+                t.text as card_title
             FROM card_data c
             JOIN chara_data cd ON c.chara_id = cd.id
             LEFT JOIN card_rarity_data cr_default ON c.id = cr_default.card_id AND cr_default.rarity = c.default_rarity
             LEFT JOIN card_rarity_data cr_max ON c.id = cr_max.card_id AND cr_max.rarity = 5
+            LEFT JOIN text_data t ON t.category = 14 AND t.[index] = c.id
             ORDER BY c.chara_id, c.default_rarity DESC
             """
 
@@ -148,6 +150,7 @@ class CharacterManager:
                     talent_power=row['talent_pow'],
                     talent_guts=row['talent_guts'],
                     talent_wit=row['talent_wiz'],
+                    card_title=row.get('card_title'),
                     base_speed=row.get('base_speed'),
                     base_stamina=row.get('base_stamina'),
                     base_power=row.get('base_pow'),

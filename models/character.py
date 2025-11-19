@@ -44,6 +44,7 @@ class CharacterCard:
     talent_power: int
     talent_guts: int
     talent_wit: int
+    card_title: Optional[str] = None
     # Base stats at default rarity
     base_speed: Optional[int] = None
     base_stamina: Optional[int] = None
