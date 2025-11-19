@@ -8,7 +8,7 @@ import logging
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from utils.db_reader import MasterDBReader
-from models.character import Character, CharacterCard
+from models.character import Character, CharacterCard, CardSkill
 
 logger = logging.getLogger('UmaMusumeBot.CharacterManager')
 
@@ -163,6 +163,9 @@ class CharacterManager:
                 )
                 self.characters[chara_id].cards.append(card)
 
+            # Load skills for all cards
+            self._load_skills()
+
             self._loaded = True
             logger.info(f"Loaded {len(self.characters)} characters")
             return True
@@ -170,6 +173,55 @@ class CharacterManager:
         except Exception as e:
             logger.error(f"Failed to load characters: {e}")
             return False
+
+    def _load_skills(self):
+        """Load skills for all character cards."""
+        try:
+            # Build a mapping of card_id -> available_skill_set_id
+            card_skill_sets = {}
+            for char in self.characters.values():
+                for card in char.cards:
+                    card_skill_sets[card.card_id] = card.card_id  # available_skill_set_id = card_id
+
+            # Load all skills for these cards
+            if card_skill_sets:
+                card_ids = list(card_skill_sets.keys())
+                placeholders = ','.join('?' * len(card_ids))
+
+                query = f"""
+                SELECT
+                    a.available_skill_set_id,
+                    a.skill_id,
+                    a.need_rank,
+                    t.text as skill_name
+                FROM available_skill_set a
+                LEFT JOIN text_data t ON t.category = 47 AND t.[index] = a.skill_id
+                WHERE a.available_skill_set_id IN ({placeholders})
+                ORDER BY a.available_skill_set_id, a.need_rank
+                """
+
+                # Use parameterized query
+                skills = self.db.query(query, tuple(card_ids))
+
+                # Group skills by card_id
+                for skill_row in skills:
+                    card_id = skill_row['available_skill_set_id']
+
+                    # Find the card and add the skill
+                    for char in self.characters.values():
+                        for card in char.cards:
+                            if card.card_id == card_id:
+                                skill = CardSkill(
+                                    skill_id=skill_row['skill_id'],
+                                    skill_name=skill_row['skill_name'] or f"Skill {skill_row['skill_id']}",
+                                    need_rank=skill_row['need_rank']
+                                )
+                                card.skills.append(skill)
+                                break
+
+                logger.info(f"Loaded skills for cards")
+        except Exception as e:
+            logger.warning(f"Failed to load skills: {e}")
 
     def get_by_id(self, chara_id: int) -> Optional[Character]:
         """Get character by ID."""

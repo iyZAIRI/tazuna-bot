@@ -13,6 +13,20 @@ from constants import (
     RANK_EMOJIS
 )
 
+@dataclass
+class CardSkill:
+    """Represents a skill available on a character card."""
+    skill_id: int
+    skill_name: str
+    need_rank: int  # Bond level required to unlock (0-5)
+
+    @property
+    def rank_emoji(self) -> str:
+        """Get emoji for unlock rank."""
+        if self.need_rank == 0:
+            return "🔓"
+        return f"🔒{self.need_rank}"
+
 class RunningStyle(IntEnum):
     """Running style enum."""
     RUNNER = 1
@@ -78,6 +92,13 @@ class CharacterCard:
     apt_style_end_closer: Optional[int] = None
     apt_ground_turf: Optional[int] = None
     apt_ground_dirt: Optional[int] = None
+    # Skills available on this card
+    skills: List['CardSkill'] = None
+
+    def __post_init__(self):
+        """Initialize default values."""
+        if self.skills is None:
+            self.skills = []
 
     @staticmethod
     def aptitude_to_grade(value: Optional[int]) -> str:
