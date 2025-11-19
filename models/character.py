@@ -94,6 +94,8 @@ class CharacterCard:
     apt_ground_dirt: Optional[int] = None
     # Skills available on this card
     skills: List['CardSkill'] = None
+    # Unique skill (unlocked at rarity 3+)
+    unique_skill: Optional['CardSkill'] = None
 
     def __post_init__(self):
         """Initialize default values."""

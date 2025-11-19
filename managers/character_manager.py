@@ -220,8 +220,65 @@ class CharacterManager:
                                 break
 
                 logger.info(f"Loaded skills for cards")
+
+            # Load unique skills from skill_set via card_rarity_data
+            # Unique skills are unlocked at rarity 3+
+            self._load_unique_skills()
+
         except Exception as e:
             logger.warning(f"Failed to load skills: {e}")
+
+    def _load_unique_skills(self):
+        """Load unique skills for character cards from skill_set table."""
+        try:
+            if not self.characters:
+                return
+
+            card_ids = []
+            for char in self.characters.values():
+                for card in char.cards:
+                    card_ids.append(card.card_id)
+
+            if not card_ids:
+                return
+
+            placeholders = ','.join('?' * len(card_ids))
+
+            # Query for unique skills from skill_set via card_rarity_data
+            # We'll get the skill_set for rarity 3 (where unique skills unlock)
+            query = f"""
+            SELECT
+                cr.card_id,
+                ss.skill_id1 as unique_skill_id,
+                t.text as skill_name
+            FROM card_rarity_data cr
+            JOIN skill_set ss ON cr.skill_set = ss.id
+            LEFT JOIN text_data t ON t.category = 47 AND t.[index] = ss.skill_id1
+            WHERE cr.card_id IN ({placeholders})
+              AND cr.rarity = 3
+              AND ss.skill_id1 > 0
+            """
+
+            unique_skills = self.db.query(query, tuple(card_ids))
+
+            # Add unique skills to cards
+            for skill_row in unique_skills:
+                card_id = skill_row['card_id']
+
+                # Find the card and set the unique skill
+                for char in self.characters.values():
+                    for card in char.cards:
+                        if card.card_id == card_id:
+                            card.unique_skill = CardSkill(
+                                skill_id=skill_row['unique_skill_id'],
+                                skill_name=skill_row['skill_name'] or f"Skill {skill_row['unique_skill_id']}",
+                                need_rank=0  # Unique skills unlock at rarity 3, not bond level
+                            )
+                            break
+
+            logger.info(f"Loaded unique skills for cards")
+        except Exception as e:
+            logger.warning(f"Failed to load unique skills: {e}")
 
     def get_by_id(self, chara_id: int) -> Optional[Character]:
         """Get character by ID."""

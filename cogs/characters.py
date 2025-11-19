@@ -232,6 +232,14 @@ class CardDetailView(discord.ui.View):
         if card.card_title:
             embed.add_field(name="Card", value=f"{card.rarity_stars} {card.card_title}", inline=False)
 
+        # Unique Skill (unlocked at rarity 3+)
+        if card.unique_skill:
+            embed.add_field(
+                name="💎 Unique Skill",
+                value=f"⭐ {card.unique_skill.skill_name}\n*Unlocked at rarity 3+*",
+                inline=False
+            )
+
         # Separate skills into innate (rank 0) and awakening (rank 2-5)
         innate_skills = [s for s in card.skills if s.need_rank == 0]
         awakening_skills = [s for s in card.skills if s.need_rank > 0]
@@ -260,7 +268,7 @@ class CardDetailView(discord.ui.View):
                 inline=False
             )
 
-        if not card.skills:
+        if not card.unique_skill and not card.skills:
             embed.add_field(
                 name="✨ Available Skills",
                 value="No skills found for this card.",
