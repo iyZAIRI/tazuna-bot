@@ -47,19 +47,28 @@ class CardSelectorView(discord.ui.View):
             embed.add_field(name="Running Style", value=f"{card.running_style_emoji} {card.running_style_name}", inline=True)
             embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
 
-            # Bonuses (as percentages)
-            embed.add_field(name="<:speed:1440769160182366259> Bonus", value=f"{card.talent_speed}%", inline=True)
-            embed.add_field(name="<:stamina:1440769173880832081> Bonus", value=f"{card.talent_stamina}%", inline=True)
-            embed.add_field(name="<:power:1440769145707827382> Bonus", value=f"{card.talent_power}%", inline=True)
-            embed.add_field(name="<:guts:1440769099985719528> Bonus", value=f"{card.talent_guts}%", inline=True)
-            embed.add_field(name="<:wit:1440769186967326872> Bonus", value=f"{card.talent_wit}%", inline=True)
-            embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
+            # Bonuses (compact format)
+            bonuses_text = (
+                f"<:speed:1440769160182366259> {card.talent_speed}% | "
+                f"<:stamina:1440769173880832081> {card.talent_stamina}% | "
+                f"<:power:1440769145707827382> {card.talent_power}% | "
+                f"<:guts:1440769099985719528> {card.talent_guts}% | "
+                f"<:wit:1440769186967326872> {card.talent_wit}%"
+            )
+            embed.add_field(
+                name="💎 Bonuses",
+                value=bonuses_text,
+                inline=False
+            )
 
             # Base stats at default rarity
             if card.base_speed is not None:
                 base_stats_text = (
-                    f"<:speed:1440769160182366259> {card.base_speed} | <:stamina:1440769173880832081> {card.base_stamina} | <:power:1440769145707827382> {card.base_power}\n"
-                    f"<:guts:1440769099985719528> {card.base_guts} | <:wit:1440769186967326872> {card.base_wit}"
+                    f"<:speed:1440769160182366259> {card.base_speed}  |  "
+                    f"<:stamina:1440769173880832081> {card.base_stamina}  |  "
+                    f"<:power:1440769145707827382> {card.base_power}  |  "
+                    f"<:guts:1440769099985719528> {card.base_guts}  |  "
+                    f"<:wit:1440769186967326872> {card.base_wit}"
                 )
                 embed.add_field(
                     name=f"📊 Base Stats ({card.rarity_stars})",
@@ -70,8 +79,11 @@ class CardSelectorView(discord.ui.View):
             # Base stats at max rarity (5)
             if card.max_base_speed is not None:
                 max_stats_text = (
-                    f"<:speed:1440769160182366259> {card.max_base_speed} | <:stamina:1440769173880832081> {card.max_base_stamina} | <:power:1440769145707827382> {card.max_base_power}\n"
-                    f"<:guts:1440769099985719528> {card.max_base_guts} | <:wit:1440769186967326872> {card.max_base_wit}"
+                    f"<:speed:1440769160182366259> {card.max_base_speed}  |  "
+                    f"<:stamina:1440769173880832081> {card.max_base_stamina}  |  "
+                    f"<:power:1440769145707827382> {card.max_base_power}  |  "
+                    f"<:guts:1440769099985719528> {card.max_base_guts}  |  "
+                    f"<:wit:1440769186967326872> {card.max_base_wit}"
                 )
                 embed.add_field(
                     name="📈 Base Stats (★★★★★)",
