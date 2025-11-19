@@ -1,0 +1,602 @@
+[
+  {
+    "id": 409021,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "リカバリーシーケンス"
+  },
+  {
+    "id": 409031,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "システムオールグリーン"
+  },
+  {
+    "id": 410011,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "伝説降臨"
+  },
+  {
+    "id": 102303211,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "ネオンの尾を引いて"
+  },
+  {
+    "id": 104603211,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "爆レスあげちゃう☆"
+  },
+  {
+    "id": 106402211,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "メリ☆クリ↑パーリー"
+  },
+  {
+    "id": 109701211,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "誰にも告げぬ誓い"
+  },
+  {
+    "id": 109701221,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "呼び覚まされし願い"
+  },
+  {
+    "id": 109902111,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "感謝のふるさとメドレー"
+  },
+  {
+    "id": 111501211,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "王威絢爛"
+  },
+  {
+    "id": 111501221,
+    "rarity": 6,
+    "grade_value": 758,
+    "name_jp": "――畏れよ、然して拝跪せよ"
+  },
+  {
+    "id": 407011,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "キラメキの勝負"
+  },
+  {
+    "id": 407021,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "燃えてきたッ！！"
+  },
+  {
+    "id": 407031,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "ベストを尽くして！"
+  },
+  {
+    "id": 407041,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "無二の情熱"
+  },
+  {
+    "id": 407051,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "破竹の筋肉"
+  },
+  {
+    "id": 407061,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "ステイチューン！"
+  },
+  {
+    "id": 407071,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "繋がる高揚感"
+  },
+  {
+    "id": 408011,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "敬愛ッ！ウママニア"
+  },
+  {
+    "id": 408021,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "お待ちどおさま！"
+  },
+  {
+    "id": 408031,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "ここらで味変！"
+  },
+  {
+    "id": 408041,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "即席三ツ星コーナリング"
+  },
+  {
+    "id": 408051,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "耕せ！開墾スプリント"
+  },
+  {
+    "id": 408061,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "曲線のグランシェフ"
+  },
+  {
+    "id": 409011,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "モンスターマシン"
+  },
+  {
+    "id": 409041,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "リミッター解除"
+  },
+  {
+    "id": 409051,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "先頭維持アルゴリズム"
+  },
+  {
+    "id": 409061,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "弧線のトップスカラー"
+  },
+  {
+    "id": 410021,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "疾風より先へ"
+  },
+  {
+    "id": 410031,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "革命の岐路"
+  },
+  {
+    "id": 410051,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "幾星霜が導く一手"
+  },
+  {
+    "id": 410061,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "雲上飛翔"
+  },
+  {
+    "id": 411011,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "開拓者の軌跡"
+  },
+  {
+    "id": 411021,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "未知へのトライアル"
+  },
+  {
+    "id": 411031,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "不屈のサバイバル魂"
+  },
+  {
+    "id": 411041,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "大地を揺るがす疾走"
+  },
+  {
+    "id": 411051,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "ワイルドアットハート"
+  },
+  {
+    "id": 411061,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "大自然の鼓動"
+  },
+  {
+    "id": 100101111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "はらぺこ大将"
+  },
+  {
+    "id": 100101211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "夢叶える末脚"
+  },
+  {
+    "id": 100102111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "真夏の思い切り"
+  },
+  {
+    "id": 100102211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "真夏の総大将"
+  },
+  {
+    "id": 100103111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "怒涛の出陣"
+  },
+  {
+    "id": 100103211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "日之本一のド根性"
+  },
+  {
+    "id": 100201211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "異次元の逃亡者"
+  },
+  {
+    "id": 100202111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "瑠璃色エスケイプ"
+  },
+  {
+    "id": 100202121,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "滄海を越えしフーガ"
+  },
+  {
+    "id": 100302111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "レースの天才"
+  },
+  {
+    "id": 100302211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "地平の彼方まで"
+  },
+  {
+    "id": 100303111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "天賦の身ごなし"
+  },
+  {
+    "id": 100303211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "盤楽遊嬉"
+  },
+  {
+    "id": 100303221,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "朝腹、朝腹、かやすしや♪"
+  },
+  {
+    "id": 100401111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "かっ飛ばすわよ！"
+  },
+  {
+    "id": 100401211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "紅蓮のオーバーレブ"
+  },
+  {
+    "id": 100402111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "ドキッ☆じゃじゃウマ娘！"
+  },
+  {
+    "id": 100402211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "お立ち台の支配者"
+  },
+  {
+    "id": 100403211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "神薙ダンス"
+  },
+  {
+    "id": 100501211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "エンターテイナー"
+  },
+  {
+    "id": 100501221,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "煌めく“キセキ”を"
+  },
+  {
+    "id": 100502111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "圧巻のトリック"
+  },
+  {
+    "id": 100502121,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "見惚れるコーナリング"
+  },
+  {
+    "id": 100502211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "煌めきのトップスタァ"
+  },
+  {
+    "id": 100601111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "笠松の食いしん坊"
+  },
+  {
+    "id": 100601121,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "飢えた怪物"
+  },
+  {
+    "id": 100601211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "怪物的コーナリング"
+  },
+  {
+    "id": 100602111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "ドカ食い養生"
+  },
+  {
+    "id": 100602211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "クリスマスの奇跡体験"
+  },
+  {
+    "id": 100701211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "エクストリーム下校術"
+  },
+  {
+    "id": 100702111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "神秘体験！ゴルシワープ"
+  },
+  {
+    "id": 100702211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "イカ揚げ、いかがですか！？"
+  },
+  {
+    "id": 100702221,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "高まってきたぜぇ！！"
+  },
+  {
+    "id": 100703111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "押し寄せるジュテーム"
+  },
+  {
+    "id": 100801111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "スキットルブレイク"
+  },
+  {
+    "id": 100801211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "抜群の豪脚"
+  },
+  {
+    "id": 100802211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "最速のトップギア"
+  },
+  {
+    "id": 100901111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "パーフェクトチューン"
+  },
+  {
+    "id": 100901211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "アタシが勝つんだから！"
+  },
+  {
+    "id": 100902111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "おてんば女王"
+  },
+  {
+    "id": 100902121,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "緋色の光となって"
+  },
+  {
+    "id": 100902211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "開かれる夢の扉"
+  },
+  {
+    "id": 101001111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "狙い撃ちデス！"
+  },
+  {
+    "id": 101001211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "Frontier Spirit"
+  },
+  {
+    "id": 101002111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "アドベンチャーの先導者"
+  },
+  {
+    "id": 101002211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "真剣勝負デス！"
+  },
+  {
+    "id": 101101111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "大和撫子"
+  },
+  {
+    "id": 101101211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "不退転の意思"
+  },
+  {
+    "id": 101102111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "キュアリーヒール"
+  },
+  {
+    "id": 101102211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "勇気の魔法"
+  },
+  {
+    "id": 101103111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "射貫く蒼"
+  },
+  {
+    "id": 101103211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "勝機到来"
+  },
+  {
+    "id": 101201111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "勝利への咆哮"
+  },
+  {
+    "id": 101201121,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "タイマンにかける執念"
+  },
+  {
+    "id": 101201211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "怒濤のポロロッカ"
+  },
+  {
+    "id": 101202111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "熱烈エンゲージ！"
+  },
+  {
+    "id": 101202211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "闘魂入刀！"
+  },
+  {
+    "id": 101202221,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "誓いの一振り"
+  },
+  {
+    "id": 101301111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "メジロの心得"
+  },
+  {
+    "id": 101301211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "名優の余裕"
+  },
+  {
+    "id": 101302111,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "アクティブレスト"
+  },
+  {
+    "id": 101302211,
+    "rarity": 6,
+    "grade_value": 633,
+    "name_jp": "空の果てまで"
+  }
+]

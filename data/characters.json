@@ -1,0 +1,2223 @@
+[
+  {
+    "chara_id": 1001,
+    "name_jp": "スペシャルウィーク",
+    "name_en": "Special Week",
+    "birth_date": "1995-05-02",
+    "color": "FCA7FF",
+    "cards": [
+      {
+        "card_id": 100101,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 100102,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 100103,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 9100101,
+        "rarity": 0,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1002,
+    "name_jp": "サイレンススズカ",
+    "name_en": "Silence Suzuka",
+    "birth_date": "1994-05-01",
+    "color": "8FE78D",
+    "cards": [
+      {
+        "card_id": 100201,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 100202,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1003,
+    "name_jp": "トウカイテイオー",
+    "name_en": "Tokai Teio",
+    "birth_date": "1988-04-20",
+    "color": "A8C6FD",
+    "cards": [
+      {
+        "card_id": 100301,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 100302,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 100303,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1004,
+    "name_jp": "マルゼンスキー",
+    "name_en": "Maruz ensky",
+    "birth_date": "1974-05-19",
+    "color": "F84B40",
+    "cards": [
+      {
+        "card_id": 100401,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 100402,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 100403,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1005,
+    "name_jp": "フジキセキ",
+    "name_en": "Fujikiseki",
+    "birth_date": "1992-04-15",
+    "color": "6C6C6C",
+    "cards": [
+      {
+        "card_id": 100501,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 100502,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1006,
+    "name_jp": "オグリキャップ",
+    "name_en": "Oguri Cap",
+    "birth_date": "1985-03-27",
+    "color": "7991EC",
+    "cards": [
+      {
+        "card_id": 100601,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 100602,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1007,
+    "name_jp": "ゴールドシップ",
+    "name_en": "Gold Ship",
+    "birth_date": "2009-03-06",
+    "color": "FFFFFF",
+    "cards": [
+      {
+        "card_id": 100702,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 100703,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 100701,
+        "rarity": 2,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1008,
+    "name_jp": "ウオッカ",
+    "name_en": "Vodka",
+    "birth_date": "2004-04-04",
+    "color": "FFEF72",
+    "cards": [
+      {
+        "card_id": 100802,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 100801,
+        "rarity": 2,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1009,
+    "name_jp": "ダイワスカーレット",
+    "name_en": "Daiwa Scarlet",
+    "birth_date": "2004-05-13",
+    "color": "8DA3E7",
+    "cards": [
+      {
+        "card_id": 100902,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 100901,
+        "rarity": 2,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1010,
+    "name_jp": "タイキシャトル",
+    "name_en": "Taiki Shuttle",
+    "birth_date": "1994-03-23",
+    "color": "CBFF9E",
+    "cards": [
+      {
+        "card_id": 101001,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 101002,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1011,
+    "name_jp": "グラスワンダー",
+    "name_en": "Grass Wonder",
+    "birth_date": "1995-02-18",
+    "color": "A3B2D6",
+    "cards": [
+      {
+        "card_id": 101102,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 101103,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 101101,
+        "rarity": 2,
+        "running_style": 3
+      },
+      {
+        "card_id": 9101101,
+        "rarity": 0,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1012,
+    "name_jp": "ヒシアマゾン",
+    "name_en": "Hishi Amazon",
+    "birth_date": "1991-03-26",
+    "color": "5BA5DD",
+    "cards": [
+      {
+        "card_id": 101201,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 101202,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1013,
+    "name_jp": "メジロマックイーン",
+    "name_en": "Mejiro McQueen",
+    "birth_date": "1987-04-03",
+    "color": "38BDC3",
+    "cards": [
+      {
+        "card_id": 101301,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 101302,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 101303,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1014,
+    "name_jp": "エルコンドルパサー",
+    "name_en": "El Condor Pasa",
+    "birth_date": "1995-03-17",
+    "color": "D64F3E",
+    "cards": [
+      {
+        "card_id": 101402,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 101401,
+        "rarity": 2,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1015,
+    "name_jp": "テイエムオペラオー",
+    "name_en": "T.M. Opera O",
+    "birth_date": "1996-03-13",
+    "color": "ECEB61",
+    "cards": [
+      {
+        "card_id": 101501,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 101502,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1016,
+    "name_jp": "ナリタブライアン",
+    "name_en": "Narita Brian",
+    "birth_date": "1991-05-03",
+    "color": "FFACE1",
+    "cards": [
+      {
+        "card_id": 101601,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 101602,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1017,
+    "name_jp": "シンボリルドルフ",
+    "name_en": "Symboli Rudolf",
+    "birth_date": "1981-03-13",
+    "color": "27B798",
+    "cards": [
+      {
+        "card_id": 101701,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 101702,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1018,
+    "name_jp": "エアグルーヴ",
+    "name_en": "Air Groove",
+    "birth_date": "1993-04-06",
+    "color": "27A1B7",
+    "cards": [
+      {
+        "card_id": 101802,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 101801,
+        "rarity": 2,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1019,
+    "name_jp": "アグネスデジタル",
+    "name_en": "Agnes Digital",
+    "birth_date": "1997-05-15",
+    "color": "F7FFAC",
+    "cards": [
+      {
+        "card_id": 101901,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 101902,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1020,
+    "name_jp": "セイウンスカイ",
+    "name_en": "Seiun Sky",
+    "birth_date": "1995-04-26",
+    "color": "BDE9C9",
+    "cards": [
+      {
+        "card_id": 102001,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 102002,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1021,
+    "name_jp": "タマモクロス",
+    "name_en": "Tamamo Cross",
+    "birth_date": "1984-05-23",
+    "color": "5DA9E2",
+    "cards": [
+      {
+        "card_id": 102101,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 102102,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1022,
+    "name_jp": "ファインモーション",
+    "name_en": "Fine Motion",
+    "birth_date": "1999-01-27",
+    "color": "71CC99",
+    "cards": [
+      {
+        "card_id": 102201,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 102202,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1023,
+    "name_jp": "ビワハヤヒデ",
+    "name_en": "Biwa Hayahide",
+    "birth_date": "1990-03-10",
+    "color": "D17F9B",
+    "cards": [
+      {
+        "card_id": 102301,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 102302,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 102303,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1024,
+    "name_jp": "マヤノトップガン",
+    "name_en": "Mayano Top Gun",
+    "birth_date": "1992-03-24",
+    "color": "F3E67B",
+    "cards": [
+      {
+        "card_id": 102402,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 102403,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 102401,
+        "rarity": 2,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1025,
+    "name_jp": "マンハッタンカフェ",
+    "name_en": "Manhattan Cafe",
+    "birth_date": "1998-03-05",
+    "color": "3D3935",
+    "cards": [
+      {
+        "card_id": 102501,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 102502,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1026,
+    "name_jp": "ミホノブルボン",
+    "name_en": "Mihono Bourbon",
+    "birth_date": "1989-04-25",
+    "color": "F177AF",
+    "cards": [
+      {
+        "card_id": 102601,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 102602,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1027,
+    "name_jp": "メジロライアン",
+    "name_en": "Mejiro Ryan",
+    "birth_date": "1987-04-11",
+    "color": "62D9D1",
+    "cards": [
+      {
+        "card_id": 102702,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 102701,
+        "rarity": 1,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1028,
+    "name_jp": "ヒシアケボノ",
+    "name_en": "Hishi Akebono",
+    "birth_date": "1992-02-27",
+    "color": "61AAD9",
+    "cards": [
+      {
+        "card_id": 102801,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 102802,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1029,
+    "name_jp": "ユキノビジン",
+    "name_en": "Yukino Bijin",
+    "birth_date": "1990-03-10",
+    "color": "A7DDFF",
+    "cards": [
+      {
+        "card_id": 102901,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 102902,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1030,
+    "name_jp": "ライスシャワー",
+    "name_en": "Rice Shower",
+    "birth_date": "1989-03-05",
+    "color": "304073",
+    "cards": [
+      {
+        "card_id": 103001,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 103002,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 103003,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1031,
+    "name_jp": "アイネスフウジン",
+    "name_en": "Ines Fujin",
+    "birth_date": "1987-04-10",
+    "color": "FD89D5",
+    "cards": [
+      {
+        "card_id": 103101,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 103102,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 103103,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1032,
+    "name_jp": "アグネスタキオン",
+    "name_en": "Agnes Tachyon",
+    "birth_date": "1998-04-13",
+    "color": "E9FD89",
+    "cards": [
+      {
+        "card_id": 103202,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 103203,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 103201,
+        "rarity": 1,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1033,
+    "name_jp": "アドマイヤベガ",
+    "name_en": "Admire Vega",
+    "birth_date": "1996-03-12",
+    "color": "6592CC",
+    "cards": [
+      {
+        "card_id": 103301,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 103302,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1034,
+    "name_jp": "イナリワン",
+    "name_en": "Inari One",
+    "birth_date": "1984-05-07",
+    "color": "CC54BA",
+    "cards": [
+      {
+        "card_id": 103401,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 103402,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1035,
+    "name_jp": "ウイニングチケット",
+    "name_en": "Winning Ticket",
+    "birth_date": "1990-03-21",
+    "color": "DB5E64",
+    "cards": [
+      {
+        "card_id": 103502,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 103503,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 103501,
+        "rarity": 1,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1036,
+    "name_jp": "エアシャカール",
+    "name_en": "Air Shakur",
+    "birth_date": "1997-02-26",
+    "color": "D1D13E",
+    "cards": [
+      {
+        "card_id": 103601,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 103602,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1037,
+    "name_jp": "エイシンフラッシュ",
+    "name_en": "Eishin Flash",
+    "birth_date": "2007-03-27",
+    "color": "413D39",
+    "cards": [
+      {
+        "card_id": 103701,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 103702,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 103703,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1038,
+    "name_jp": "カレンチャン",
+    "name_en": "Kare Chan",
+    "birth_date": "2007-03-31",
+    "color": "FF6D70",
+    "cards": [
+      {
+        "card_id": 103801,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 103802,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1039,
+    "name_jp": "カワカミプリンセス",
+    "name_en": "Kawakami Princess",
+    "birth_date": "2003-06-05",
+    "color": "EC77C0",
+    "cards": [
+      {
+        "card_id": 103901,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 103902,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1040,
+    "name_jp": "ゴールドシチー",
+    "name_en": "Gold City",
+    "birth_date": "1984-04-16",
+    "color": "688AD6",
+    "cards": [
+      {
+        "card_id": 104001,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 104002,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 104003,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1041,
+    "name_jp": "サクラバクシンオー",
+    "name_en": "Sakura Bakushin O",
+    "birth_date": "1989-04-14",
+    "color": "F595C3",
+    "cards": [
+      {
+        "card_id": 104102,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 104101,
+        "rarity": 1,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1042,
+    "name_jp": "シーキングザパール",
+    "name_en": null,
+    "birth_date": "1994-04-16",
+    "color": "CC5A6B",
+    "cards": [
+      {
+        "card_id": 104201,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 104202,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1043,
+    "name_jp": "シンコウウインディ",
+    "name_en": "Shinko Windy",
+    "birth_date": "1993-04-14",
+    "color": "676767",
+    "cards": [
+      {
+        "card_id": 104301,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1044,
+    "name_jp": "スイープトウショウ",
+    "name_en": "Sweep Tosho",
+    "birth_date": "2001-05-09",
+    "color": "957EC0",
+    "cards": [
+      {
+        "card_id": 104401,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 104402,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1045,
+    "name_jp": "スーパークリーク",
+    "name_en": "Super Creek",
+    "birth_date": "1985-05-27",
+    "color": "7FADE3",
+    "cards": [
+      {
+        "card_id": 104502,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 104503,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 104501,
+        "rarity": 2,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1046,
+    "name_jp": "スマートファルコン",
+    "name_en": "Smart Falcon",
+    "birth_date": "2005-04-04",
+    "color": "E9748D",
+    "cards": [
+      {
+        "card_id": 104601,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 104602,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 104603,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1047,
+    "name_jp": "ゼンノロブロイ",
+    "name_en": "Zenno Rob Roy",
+    "birth_date": "2000-03-27",
+    "color": "639337",
+    "cards": [
+      {
+        "card_id": 104701,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 104702,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1048,
+    "name_jp": "トーセンジョーダン",
+    "name_en": "Tosen Jordan",
+    "birth_date": "2006-02-04",
+    "color": "3FB7AE",
+    "cards": [
+      {
+        "card_id": 104801,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 104802,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 104803,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1049,
+    "name_jp": "ナカヤマフェスタ",
+    "name_en": "Nakayama Festa",
+    "birth_date": "2006-04-05",
+    "color": "CF5E59",
+    "cards": [
+      {
+        "card_id": 104901,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1050,
+    "name_jp": "ナリタタイシン",
+    "name_en": "Narita Taishin",
+    "birth_date": "1990-06-10",
+    "color": "E3ACD6",
+    "cards": [
+      {
+        "card_id": 105001,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 105002,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 105003,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1051,
+    "name_jp": "ニシノフラワー",
+    "name_en": "Nishino Flower",
+    "birth_date": "1989-04-19",
+    "color": "E0D773",
+    "cards": [
+      {
+        "card_id": 105101,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 105102,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1052,
+    "name_jp": "ハルウララ",
+    "name_en": "Haru Urara",
+    "birth_date": "1996-02-27",
+    "color": "FAADC3",
+    "cards": [
+      {
+        "card_id": 105202,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 105201,
+        "rarity": 1,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1053,
+    "name_jp": "バンブーメモリー",
+    "name_en": "Bamboo Memory",
+    "birth_date": "1985-05-14",
+    "color": "29504D",
+    "cards": [
+      {
+        "card_id": 105301,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 105302,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1054,
+    "name_jp": "ビコーペガサス",
+    "name_en": "Biko Pegasus",
+    "birth_date": "1991-02-08",
+    "color": "F20C46",
+    "cards": [
+      {
+        "card_id": 105401,
+        "rarity": 2,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1055,
+    "name_jp": "マーベラスサンデー",
+    "name_en": "Marvelous Sunday",
+    "birth_date": "1992-05-31",
+    "color": "A30083",
+    "cards": [
+      {
+        "card_id": 105501,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 105502,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1056,
+    "name_jp": "マチカネフクキタル",
+    "name_en": "Matikane Fukukitaru",
+    "birth_date": "1994-05-22",
+    "color": "307FE2",
+    "cards": [
+      {
+        "card_id": 105602,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 105601,
+        "rarity": 1,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1057,
+    "name_jp": "ミスターシービー",
+    "name_en": "Mr. C.B.",
+    "birth_date": "1980-04-07",
+    "color": "77D64A",
+    "cards": [
+      {
+        "card_id": 105701,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 105702,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1058,
+    "name_jp": "メイショウドトウ",
+    "name_en": null,
+    "birth_date": "1996-03-25",
+    "color": "06038D",
+    "cards": [
+      {
+        "card_id": 105801,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 105802,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1059,
+    "name_jp": "メジロドーベル",
+    "name_en": "Mejiro Dober",
+    "birth_date": "1994-05-06",
+    "color": "00B097",
+    "cards": [
+      {
+        "card_id": 105901,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 105902,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1060,
+    "name_jp": "ナイスネイチャ",
+    "name_en": "Nice Nature",
+    "birth_date": "1988-04-16",
+    "color": "009639",
+    "cards": [
+      {
+        "card_id": 106002,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 106003,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 106001,
+        "rarity": 1,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1061,
+    "name_jp": "キングヘイロー",
+    "name_en": "King Halo",
+    "birth_date": "1995-04-28",
+    "color": "007B3E",
+    "cards": [
+      {
+        "card_id": 106102,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 106103,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 106101,
+        "rarity": 1,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1062,
+    "name_jp": "マチカネタンホイザ",
+    "name_en": "Matikane Tannhauser",
+    "birth_date": "1989-05-07",
+    "color": "0085CA",
+    "cards": [
+      {
+        "card_id": 106202,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 106201,
+        "rarity": 2,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1063,
+    "name_jp": "イクノディクタス",
+    "name_en": "Ikuno Dictus",
+    "birth_date": "1987-04-16",
+    "color": "47A23F",
+    "cards": [
+      {
+        "card_id": 106301,
+        "rarity": 2,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1064,
+    "name_jp": "メジロパーマー",
+    "name_en": "Mejiro Palmer",
+    "birth_date": "1987-03-21",
+    "color": "00A499",
+    "cards": [
+      {
+        "card_id": 106401,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 106402,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1065,
+    "name_jp": "ダイタクヘリオス",
+    "name_en": null,
+    "birth_date": "1987-04-10",
+    "color": "303AB2",
+    "cards": [
+      {
+        "card_id": 106501,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 106502,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1066,
+    "name_jp": "ツインターボ",
+    "name_en": "Twin Turbo",
+    "birth_date": "1988-04-13",
+    "color": "0050C8",
+    "cards": [
+      {
+        "card_id": 106601,
+        "rarity": 1,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1067,
+    "name_jp": "サトノダイヤモンド",
+    "name_en": "Satono Diamond",
+    "birth_date": "2013-01-30",
+    "color": "90AA6B",
+    "cards": [
+      {
+        "card_id": 106701,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 106702,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 106703,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1068,
+    "name_jp": "キタサンブラック",
+    "name_en": "Kitasan Black",
+    "birth_date": "2012-03-10",
+    "color": "25282A",
+    "cards": [
+      {
+        "card_id": 106801,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 106802,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 106803,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1069,
+    "name_jp": "サクラチヨノオー",
+    "name_en": "Sakura Chiyono O",
+    "birth_date": "1985-02-19",
+    "color": "FFA3B5",
+    "cards": [
+      {
+        "card_id": 106901,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 106902,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1070,
+    "name_jp": "シリウスシンボリ",
+    "name_en": "Sirius Symboli",
+    "birth_date": "1982-03-26",
+    "color": "007763",
+    "cards": [
+      {
+        "card_id": 107001,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 107002,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1071,
+    "name_jp": "メジロアルダン",
+    "name_en": "Mejiro Ardan",
+    "birth_date": "1985-03-28",
+    "color": "269988",
+    "cards": [
+      {
+        "card_id": 107101,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 107102,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1072,
+    "name_jp": "ヤエノムテキ",
+    "name_en": "Yaeno Muteki",
+    "birth_date": "1985-04-11",
+    "color": "CB2819",
+    "cards": [
+      {
+        "card_id": 107201,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 107202,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1073,
+    "name_jp": "ツルマルツヨシ",
+    "name_en": "Tsurumaru Tsuyoshi",
+    "birth_date": "1995-04-06",
+    "color": "A743D1",
+    "cards": [
+      {
+        "card_id": 107301,
+        "rarity": 2,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1074,
+    "name_jp": "メジロブライト",
+    "name_en": "Mejiro Bright",
+    "birth_date": "1994-04-19",
+    "color": "64CCC9",
+    "cards": [
+      {
+        "card_id": 107401,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 107402,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1076,
+    "name_jp": "サクラローレル",
+    "name_en": null,
+    "birth_date": "1991-05-08",
+    "color": "ED7092",
+    "cards": [
+      {
+        "card_id": 107601,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1077,
+    "name_jp": "ナリタトップロード",
+    "name_en": "Narita Top Road",
+    "birth_date": "1996-04-04",
+    "color": "E280D2",
+    "cards": [
+      {
+        "card_id": 107701,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 107702,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1078,
+    "name_jp": "ヤマニンゼファー",
+    "name_en": "Yamanin Zephyr",
+    "birth_date": "1988-05-27",
+    "color": "639CCC",
+    "cards": [
+      {
+        "card_id": 107801,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 107802,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1079,
+    "name_jp": "フリオーソ",
+    "name_en": null,
+    "birth_date": "2004-05-01",
+    "color": "4E65DA",
+    "cards": [
+      {
+        "card_id": 107901,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1080,
+    "name_jp": "トランセンド",
+    "name_en": null,
+    "birth_date": "2006-03-09",
+    "color": "28F4FF",
+    "cards": [
+      {
+        "card_id": 108001,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1081,
+    "name_jp": "エスポワールシチー",
+    "name_en": null,
+    "birth_date": "2005-04-22",
+    "color": "F2303B",
+    "cards": [
+      {
+        "card_id": 108101,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1082,
+    "name_jp": "ノースフライト",
+    "name_en": null,
+    "birth_date": "1990-04-12",
+    "color": "D82050",
+    "cards": [
+      {
+        "card_id": 108201,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1083,
+    "name_jp": "シンボリクリスエス",
+    "name_en": null,
+    "birth_date": "1999-01-21",
+    "color": "174C28",
+    "cards": [
+      {
+        "card_id": 108301,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 108302,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1084,
+    "name_jp": "タニノギムレット",
+    "name_en": null,
+    "birth_date": "1999-05-04",
+    "color": "F3E972",
+    "cards": [
+      {
+        "card_id": 108401,
+        "rarity": 3,
+        "running_style": 4
+      },
+      {
+        "card_id": 108402,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1085,
+    "name_jp": "ダイイチルビー",
+    "name_en": null,
+    "birth_date": "1987-04-15",
+    "color": "E2435F",
+    "cards": [
+      {
+        "card_id": 108501,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 108502,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1086,
+    "name_jp": "メジロラモーヌ",
+    "name_en": "Mejiro Ramonu",
+    "birth_date": "1983-04-09",
+    "color": "2EB8B1",
+    "cards": [
+      {
+        "card_id": 108601,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 108602,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1087,
+    "name_jp": "アストンマーチャン",
+    "name_en": "Aston Machan",
+    "birth_date": "2004-03-05",
+    "color": "CB3725",
+    "cards": [
+      {
+        "card_id": 108701,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 108702,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1088,
+    "name_jp": "サトノクラウン",
+    "name_en": null,
+    "birth_date": "2012-03-10",
+    "color": "225D39",
+    "cards": [
+      {
+        "card_id": 108801,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 108802,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1089,
+    "name_jp": "シュヴァルグラン",
+    "name_en": null,
+    "birth_date": "2012-03-14",
+    "color": "BFFFFE",
+    "cards": [
+      {
+        "card_id": 108901,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 108902,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1090,
+    "name_jp": "ヴィルシーナ",
+    "name_en": null,
+    "birth_date": "2009-03-05",
+    "color": "0000DD",
+    "cards": [
+      {
+        "card_id": 109001,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1091,
+    "name_jp": "ヴィブロス",
+    "name_en": null,
+    "birth_date": "2013-04-09",
+    "color": "162ECC",
+    "cards": [
+      {
+        "card_id": 109101,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 109102,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1093,
+    "name_jp": "ケイエスミラクル",
+    "name_en": "K.S. Miracle",
+    "birth_date": "1988-03-16",
+    "color": "ADCBEF",
+    "cards": [
+      {
+        "card_id": 109301,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 109302,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1094,
+    "name_jp": "ジャングルポケット",
+    "name_en": null,
+    "birth_date": "1998-05-07",
+    "color": "F3EA5D",
+    "cards": [
+      {
+        "card_id": 109401,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1095,
+    "name_jp": "ビリーヴ",
+    "name_en": null,
+    "birth_date": "1998-04-26",
+    "color": "A7EAFF",
+    "cards": [
+      {
+        "card_id": 109501,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1096,
+    "name_jp": "ノーリーズン",
+    "name_en": null,
+    "birth_date": "1999-06-04",
+    "color": "E42947",
+    "cards": [
+      {
+        "card_id": 109601,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1097,
+    "name_jp": "スティルインラブ",
+    "name_en": null,
+    "birth_date": "2000-05-02",
+    "color": "D0383E",
+    "cards": [
+      {
+        "card_id": 109701,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1098,
+    "name_jp": "コパノリッキー",
+    "name_en": null,
+    "birth_date": "2010-03-24",
+    "color": "FDDA26",
+    "cards": [
+      {
+        "card_id": 109801,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 109802,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1099,
+    "name_jp": "ホッコータルマエ",
+    "name_en": null,
+    "birth_date": "2009-05-26",
+    "color": "DFF0F2",
+    "cards": [
+      {
+        "card_id": 109901,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 109902,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1100,
+    "name_jp": "ワンダーアキュート",
+    "name_en": null,
+    "birth_date": "2006-03-14",
+    "color": "D792A9",
+    "cards": [
+      {
+        "card_id": 110001,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1102,
+    "name_jp": "サウンズオブアース",
+    "name_en": null,
+    "birth_date": "2011-04-12",
+    "color": "D12F29",
+    "cards": [
+      {
+        "card_id": 110201,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1104,
+    "name_jp": "カツラギエース",
+    "name_en": null,
+    "birth_date": "1980-04-24",
+    "color": "86C4F8",
+    "cards": [
+      {
+        "card_id": 110401,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 110402,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1105,
+    "name_jp": "ネオユニヴァース",
+    "name_en": null,
+    "birth_date": "2000-05-21",
+    "color": "FDF16C",
+    "cards": [
+      {
+        "card_id": 110501,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 110502,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1106,
+    "name_jp": "ヒシミラクル",
+    "name_en": null,
+    "birth_date": "1999-03-31",
+    "color": "487BCC",
+    "cards": [
+      {
+        "card_id": 110601,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 110602,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1107,
+    "name_jp": "タップダンスシチー",
+    "name_en": null,
+    "birth_date": "1997-03-16",
+    "color": "EF3340",
+    "cards": [
+      {
+        "card_id": 110701,
+        "rarity": 3,
+        "running_style": 1
+      },
+      {
+        "card_id": 110702,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1108,
+    "name_jp": "ドゥラメンテ",
+    "name_en": "Duramente",
+    "birth_date": "2012-03-22",
+    "color": "A60014",
+    "cards": [
+      {
+        "card_id": 110801,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1109,
+    "name_jp": "ラインクラフト",
+    "name_en": null,
+    "birth_date": "2002-04-04",
+    "color": "FFCBD4",
+    "cards": [
+      {
+        "card_id": 110901,
+        "rarity": 3,
+        "running_style": 2
+      },
+      {
+        "card_id": 110902,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1110,
+    "name_jp": "シーザリオ",
+    "name_en": null,
+    "birth_date": "2002-03-31",
+    "color": "E7E4F2",
+    "cards": [
+      {
+        "card_id": 111001,
+        "rarity": 3,
+        "running_style": 3
+      },
+      {
+        "card_id": 111002,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1111,
+    "name_jp": "エアメサイア",
+    "name_en": null,
+    "birth_date": "2002-02-04",
+    "color": "272AA4",
+    "cards": [
+      {
+        "card_id": 111101,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1113,
+    "name_jp": "フサイチパンドラ",
+    "name_en": null,
+    "birth_date": "2003-02-27",
+    "color": "FB637E",
+    "cards": [
+      {
+        "card_id": 111301,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1115,
+    "name_jp": "オルフェーヴル",
+    "name_en": null,
+    "birth_date": "2008-05-14",
+    "color": "CB3E38",
+    "cards": [
+      {
+        "card_id": 111501,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1116,
+    "name_jp": "ジェンティルドンナ",
+    "name_en": null,
+    "birth_date": "2009-02-20",
+    "color": "C4352D",
+    "cards": [
+      {
+        "card_id": 111601,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1117,
+    "name_jp": "ウインバリアシオン",
+    "name_en": null,
+    "birth_date": "2008-04-10",
+    "color": "C10016",
+    "cards": [
+      {
+        "card_id": 111701,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1119,
+    "name_jp": "ドリームジャーニー",
+    "name_en": null,
+    "birth_date": "2004-02-24",
+    "color": "2E2E27",
+    "cards": [
+      {
+        "card_id": 111901,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1120,
+    "name_jp": "カルストンライトオ",
+    "name_en": null,
+    "birth_date": "1998-05-03",
+    "color": "131B4C",
+    "cards": [
+      {
+        "card_id": 112001,
+        "rarity": 3,
+        "running_style": 1
+      }
+    ]
+  },
+  {
+    "chara_id": 1121,
+    "name_jp": "デュランダル",
+    "name_en": null,
+    "birth_date": "1999-05-25",
+    "color": "F2B730",
+    "cards": [
+      {
+        "card_id": 112101,
+        "rarity": 3,
+        "running_style": 4
+      }
+    ]
+  },
+  {
+    "chara_id": 1124,
+    "name_jp": "バブルガムフェロー",
+    "name_en": null,
+    "birth_date": "1993-04-11",
+    "color": "FEE600",
+    "cards": [
+      {
+        "card_id": 112401,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1127,
+    "name_jp": "フェノーメノ",
+    "name_en": null,
+    "birth_date": "2009-04-20",
+    "color": "574B72",
+    "cards": [
+      {
+        "card_id": 112701,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  },
+  {
+    "chara_id": 1131,
+    "name_jp": "グランアレグリア",
+    "name_en": null,
+    "birth_date": "2016-01-24",
+    "color": "5F6266",
+    "cards": [
+      {
+        "card_id": 113101,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1132,
+    "name_jp": "ラヴズオンリーユー",
+    "name_en": null,
+    "birth_date": "2016-03-26",
+    "color": "373A37",
+    "cards": [
+      {
+        "card_id": 113201,
+        "rarity": 3,
+        "running_style": 3
+      }
+    ]
+  },
+  {
+    "chara_id": 1133,
+    "name_jp": "クロノジェネシス",
+    "name_en": null,
+    "birth_date": "2016-03-06",
+    "color": "464647",
+    "cards": [
+      {
+        "card_id": 113301,
+        "rarity": 3,
+        "running_style": 2
+      }
+    ]
+  }
+]
