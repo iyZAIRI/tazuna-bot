@@ -44,6 +44,18 @@ class CharacterCard:
     talent_power: int
     talent_guts: int
     talent_wisdom: int
+    # Base stats at default rarity
+    base_speed: Optional[int] = None
+    base_stamina: Optional[int] = None
+    base_power: Optional[int] = None
+    base_guts: Optional[int] = None
+    base_wisdom: Optional[int] = None
+    # Base stats at max rarity (5)
+    max_base_speed: Optional[int] = None
+    max_base_stamina: Optional[int] = None
+    max_base_power: Optional[int] = None
+    max_base_guts: Optional[int] = None
+    max_base_wisdom: Optional[int] = None
 
     @property
     def rarity_stars(self) -> str:

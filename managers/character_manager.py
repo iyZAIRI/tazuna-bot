@@ -62,7 +62,7 @@ class CharacterManager:
             return False
 
         try:
-            # Query for all characters with their cards
+            # Query for all characters with their cards and base stats
             query = """
             SELECT
                 c.id as card_id,
@@ -79,9 +79,21 @@ class CharacterManager:
                 cd.birth_day,
                 cd.image_color_main,
                 cd.image_color_sub,
-                cd.height
+                cd.height,
+                cr_default.speed as base_speed,
+                cr_default.stamina as base_stamina,
+                cr_default.pow as base_pow,
+                cr_default.guts as base_guts,
+                cr_default.wiz as base_wiz,
+                cr_max.speed as max_base_speed,
+                cr_max.stamina as max_base_stamina,
+                cr_max.pow as max_base_pow,
+                cr_max.guts as max_base_guts,
+                cr_max.wiz as max_base_wiz
             FROM card_data c
             JOIN chara_data cd ON c.chara_id = cd.id
+            LEFT JOIN card_rarity_data cr_default ON c.id = cr_default.card_id AND cr_default.rarity = c.default_rarity
+            LEFT JOIN card_rarity_data cr_max ON c.id = cr_max.card_id AND cr_max.rarity = 5
             ORDER BY c.chara_id, c.default_rarity DESC
             """
 
@@ -115,7 +127,7 @@ class CharacterManager:
                     # Index by name (lowercase for search)
                     self.name_index[name_en.lower()] = chara_id
 
-                # Add card
+                # Add card with base stats
                 card = CharacterCard(
                     card_id=row['card_id'],
                     chara_id=chara_id,
@@ -125,7 +137,17 @@ class CharacterManager:
                     talent_stamina=row['talent_stamina'],
                     talent_power=row['talent_pow'],
                     talent_guts=row['talent_guts'],
-                    talent_wisdom=row['talent_wiz']
+                    talent_wisdom=row['talent_wiz'],
+                    base_speed=row.get('base_speed'),
+                    base_stamina=row.get('base_stamina'),
+                    base_power=row.get('base_pow'),
+                    base_guts=row.get('base_guts'),
+                    base_wisdom=row.get('base_wiz'),
+                    max_base_speed=row.get('max_base_speed'),
+                    max_base_stamina=row.get('max_base_stamina'),
+                    max_base_power=row.get('max_base_pow'),
+                    max_base_guts=row.get('max_base_guts'),
+                    max_base_wisdom=row.get('max_base_wiz')
                 )
                 self.characters[chara_id].cards.append(card)
 

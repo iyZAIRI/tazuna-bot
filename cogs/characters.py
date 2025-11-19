@@ -48,12 +48,36 @@ class CardSelectorView(discord.ui.View):
             embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
 
             # Talents
-            embed.add_field(name="Speed", value=card.talent_speed, inline=True)
-            embed.add_field(name="Stamina", value=card.talent_stamina, inline=True)
-            embed.add_field(name="Power", value=card.talent_power, inline=True)
-            embed.add_field(name="Guts", value=card.talent_guts, inline=True)
-            embed.add_field(name="Wisdom", value=card.talent_wisdom, inline=True)
+            embed.add_field(name="💎 Talent: Speed", value=card.talent_speed, inline=True)
+            embed.add_field(name="💎 Talent: Stamina", value=card.talent_stamina, inline=True)
+            embed.add_field(name="💎 Talent: Power", value=card.talent_power, inline=True)
+            embed.add_field(name="💎 Talent: Guts", value=card.talent_guts, inline=True)
+            embed.add_field(name="💎 Talent: Wisdom", value=card.talent_wisdom, inline=True)
             embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
+
+            # Base stats at default rarity
+            if card.base_speed is not None:
+                base_stats_text = (
+                    f"Speed: {card.base_speed} | Stamina: {card.base_stamina} | Power: {card.base_power}\n"
+                    f"Guts: {card.base_guts} | Wisdom: {card.base_wisdom}"
+                )
+                embed.add_field(
+                    name=f"📊 Base Stats ({card.rarity_stars})",
+                    value=base_stats_text,
+                    inline=False
+                )
+
+            # Base stats at max rarity (5)
+            if card.max_base_speed is not None:
+                max_stats_text = (
+                    f"Speed: {card.max_base_speed} | Stamina: {card.max_base_stamina} | Power: {card.max_base_power}\n"
+                    f"Guts: {card.max_base_guts} | Wisdom: {card.max_base_wisdom}"
+                )
+                embed.add_field(
+                    name="📈 Base Stats (★★★★★)",
+                    value=max_stats_text,
+                    inline=False
+                )
 
             # Character info
             if self.character.birth_date:
