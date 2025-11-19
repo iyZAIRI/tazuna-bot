@@ -81,6 +81,9 @@ class Characters(commands.Cog):
                 inline=False
             )
 
+            # Add character image from highest rarity card
+            embed.set_image(url=highest_card.image_url)
+
         embed.set_footer(text=f"Uma Musume Pretty Derby • {char.highest_rarity}★ Max")
         await interaction.followup.send(embed=embed)
 
@@ -155,6 +158,9 @@ class Characters(commands.Cog):
                 value=f"{highest_card.running_style_emoji} {highest_card.running_style_name}",
                 inline=False
             )
+
+            # Add character image
+            embed.set_image(url=highest_card.image_url)
 
         embed.set_footer(text="Uma Musume Pretty Derby")
         await interaction.response.send_message(embed=embed)

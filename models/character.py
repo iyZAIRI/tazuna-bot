@@ -60,6 +60,11 @@ class CharacterCard:
         """Get running style emoji."""
         return RunningStyle.get_emoji(self.running_style)
 
+    @property
+    def image_url(self) -> str:
+        """Get character card image URL from GameTora CDN."""
+        return f"https://gametora.com/images/umamusume/characters/chara_stand_{self.chara_id}_{self.card_id}.png"
+
 @dataclass
 class Character:
     """Represents a Uma Musume character."""
