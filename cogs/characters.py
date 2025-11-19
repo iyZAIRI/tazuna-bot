@@ -11,6 +11,7 @@ from typing import Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from managers.character_manager import CharacterManager
+from managers.skill_manager import SkillManager
 from models.character import Character, CharacterCard
 from constants import (
     EMOJI_SPEED, EMOJI_STAMINA, EMOJI_POWER, EMOJI_GUTS, EMOJI_WIT,
@@ -20,9 +21,10 @@ from constants import (
 class CardSelectorView(discord.ui.View):
     """View for selecting character cards/alts."""
 
-    def __init__(self, character: Character):
+    def __init__(self, character: Character, skill_manager: SkillManager):
         super().__init__(timeout=180)  # 3 minute timeout
         self.character = character
+        self.skill_manager = skill_manager
 
         # Add a button for each card (limit to 25 buttons total - Discord limit)
         for idx, card in enumerate(character.cards[:25]):
@@ -47,7 +49,7 @@ class CardSelectorView(discord.ui.View):
         """Create a callback for a specific card button."""
         async def callback(interaction: discord.Interaction):
             # Create a new view with pagination for this card
-            detail_view = CardDetailView(self.character, card, self)
+            detail_view = CardDetailView(self.character, card, self, self.skill_manager)
             embed = detail_view.create_stats_embed()
             await interaction.response.edit_message(embed=embed, view=detail_view)
 
@@ -57,11 +59,12 @@ class CardSelectorView(discord.ui.View):
 class CardDetailView(discord.ui.View):
     """View for displaying card details with pagination between stats and skills."""
 
-    def __init__(self, character: Character, card: CharacterCard, parent_view: CardSelectorView):
+    def __init__(self, character: Character, card: CharacterCard, parent_view: CardSelectorView, skill_manager: SkillManager):
         super().__init__(timeout=180)
         self.character = character
         self.card = card
         self.parent_view = parent_view
+        self.skill_manager = skill_manager
         self.current_page = 0  # 0 = stats, 1 = skills
 
         # Add navigation buttons
@@ -76,6 +79,9 @@ class CardDetailView(discord.ui.View):
         self.back_button = discord.ui.Button(label="⬅ Back to Cards", style=discord.ButtonStyle.primary)
         self.back_button.callback = self.go_back
         self.add_item(self.back_button)
+
+        # Add skill select menu (will be shown only on skills page)
+        self.skill_select = None
 
     async def prev_page(self, interaction: discord.Interaction):
         """Go to previous page."""
@@ -104,12 +110,87 @@ class CardDetailView(discord.ui.View):
         self.prev_button.label = "◀ Stats" if self.current_page == 1 else "◀ Prev"
         self.next_button.label = "Skills ▶" if self.current_page == 0 else "Next ▶"
 
+        # Add/remove skill select menu based on page
+        if self.current_page == 1 and self.skill_select is None:
+            # On skills page, add select menu
+            self._add_skill_select()
+        elif self.current_page == 0 and self.skill_select is not None:
+            # Not on skills page, remove select menu
+            self.remove_item(self.skill_select)
+            self.skill_select = None
+
         if self.current_page == 0:
             embed = self.create_stats_embed()
         else:
             embed = self.create_skills_embed()
 
         await interaction.response.edit_message(embed=embed, view=self)
+
+    def _add_skill_select(self):
+        """Add skill select menu to the view."""
+        # Collect all skills from the card
+        all_skills = []
+
+        # Add unique skill first
+        if self.card.unique_skill:
+            all_skills.append(('💎', self.card.unique_skill))
+
+        # Add innate skills
+        for skill in [s for s in self.card.skills if s.need_rank == 0]:
+            all_skills.append(('✨', skill))
+
+        # Add awakening skills
+        for skill in [s for s in self.card.skills if s.need_rank > 0]:
+            all_skills.append(('⭐', skill))
+
+        # Only add select if there are skills
+        if not all_skills:
+            return
+
+        # Create select menu options (limit to 25 - Discord limit)
+        options = []
+        for emoji, skill in all_skills[:25]:
+            # Truncate skill name if too long (max 100 chars for select option label)
+            skill_name = skill.skill_name[:97] + "..." if len(skill.skill_name) > 100 else skill.skill_name
+            options.append(
+                discord.SelectOption(
+                    label=skill_name,
+                    value=str(skill.skill_id),
+                    emoji=emoji
+                )
+            )
+
+        # Create select menu
+        self.skill_select = discord.ui.Select(
+            placeholder="📖 View skill details...",
+            options=options,
+            row=4  # Put in last row
+        )
+        self.skill_select.callback = self.skill_selected
+        self.add_item(self.skill_select)
+
+    async def skill_selected(self, interaction: discord.Interaction):
+        """Handle skill selection from dropdown."""
+        skill_id = int(interaction.data['values'][0])
+
+        # Find the skill from card
+        selected_skill = None
+        if self.card.unique_skill and self.card.unique_skill.skill_id == skill_id:
+            selected_skill = self.card.unique_skill
+        else:
+            for skill in self.card.skills:
+                if skill.skill_id == skill_id:
+                    selected_skill = skill
+                    break
+
+        if not selected_skill:
+            await interaction.response.send_message("❌ Skill not found", ephemeral=True)
+            return
+
+        # Create skill detail view
+        skill_view = SkillDetailView(selected_skill, self, self.skill_manager)
+        embed = skill_view.create_embed()
+        await interaction.response.edit_message(embed=embed, view=skill_view)
 
     def create_stats_embed(self) -> discord.Embed:
         """Create the stats page embed."""
@@ -281,19 +362,82 @@ class CardDetailView(discord.ui.View):
 
         return embed
 
+
+class SkillDetailView(discord.ui.View):
+    """View for displaying skill details with navigation back to card skills."""
+
+    def __init__(self, skill, card_detail_view: 'CardDetailView', skill_manager: SkillManager):
+        super().__init__(timeout=180)
+        self.skill_obj = skill_manager.get_by_id(skill.skill_id)
+        self.card_detail_view = card_detail_view
+        self.skill_manager = skill_manager
+
+        # Back button to return to card skills
+        back_button = discord.ui.Button(label="⬅ Back to Skills", style=discord.ButtonStyle.primary)
+        back_button.callback = self.go_back
+        self.add_item(back_button)
+
+    async def go_back(self, interaction: discord.Interaction):
+        """Go back to card skills page."""
+        # Set card detail view to skills page
+        self.card_detail_view.current_page = 1
+        embed = self.card_detail_view.create_skills_embed()
+        await interaction.response.edit_message(embed=embed, view=self.card_detail_view)
+
+    def create_embed(self) -> discord.Embed:
+        """Create skill detail embed."""
+        skill = self.skill_obj
+        if not skill:
+            return discord.Embed(
+                title="❌ Skill Not Found",
+                description="Unable to load skill details",
+                color=config.ERROR_COLOR
+            )
+
+        embed = discord.Embed(
+            title=f"{skill.category_emoji} {skill.display_name}",
+            description=skill.description or "No description available",
+            color=config.EMBED_COLOR
+        )
+
+        embed.add_field(name="Rarity", value=skill.rarity_stars, inline=True)
+        embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
+        embed.add_field(name="Skill ID", value=skill.skill_id, inline=True)
+
+        if skill.condition:
+            condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
+            embed.add_field(
+                name="Activation Condition",
+                value=f"```{condition_text}```",
+                inline=False
+            )
+
+        if skill.is_unique:
+            embed.add_field(name="Type", value="✨ Unique Skill", inline=True)
+        elif skill.is_debuff:
+            embed.add_field(name="Type", value="❌ Debuff", inline=True)
+
+        embed.set_footer(text="Uma Musume Pretty Derby • Skill Details")
+        return embed
+
+
 class Characters(commands.Cog):
     """Character lookup and information commands."""
 
     def __init__(self, bot):
         self.bot = bot
         self.manager = CharacterManager()
+        self.skill_manager = SkillManager()
         # Load data on initialization
         if not self.manager.load():
             print("⚠️  Failed to load character data")
+        if not self.skill_manager.load():
+            print("⚠️  Failed to load skill data")
 
     def cog_unload(self):
         """Clean up when cog is unloaded."""
         self.manager.close()
+        self.skill_manager.close()
 
     @app_commands.command(name="character", description="Look up information about a character")
     @app_commands.describe(name="Character name (partial match supported)")
@@ -328,7 +472,7 @@ class Characters(commands.Cog):
         embed.set_footer(text="Uma Musume Pretty Derby • Click a button to view card details")
 
         # Create view with card selection buttons
-        view = CardSelectorView(char)
+        view = CardSelectorView(char, self.skill_manager)
 
         # Send with buttons
         await interaction.followup.send(embed=embed, view=view)
