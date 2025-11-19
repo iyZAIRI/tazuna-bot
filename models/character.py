@@ -71,7 +71,6 @@ class Character:
     chara_id: int
     name: str
     name_en: Optional[str] = None
-    name_jp: Optional[str] = None
     birth_year: Optional[int] = None
     birth_month: Optional[int] = None
     birth_day: Optional[int] = None
@@ -87,8 +86,8 @@ class Character:
 
     @property
     def display_name(self) -> str:
-        """Get display name (prefers English)."""
-        return self.name_en or self.name_jp or self.name or f"Character {self.chara_id}"
+        """Get display name (English only)."""
+        return self.name_en or self.name or f"Character {self.chara_id}"
 
     @property
     def birth_date(self) -> Optional[str]:

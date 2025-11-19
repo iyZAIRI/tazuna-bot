@@ -1,5 +1,6 @@
 """Character manager for loading and querying character data."""
 import sys
+import json
 from pathlib import Path
 from typing import List, Optional, Dict
 import logging
@@ -15,18 +16,36 @@ logger = logging.getLogger('UmaMusumeBot.CharacterManager')
 class CharacterManager:
     """Manages character data from the database."""
 
-    def __init__(self, db_path: str = "./data/master.mdb"):
+    def __init__(self, db_path: str = "./data/master.mdb", names_path: str = "./data/characters.json"):
         """
         Initialize the character manager.
 
         Args:
             db_path: Path to the master.mdb file
+            names_path: Path to the characters.json file with English names
         """
         self.db_path = db_path
+        self.names_path = names_path
         self.db = MasterDBReader(db_path)
         self.characters: Dict[int, Character] = {}
         self.name_index: Dict[str, int] = {}  # name -> chara_id
+        self.english_names: Dict[int, str] = {}  # chara_id -> English name
         self._loaded = False
+        self._load_english_names()
+
+    def _load_english_names(self):
+        """Load English character names from JSON file."""
+        try:
+            with open(self.names_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                for char_data in data:
+                    chara_id = char_data.get('chara_id')
+                    name_en = char_data.get('name_en')
+                    if chara_id and name_en:
+                        self.english_names[chara_id] = name_en
+                logger.info(f"Loaded {len(self.english_names)} English character names")
+        except Exception as e:
+            logger.warning(f"Could not load English names from {self.names_path}: {e}")
 
     def load(self) -> bool:
         """
@@ -60,11 +79,9 @@ class CharacterManager:
                 cd.birth_day,
                 cd.image_color_main,
                 cd.image_color_sub,
-                cd.height,
-                t.text as name
+                cd.height
             FROM card_data c
             JOIN chara_data cd ON c.chara_id = cd.id
-            LEFT JOIN text_data t ON t.category = 6 AND t.[index] = c.chara_id
             ORDER BY c.chara_id, c.default_rarity DESC
             """
 
@@ -74,13 +91,17 @@ class CharacterManager:
             for row in results:
                 chara_id = row['chara_id']
 
+                # Skip characters without English names
+                if chara_id not in self.english_names:
+                    continue
+
                 # Create character if doesn't exist
                 if chara_id not in self.characters:
+                    name_en = self.english_names[chara_id]
                     char = Character(
                         chara_id=chara_id,
-                        name=row['name'] or f"Character {chara_id}",
-                        name_en=row['name'],  # Will be EN if using EN database
-                        name_jp=row['name'],  # Will be JP if using JP database
+                        name=name_en,
+                        name_en=name_en,
                         birth_year=row['birth_year'],
                         birth_month=row['birth_month'],
                         birth_day=row['birth_day'],
@@ -92,8 +113,7 @@ class CharacterManager:
                     self.characters[chara_id] = char
 
                     # Index by name (lowercase for search)
-                    if row['name']:
-                        self.name_index[row['name'].lower()] = chara_id
+                    self.name_index[name_en.lower()] = chara_id
 
                 # Add card
                 card = CharacterCard(
