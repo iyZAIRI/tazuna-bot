@@ -82,9 +82,9 @@ class CardSelectorView(discord.ui.View):
             # Aptitudes - Distance
             if card.apt_distance_short is not None:
                 distance_apt = (
-                    f"Short: {card.aptitude_to_grade(card.apt_distance_short)} | "
+                    f"Sprint: {card.aptitude_to_grade(card.apt_distance_short)} | "
                     f"Mile: {card.aptitude_to_grade(card.apt_distance_mile)} | "
-                    f"Middle: {card.aptitude_to_grade(card.apt_distance_middle)} | "
+                    f"Medium: {card.aptitude_to_grade(card.apt_distance_middle)} | "
                     f"Long: {card.aptitude_to_grade(card.apt_distance_long)}"
                 )
                 embed.add_field(
