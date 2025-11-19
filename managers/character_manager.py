@@ -105,7 +105,8 @@ class CharacterManager:
             JOIN chara_data cd ON c.chara_id = cd.id
             LEFT JOIN card_rarity_data cr_default ON c.id = cr_default.card_id AND cr_default.rarity = c.default_rarity
             LEFT JOIN card_rarity_data cr_max ON c.id = cr_max.card_id AND cr_max.rarity = 5
-            LEFT JOIN text_data t ON t.category = 14 AND t.[index] = c.id
+            LEFT JOIN text_data t ON t.category = 5 AND t.[index] = c.id
+            WHERE c.default_rarity > 0
             ORDER BY c.chara_id, c.default_rarity DESC
             """
 
@@ -140,6 +141,10 @@ class CharacterManager:
                     self.name_index[name_en.lower()] = chara_id
 
                 # Add card with base stats and aptitudes
+                # Strip brackets from card title (category 5 has format [Title])
+                card_title_raw = row.get('card_title')
+                card_title = card_title_raw.strip('[]') if card_title_raw else None
+
                 card = CharacterCard(
                     card_id=row['card_id'],
                     chara_id=chara_id,
@@ -150,7 +155,7 @@ class CharacterManager:
                     talent_power=row['talent_pow'],
                     talent_guts=row['talent_guts'],
                     talent_wit=row['talent_wiz'],
-                    card_title=row.get('card_title'),
+                    card_title=card_title,
                     base_speed=row.get('base_speed'),
                     base_stamina=row.get('base_stamina'),
                     base_power=row.get('base_pow'),
