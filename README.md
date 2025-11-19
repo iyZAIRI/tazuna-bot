@@ -76,6 +76,12 @@ You should see output indicating the bot has logged in successfully!
 - `!gacha [1-10]` or `!roll [1-10]` - Simulate gacha rolls
   - Example: `!gacha 10` for a 10-pull
 
+### Database Commands (requires master.mdb)
+- `!dbstatus` - Check database connection status
+- `!dbtables [search]` - List all database tables
+- `!dbschema <table>` - Show table structure
+- `!dbquery <sql>` - Run SELECT query (owner only)
+
 ## 🔧 Getting a Discord Bot Token
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
@@ -106,11 +112,71 @@ tazuna-bot/
 ├── .env               # Environment variables (not in git)
 ├── .env.example       # Example environment file
 ├── .gitignore         # Git ignore rules
-└── cogs/              # Command modules
-    ├── __init__.py
-    ├── general.py     # General bot commands
-    └── umamusume.py   # Uma Musume specific commands
+├── cogs/              # Command modules
+│   ├── __init__.py
+│   ├── general.py     # General bot commands
+│   ├── umamusume.py   # Uma Musume specific commands
+│   └── database.py    # Database exploration commands
+├── utils/             # Utility scripts
+│   ├── __init__.py
+│   ├── download_masterdb.py  # Download master.mdb from GitHub
+│   ├── db_reader.py          # SQLite database reader
+│   └── extract_data.py       # Data extraction tool
+└── data/              # Game database and extracted data
+    ├── README.md      # Data directory documentation
+    └── master.mdb     # Game database (download separately)
 ```
+
+## 🗄️ Working with Game Data (master.mdb)
+
+The bot can use real game data from Uma Musume's master.mdb database file!
+
+### Download the Database
+
+```bash
+# Download master.mdb from GitHub
+python utils/download_masterdb.py
+```
+
+This downloads the database to `./data/master.mdb`.
+
+### Explore the Database
+
+```bash
+# See all available tables
+python utils/db_reader.py
+
+# Extract and explore game data
+python utils/extract_data.py
+```
+
+### Use Database in Discord
+
+Once downloaded, use these commands in Discord:
+- `!dbstatus` - Check if database is connected
+- `!dbtables` - List all tables
+- `!dbtables skill` - Search for tables containing "skill"
+- `!dbschema table_name` - See table structure
+
+### Extract Custom Data
+
+```python
+from utils.db_reader import MasterDBReader
+
+db = MasterDBReader()
+db.connect()
+
+# Get character data (example - table names may vary)
+characters = db.query("SELECT * FROM card_data LIMIT 10")
+print(characters)
+
+# Export to JSON
+db.export_table_to_json('skill_data', './data/skills.json')
+
+db.close()
+```
+
+See `data/README.md` for more details!
 
 ## 🛠️ Development
 
