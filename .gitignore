@@ -44,3 +44,6 @@ Thumbs.db
 *.db
 *.sqlite
 *.sqlite3
+
+# Data samples/exploration
+data/samples/
