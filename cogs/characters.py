@@ -11,6 +11,62 @@ from typing import Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from managers.character_manager import CharacterManager
+from models.character import Character, CharacterCard
+
+class CardSelectorView(discord.ui.View):
+    """View for selecting character cards/alts."""
+
+    def __init__(self, character: Character):
+        super().__init__(timeout=180)  # 3 minute timeout
+        self.character = character
+
+        # Add a button for each card (limit to 25 buttons total - Discord limit)
+        for idx, card in enumerate(character.cards[:25]):
+            # Create button label with card number (e.g., "1. ★★★ 🎯")
+            label = f"{idx + 1}. {card.rarity_stars} {card.running_style_emoji}"
+            button = discord.ui.Button(
+                label=label,
+                style=discord.ButtonStyle.primary,
+                custom_id=f"card_{card.card_id}",
+                row=idx // 5  # Group into rows of 5
+            )
+            button.callback = self.create_card_callback(card)
+            self.add_item(button)
+
+    def create_card_callback(self, card: CharacterCard):
+        """Create a callback for a specific card button."""
+        async def callback(interaction: discord.Interaction):
+            # Create embed for this specific card
+            embed = discord.Embed(
+                title=f"{card.running_style_emoji} {self.character.display_name}",
+                color=self.character.get_hex_color()
+            )
+
+            # Card details
+            embed.add_field(name="Rarity", value=card.rarity_stars, inline=True)
+            embed.add_field(name="Running Style", value=f"{card.running_style_emoji} {card.running_style_name}", inline=True)
+            embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
+
+            # Talents
+            embed.add_field(name="Speed", value=card.talent_speed, inline=True)
+            embed.add_field(name="Stamina", value=card.talent_stamina, inline=True)
+            embed.add_field(name="Power", value=card.talent_power, inline=True)
+            embed.add_field(name="Guts", value=card.talent_guts, inline=True)
+            embed.add_field(name="Wisdom", value=card.talent_wisdom, inline=True)
+            embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
+
+            # Character info
+            if self.character.birth_date:
+                embed.add_field(name="Birthday", value=self.character.birth_date, inline=True)
+
+            # Card image
+            embed.set_image(url=card.image_url)
+            embed.set_footer(text=f"Uma Musume Pretty Derby • {self.character.display_name}")
+
+            # Update the message
+            await interaction.response.edit_message(embed=embed, view=self)
+
+        return callback
 
 class Characters(commands.Cog):
     """Character lookup and information commands."""
@@ -39,53 +95,30 @@ class Characters(commands.Cog):
             await interaction.followup.send(f"❌ Character '{name}' not found. Use `/characters` to see all available characters.")
             return
 
-        # Create embed
+        if not char.cards:
+            await interaction.followup.send(f"❌ {char.display_name} has no cards available.")
+            return
+
+        # Create initial embed showing character and prompting card selection
         embed = discord.Embed(
             title=f"🏇 {char.display_name}",
+            description=f"Select a card to view details ({len(char.cards)} available)",
             color=char.get_hex_color()
         )
 
-        # Character info
+        # Show character info
         if char.birth_date:
             embed.add_field(name="Birthday", value=char.birth_date, inline=True)
 
-        embed.add_field(name="Character ID", value=char.chara_id, inline=True)
-        embed.add_field(name="Cards", value=char.card_count, inline=True)
+        embed.add_field(name="Total Cards", value=len(char.cards), inline=True)
 
-        # Card information
-        if char.cards:
-            card_info = []
-            for card in char.cards[:5]:  # Show max 5 cards
-                card_info.append(
-                    f"{card.rarity_stars} - {card.running_style_emoji} {card.running_style_name}"
-                )
+        embed.set_footer(text="Uma Musume Pretty Derby • Click a button to view card details")
 
-            embed.add_field(
-                name=f"Available Cards ({len(char.cards)})",
-                value="\n".join(card_info) or "None",
-                inline=False
-            )
+        # Create view with card selection buttons
+        view = CardSelectorView(char)
 
-            # Talents from highest rarity card
-            highest_card = max(char.cards, key=lambda c: c.rarity)
-            talent_text = (
-                f"Speed: {highest_card.talent_speed} | "
-                f"Stamina: {highest_card.talent_stamina} | "
-                f"Power: {highest_card.talent_power}\n"
-                f"Guts: {highest_card.talent_guts} | "
-                f"Wisdom: {highest_card.talent_wisdom}"
-            )
-            embed.add_field(
-                name="Base Talents (Highest Rarity Card)",
-                value=talent_text,
-                inline=False
-            )
-
-            # Add character image from highest rarity card
-            embed.set_image(url=highest_card.image_url)
-
-        embed.set_footer(text=f"Uma Musume Pretty Derby • {char.highest_rarity}★ Max")
-        await interaction.followup.send(embed=embed)
+        # Send with buttons
+        await interaction.followup.send(embed=embed, view=view)
 
     @app_commands.command(name="characters", description="List all available characters")
     @app_commands.describe(page="Page number (default: 1)")
