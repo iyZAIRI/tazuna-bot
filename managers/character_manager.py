@@ -1,6 +1,5 @@
 """Character manager for loading and querying character data."""
 import sys
-import json
 from pathlib import Path
 from typing import List, Optional, Dict
 import logging
@@ -16,36 +15,18 @@ logger = logging.getLogger('UmaMusumeBot.CharacterManager')
 class CharacterManager:
     """Manages character data from the database."""
 
-    def __init__(self, db_path: str = "./data/master.mdb", names_path: str = "./data/characters.json"):
+    def __init__(self, db_path: str = "./data/master.mdb"):
         """
         Initialize the character manager.
 
         Args:
-            db_path: Path to the master.mdb file
-            names_path: Path to the characters.json file with English names
+            db_path: Path to the master.mdb file (English version)
         """
         self.db_path = db_path
-        self.names_path = names_path
         self.db = MasterDBReader(db_path)
         self.characters: Dict[int, Character] = {}
         self.name_index: Dict[str, int] = {}  # name -> chara_id
-        self.english_names: Dict[int, str] = {}  # chara_id -> English name
         self._loaded = False
-        self._load_english_names()
-
-    def _load_english_names(self):
-        """Load English character names from JSON file."""
-        try:
-            with open(self.names_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                for char_data in data:
-                    chara_id = char_data.get('chara_id')
-                    name_en = char_data.get('name_en')
-                    if chara_id and name_en:
-                        self.english_names[chara_id] = name_en
-                logger.info(f"Loaded {len(self.english_names)} English character names")
-        except Exception as e:
-            logger.warning(f"Could not load English names from {self.names_path}: {e}")
 
     def load(self) -> bool:
         """
@@ -100,12 +81,14 @@ class CharacterManager:
                 cr_default.proper_running_style_oikomi as apt_style_end_closer,
                 cr_default.proper_ground_turf as apt_ground_turf,
                 cr_default.proper_ground_dirt as apt_ground_dirt,
-                t.text as card_title
+                t_card.text as card_title,
+                t_name.text as chara_name
             FROM card_data c
             JOIN chara_data cd ON c.chara_id = cd.id
             LEFT JOIN card_rarity_data cr_default ON c.id = cr_default.card_id AND cr_default.rarity = c.default_rarity
             LEFT JOIN card_rarity_data cr_max ON c.id = cr_max.card_id AND cr_max.rarity = 5
-            LEFT JOIN text_data t ON t.category = 5 AND t.[index] = c.id
+            LEFT JOIN text_data t_card ON t_card.category = 5 AND t_card.[index] = c.id
+            LEFT JOIN text_data t_name ON t_name.category = 6 AND t_name.[index] = c.chara_id
             WHERE c.default_rarity > 0
             ORDER BY c.chara_id, c.default_rarity DESC
             """
@@ -116,17 +99,18 @@ class CharacterManager:
             for row in results:
                 chara_id = row['chara_id']
 
-                # Skip characters without English names
-                if chara_id not in self.english_names:
-                    continue
-
                 # Create character if doesn't exist
                 if chara_id not in self.characters:
-                    name_en = self.english_names[chara_id]
+                    chara_name = row.get('chara_name')
+                    if not chara_name:
+                        # Skip characters without names
+                        logger.warning(f"Character {chara_id} has no name, skipping")
+                        continue
+
                     char = Character(
                         chara_id=chara_id,
-                        name=name_en,
-                        name_en=name_en,
+                        name=chara_name,
+                        name_en=chara_name,
                         birth_year=row['birth_year'],
                         birth_month=row['birth_month'],
                         birth_day=row['birth_day'],
@@ -138,7 +122,7 @@ class CharacterManager:
                     self.characters[chara_id] = char
 
                     # Index by name (lowercase for search)
-                    self.name_index[name_en.lower()] = chara_id
+                    self.name_index[chara_name.lower()] = chara_id
 
                 # Add card with base stats and aptitudes
                 # Strip brackets from card title (category 5 has format [Title])
