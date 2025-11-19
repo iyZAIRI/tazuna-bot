@@ -35,16 +35,16 @@ class RaceManager:
             query = """
             SELECT
                 r.id,
-                r.race_number,
                 r.grade,
-                r.distance,
-                r.ground,
-                r.track_id,
+                rcs.distance,
+                rcs.ground,
+                rcs.race_track_id as track_id,
                 t.text as name
             FROM race r
+            LEFT JOIN race_course_set rcs ON r.course_set = rcs.id
             LEFT JOIN text_data t ON t.category = 30 AND t.[index] = r.id
-            WHERE r.grade > 0
-            ORDER BY r.grade DESC, r.distance
+            WHERE r.grade > 0 AND rcs.distance IS NOT NULL
+            ORDER BY r.grade DESC, rcs.distance
             LIMIT 500
             """
 
