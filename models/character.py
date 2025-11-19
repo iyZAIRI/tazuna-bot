@@ -2,6 +2,16 @@
 from dataclasses import dataclass
 from typing import List, Optional
 from enum import IntEnum
+import sys
+from pathlib import Path
+
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from constants import (
+    EMOJI_FRONT_RUNNER, EMOJI_PACE_CHASER, EMOJI_LATE, EMOJI_END_CLOSER,
+    RANK_EMOJIS
+)
 
 class RunningStyle(IntEnum):
     """Running style enum."""
@@ -25,10 +35,10 @@ class RunningStyle(IntEnum):
     def get_emoji(cls, value: int) -> str:
         """Get emoji for style."""
         emojis = {
-            1: "🏃",  # Front Runner
-            2: "👑",  # Pace Chaser
-            3: "🎯",  # Late
-            4: "⚡"   # End Closer
+            1: EMOJI_FRONT_RUNNER,
+            2: EMOJI_PACE_CHASER,
+            3: EMOJI_LATE,
+            4: EMOJI_END_CLOSER
         }
         return emojis.get(value, "❓")
 
@@ -71,11 +81,12 @@ class CharacterCard:
 
     @staticmethod
     def aptitude_to_grade(value: Optional[int]) -> str:
-        """Convert aptitude value (1-7) to letter grade (G-A)."""
+        """Convert aptitude value (1-7) to rank emoji (G-A)."""
         if value is None:
-            return "?"
+            return RANK_EMOJIS["?"]
         grades = {1: "G", 2: "F", 3: "E", 4: "D", 5: "C", 6: "B", 7: "A"}
-        return grades.get(value, "?")
+        grade_letter = grades.get(value, "?")
+        return RANK_EMOJIS.get(grade_letter, RANK_EMOJIS["?"])
 
     @property
     def rarity_stars(self) -> str:

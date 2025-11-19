@@ -12,6 +12,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from managers.character_manager import CharacterManager
 from models.character import Character, CharacterCard
+from constants import (
+    EMOJI_SPEED, EMOJI_STAMINA, EMOJI_POWER, EMOJI_GUTS, EMOJI_WIT,
+    EMOJI_FRONT_RUNNER, EMOJI_PACE_CHASER, EMOJI_LATE, EMOJI_END_CLOSER
+)
 
 class CardSelectorView(discord.ui.View):
     """View for selecting character cards/alts."""
@@ -59,11 +63,11 @@ class CardSelectorView(discord.ui.View):
 
             # Bonuses (compact format)
             bonuses_text = (
-                f"<:speed:1440769160182366259> {card.talent_speed}% | "
-                f"<:stamina:1440769173880832081> {card.talent_stamina}% | "
-                f"<:power:1440769145707827382> {card.talent_power}% | "
-                f"<:guts:1440769099985719528> {card.talent_guts}% | "
-                f"<:wit:1440769186967326872> {card.talent_wit}%"
+                f"{EMOJI_SPEED} {card.talent_speed}% | "
+                f"{EMOJI_STAMINA} {card.talent_stamina}% | "
+                f"{EMOJI_POWER} {card.talent_power}% | "
+                f"{EMOJI_GUTS} {card.talent_guts}% | "
+                f"{EMOJI_WIT} {card.talent_wit}%"
             )
             embed.add_field(
                 name="💎 Bonuses",
@@ -74,11 +78,11 @@ class CardSelectorView(discord.ui.View):
             # Base stats at default rarity
             if card.base_speed is not None:
                 base_stats_text = (
-                    f"<:speed:1440769160182366259> {card.base_speed}  |  "
-                    f"<:stamina:1440769173880832081> {card.base_stamina}  |  "
-                    f"<:power:1440769145707827382> {card.base_power}  |  "
-                    f"<:guts:1440769099985719528> {card.base_guts}  |  "
-                    f"<:wit:1440769186967326872> {card.base_wit}"
+                    f"{EMOJI_SPEED} {card.base_speed}  |  "
+                    f"{EMOJI_STAMINA} {card.base_stamina}  |  "
+                    f"{EMOJI_POWER} {card.base_power}  |  "
+                    f"{EMOJI_GUTS} {card.base_guts}  |  "
+                    f"{EMOJI_WIT} {card.base_wit}"
                 )
                 embed.add_field(
                     name=f"📊 Base Stats ({card.rarity_stars})",
@@ -89,11 +93,11 @@ class CardSelectorView(discord.ui.View):
             # Base stats at max rarity (5)
             if card.max_base_speed is not None:
                 max_stats_text = (
-                    f"<:speed:1440769160182366259> {card.max_base_speed}  |  "
-                    f"<:stamina:1440769173880832081> {card.max_base_stamina}  |  "
-                    f"<:power:1440769145707827382> {card.max_base_power}  |  "
-                    f"<:guts:1440769099985719528> {card.max_base_guts}  |  "
-                    f"<:wit:1440769186967326872> {card.max_base_wit}"
+                    f"{EMOJI_SPEED} {card.max_base_speed}  |  "
+                    f"{EMOJI_STAMINA} {card.max_base_stamina}  |  "
+                    f"{EMOJI_POWER} {card.max_base_power}  |  "
+                    f"{EMOJI_GUTS} {card.max_base_guts}  |  "
+                    f"{EMOJI_WIT} {card.max_base_wit}"
                 )
                 embed.add_field(
                     name="📈 Base Stats (★★★★★)",
@@ -118,10 +122,10 @@ class CardSelectorView(discord.ui.View):
             # Aptitudes - Running Style
             if card.apt_style_front_runner is not None:
                 style_apt = (
-                    f"🏃 Front Runner: {card.aptitude_to_grade(card.apt_style_front_runner)} | "
-                    f"👑 Pace Chaser: {card.aptitude_to_grade(card.apt_style_pace_chaser)}\n"
-                    f"🎯 Late: {card.aptitude_to_grade(card.apt_style_late)} | "
-                    f"⚡ End Closer: {card.aptitude_to_grade(card.apt_style_end_closer)}"
+                    f"{EMOJI_FRONT_RUNNER} Front Runner: {card.aptitude_to_grade(card.apt_style_front_runner)} | "
+                    f"{EMOJI_PACE_CHASER} Pace Chaser: {card.aptitude_to_grade(card.apt_style_pace_chaser)}\n"
+                    f"{EMOJI_LATE} Late: {card.aptitude_to_grade(card.apt_style_late)} | "
+                    f"{EMOJI_END_CLOSER} End Closer: {card.aptitude_to_grade(card.apt_style_end_closer)}"
                 )
                 embed.add_field(
                     name="🎽 Running Style Aptitude",

@@ -1,0 +1,35 @@
+"""Constants for the Uma Musume Discord bot."""
+
+# Stat Emojis
+EMOJI_SPEED = "<:speed:1440769160182366259>"
+EMOJI_STAMINA = "<:stamina:1440769173880832081>"
+EMOJI_POWER = "<:power:1440769145707827382>"
+EMOJI_GUTS = "<:guts:1440769099985719528>"
+EMOJI_WIT = "<:wit:1440769186967326872>"
+
+# Aptitude/Rank Emojis (A-G scale)
+EMOJI_RANK_A = "<:Rank_A:1440798305717063842>"
+EMOJI_RANK_B = "<:Rank_B:1440798321215148135>"
+EMOJI_RANK_C = "<:Rank_C:1440798337719865444>"
+EMOJI_RANK_D = "<:Rank_D:1440798351896608970>"
+EMOJI_RANK_E = "<:Rank_E:1440798367805341796>"
+EMOJI_RANK_F = "<:Rank_F:1440798384721104906>"
+EMOJI_RANK_G = "<:Rank_G:1440798401267499221>"
+
+# Running Style Emojis
+EMOJI_FRONT_RUNNER = "🏃"
+EMOJI_PACE_CHASER = "👑"
+EMOJI_LATE = "🎯"
+EMOJI_END_CLOSER = "⚡"
+
+# Rank mapping for aptitude grades
+RANK_EMOJIS = {
+    "A": EMOJI_RANK_A,
+    "B": EMOJI_RANK_B,
+    "C": EMOJI_RANK_C,
+    "D": EMOJI_RANK_D,
+    "E": EMOJI_RANK_E,
+    "F": EMOJI_RANK_F,
+    "G": EMOJI_RANK_G,
+    "?": "❓"
+}
