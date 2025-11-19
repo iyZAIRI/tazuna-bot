@@ -1,9 +1,11 @@
-"""Character commands using the database."""
+"""Character commands using slash commands and the database."""
 import discord
+from discord import app_commands
 from discord.ext import commands
 import config
 import sys
 from pathlib import Path
+from typing import Optional
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -24,26 +26,18 @@ class Characters(commands.Cog):
         """Clean up when cog is unloaded."""
         self.manager.close()
 
-    @commands.command(name='character', aliases=['char', 'uma'])
-    async def character(self, ctx, *, name: str = None):
-        """Look up information about a Uma Musume character.
+    @app_commands.command(name="character", description="Look up information about a character")
+    @app_commands.describe(name="Character name (partial match supported)")
+    async def character(self, interaction: discord.Interaction, name: str):
+        """Look up information about a Uma Musume character."""
+        await interaction.response.defer()
 
-        Usage: !character <name> or !uma <name>
-        Example: !character Special Week
-        """
-        if not name:
-            # Show random character if no name provided
-            char = self.manager.get_random()
-            if not char:
-                await ctx.send("❌ No characters available")
-                return
-        else:
-            # Search for character by name
-            char = self.manager.get_by_name(name)
+        # Search for character by name
+        char = self.manager.get_by_name(name)
 
-            if not char:
-                await ctx.send(f"❌ Character '{name}' not found. Try `{config.COMMAND_PREFIX}list` to see available characters.")
-                return
+        if not char:
+            await interaction.followup.send(f"❌ Character '{name}' not found. Use `/characters` to see all available characters.")
+            return
 
         # Create embed
         embed = discord.Embed(
@@ -88,19 +82,18 @@ class Characters(commands.Cog):
             )
 
         embed.set_footer(text=f"Uma Musume Pretty Derby • {char.highest_rarity}★ Max")
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-    @commands.command(name='list', aliases=['characters', 'charlist'])
-    async def list_characters(self, ctx, page: int = 1):
-        """List all available Uma Musume characters.
+    @app_commands.command(name="characters", description="List all available characters")
+    @app_commands.describe(page="Page number (default: 1)")
+    async def characters(self, interaction: discord.Interaction, page: Optional[int] = 1):
+        """List all available Uma Musume characters."""
+        await interaction.response.defer()
 
-        Usage: !list [page]
-        Example: !list 2
-        """
         all_chars = self.manager.get_all()
 
         if not all_chars:
-            await ctx.send("❌ No characters available")
+            await interaction.followup.send("❌ No characters available")
             return
 
         # Sort by ID
@@ -111,7 +104,7 @@ class Characters(commands.Cog):
         total_pages = (len(all_chars) + per_page - 1) // per_page
 
         if page < 1 or page > total_pages:
-            await ctx.send(f"❌ Invalid page. Available pages: 1-{total_pages}")
+            await interaction.followup.send(f"❌ Invalid page. Available pages: 1-{total_pages}")
             return
 
         start_idx = (page - 1) * per_page
@@ -131,16 +124,16 @@ class Characters(commands.Cog):
                 inline=True
             )
 
-        embed.set_footer(text=f"Use {config.COMMAND_PREFIX}character <name> for details • Page {page}/{total_pages}")
-        await ctx.send(embed=embed)
+        embed.set_footer(text=f"Use /character <name> for details • Page {page}/{total_pages}")
+        await interaction.followup.send(embed=embed)
 
-    @commands.command(name='random', aliases=['randomuma', 'randomchar'])
-    async def random_character(self, ctx):
+    @app_commands.command(name="randomchar", description="Get a random character")
+    async def random_character(self, interaction: discord.Interaction):
         """Get a random Uma Musume character."""
         char = self.manager.get_random()
 
         if not char:
-            await ctx.send("❌ No characters available")
+            await interaction.response.send_message("❌ No characters available")
             return
 
         embed = discord.Embed(
@@ -164,46 +157,17 @@ class Characters(commands.Cog):
             )
 
         embed.set_footer(text="Uma Musume Pretty Derby")
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
-    @commands.command(name='search', aliases=['find', 'charsearch'])
-    async def search(self, ctx, *, query: str):
-        """Search for characters by name.
-
-        Usage: !search <query>
-        Example: !search week
-        """
-        results = self.manager.search(query)
-
-        if not results:
-            await ctx.send(f"❌ No characters found matching '{query}'")
-            return
-
-        embed = discord.Embed(
-            title=f"🔍 Search Results for '{query}'",
-            description=f"Found {len(results)} character(s)",
-            color=config.EMBED_COLOR
-        )
-
-        for char in results[:15]:  # Limit to 15 results
-            embed.add_field(
-                name=f"{char.highest_rarity}★ {char.display_name}",
-                value=f"ID: {char.chara_id}",
-                inline=True
-            )
-
-        if len(results) > 15:
-            embed.set_footer(text=f"Showing 15 of {len(results)} results")
-
-        await ctx.send(embed=embed)
-
-    @commands.command(name='ssr', aliases=['ssrchars'])
-    async def ssr_characters(self, ctx):
+    @app_commands.command(name="ssrchars", description="List all characters with SSR cards")
+    async def ssr_characters(self, interaction: discord.Interaction):
         """List all characters with SSR cards."""
+        await interaction.response.defer()
+
         ssr_chars = self.manager.get_by_rarity(3)
 
         if not ssr_chars:
-            await ctx.send("❌ No SSR characters found")
+            await interaction.followup.send("❌ No SSR characters found")
             return
 
         ssr_chars.sort(key=lambda c: c.chara_id)
@@ -235,7 +199,7 @@ class Characters(commands.Cog):
         if len(ssr_chars) > 30:
             embed.set_footer(text=f"Showing 30 of {len(ssr_chars)} SSR characters")
 
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
 async def setup(bot):
     """Setup function for cog."""
