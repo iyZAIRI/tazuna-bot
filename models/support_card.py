@@ -104,3 +104,8 @@ class SupportCard:
     def is_r(self) -> bool:
         """Check if R rarity."""
         return self.rarity == 1
+
+    @property
+    def image_url(self) -> str:
+        """Get support card image URL from GameTora CDN."""
+        return f"https://gametora.com/images/umamusume/supports/tex_support_card_{self.card_id}.png"
