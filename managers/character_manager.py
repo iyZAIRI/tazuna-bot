@@ -137,17 +137,17 @@ class CharacterManager:
                     talent_stamina=row['talent_stamina'],
                     talent_power=row['talent_pow'],
                     talent_guts=row['talent_guts'],
-                    talent_wisdom=row['talent_wiz'],
+                    talent_wit=row['talent_wiz'],
                     base_speed=row.get('base_speed'),
                     base_stamina=row.get('base_stamina'),
                     base_power=row.get('base_pow'),
                     base_guts=row.get('base_guts'),
-                    base_wisdom=row.get('base_wiz'),
+                    base_wit=row.get('base_wiz'),
                     max_base_speed=row.get('max_base_speed'),
                     max_base_stamina=row.get('max_base_stamina'),
                     max_base_power=row.get('max_base_pow'),
                     max_base_guts=row.get('max_base_guts'),
-                    max_base_wisdom=row.get('max_base_wiz')
+                    max_base_wit=row.get('max_base_wiz')
                 )
                 self.characters[chara_id].cards.append(card)
 

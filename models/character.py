@@ -14,10 +14,10 @@ class RunningStyle(IntEnum):
     def get_name(cls, value: int) -> str:
         """Get human-readable name."""
         names = {
-            1: "Runner",
-            2: "Leader",
-            3: "Betweener",
-            4: "Chaser"
+            1: "Front Runner",
+            2: "Pace Chaser",
+            3: "Late",
+            4: "End Closer"
         }
         return names.get(value, "Unknown")
 
@@ -25,10 +25,10 @@ class RunningStyle(IntEnum):
     def get_emoji(cls, value: int) -> str:
         """Get emoji for style."""
         emojis = {
-            1: "🏃",  # Runner
-            2: "👑",  # Leader
-            3: "🎯",  # Betweener
-            4: "⚡"   # Chaser
+            1: "🏃",  # Front Runner
+            2: "👑",  # Pace Chaser
+            3: "🎯",  # Late
+            4: "⚡"   # End Closer
         }
         return emojis.get(value, "❓")
 
@@ -43,19 +43,19 @@ class CharacterCard:
     talent_stamina: int
     talent_power: int
     talent_guts: int
-    talent_wisdom: int
+    talent_wit: int
     # Base stats at default rarity
     base_speed: Optional[int] = None
     base_stamina: Optional[int] = None
     base_power: Optional[int] = None
     base_guts: Optional[int] = None
-    base_wisdom: Optional[int] = None
+    base_wit: Optional[int] = None
     # Base stats at max rarity (5)
     max_base_speed: Optional[int] = None
     max_base_stamina: Optional[int] = None
     max_base_power: Optional[int] = None
     max_base_guts: Optional[int] = None
-    max_base_wisdom: Optional[int] = None
+    max_base_wit: Optional[int] = None
 
     @property
     def rarity_stars(self) -> str:
