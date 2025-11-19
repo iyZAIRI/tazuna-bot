@@ -46,117 +46,215 @@ class CardSelectorView(discord.ui.View):
     def create_card_callback(self, card: CharacterCard):
         """Create a callback for a specific card button."""
         async def callback(interaction: discord.Interaction):
-            # Create embed for this specific card
-            embed = discord.Embed(
-                title=f"{card.running_style_emoji} {self.character.display_name}",
-                color=self.character.get_hex_color()
-            )
+            # Create a new view with pagination for this card
+            detail_view = CardDetailView(self.character, card, self)
+            embed = detail_view.create_stats_embed()
+            await interaction.response.edit_message(embed=embed, view=detail_view)
 
-            # Card details
-            embed.add_field(name="Rarity", value=card.rarity_stars, inline=True)
-            embed.add_field(name="Running Style", value=f"{card.running_style_emoji} {card.running_style_name}", inline=True)
-            embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
+        return callback
 
-            # Card title
-            if card.card_title:
-                embed.add_field(name="Card Title", value=card.card_title, inline=False)
 
-            # Bonuses (compact format)
-            bonuses_text = (
-                f"{EMOJI_SPEED} {card.talent_speed}% | "
-                f"{EMOJI_STAMINA} {card.talent_stamina}% | "
-                f"{EMOJI_POWER} {card.talent_power}% | "
-                f"{EMOJI_GUTS} {card.talent_guts}% | "
-                f"{EMOJI_WIT} {card.talent_wit}%"
+class CardDetailView(discord.ui.View):
+    """View for displaying card details with pagination between stats and skills."""
+
+    def __init__(self, character: Character, card: CharacterCard, parent_view: CardSelectorView):
+        super().__init__(timeout=180)
+        self.character = character
+        self.card = card
+        self.parent_view = parent_view
+        self.current_page = 0  # 0 = stats, 1 = skills
+
+        # Add navigation buttons
+        self.prev_button = discord.ui.Button(label="◀ Prev", style=discord.ButtonStyle.secondary, disabled=True)
+        self.prev_button.callback = self.prev_page
+        self.add_item(self.prev_button)
+
+        self.next_button = discord.ui.Button(label="Skills ▶", style=discord.ButtonStyle.secondary)
+        self.next_button.callback = self.next_page
+        self.add_item(self.next_button)
+
+        self.back_button = discord.ui.Button(label="⬅ Back to Cards", style=discord.ButtonStyle.primary)
+        self.back_button.callback = self.go_back
+        self.add_item(self.back_button)
+
+    async def prev_page(self, interaction: discord.Interaction):
+        """Go to previous page."""
+        self.current_page = 0
+        await self.update_view(interaction)
+
+    async def next_page(self, interaction: discord.Interaction):
+        """Go to next page."""
+        self.current_page = 1
+        await self.update_view(interaction)
+
+    async def go_back(self, interaction: discord.Interaction):
+        """Go back to card selection."""
+        embed = discord.Embed(
+            title=f"🏇 {self.character.display_name}",
+            description=f"Select a card to view details ({len(self.character.cards)} available)",
+            color=self.character.get_hex_color()
+        )
+        await interaction.response.edit_message(embed=embed, view=self.parent_view)
+
+    async def update_view(self, interaction: discord.Interaction):
+        """Update the embed based on current page."""
+        # Update button states
+        self.prev_button.disabled = (self.current_page == 0)
+        self.next_button.disabled = (self.current_page == 1)
+        self.prev_button.label = "◀ Stats" if self.current_page == 1 else "◀ Prev"
+        self.next_button.label = "Skills ▶" if self.current_page == 0 else "Next ▶"
+
+        if self.current_page == 0:
+            embed = self.create_stats_embed()
+        else:
+            embed = self.create_skills_embed()
+
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    def create_stats_embed(self) -> discord.Embed:
+        """Create the stats page embed."""
+        card = self.card
+        embed = discord.Embed(
+            title=f"{card.running_style_emoji} {self.character.display_name}",
+            description=f"📄 Page 1/2: Stats & Aptitudes",
+            color=self.character.get_hex_color()
+        )
+
+        # Card details
+        embed.add_field(name="Rarity", value=card.rarity_stars, inline=True)
+        embed.add_field(name="Running Style", value=f"{card.running_style_emoji} {card.running_style_name}", inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
+
+        # Card title
+        if card.card_title:
+            embed.add_field(name="Card Title", value=card.card_title, inline=False)
+
+        # Bonuses (compact format)
+        bonuses_text = (
+            f"{EMOJI_SPEED} {card.talent_speed}% | "
+            f"{EMOJI_STAMINA} {card.talent_stamina}% | "
+            f"{EMOJI_POWER} {card.talent_power}% | "
+            f"{EMOJI_GUTS} {card.talent_guts}% | "
+            f"{EMOJI_WIT} {card.talent_wit}%"
+        )
+        embed.add_field(
+            name="💎 Bonuses",
+            value=bonuses_text,
+            inline=False
+        )
+
+        # Base stats at default rarity
+        if card.base_speed is not None:
+            base_stats_text = (
+                f"{EMOJI_SPEED} {card.base_speed}  |  "
+                f"{EMOJI_STAMINA} {card.base_stamina}  |  "
+                f"{EMOJI_POWER} {card.base_power}  |  "
+                f"{EMOJI_GUTS} {card.base_guts}  |  "
+                f"{EMOJI_WIT} {card.base_wit}"
             )
             embed.add_field(
-                name="💎 Bonuses",
-                value=bonuses_text,
+                name=f"📊 Base Stats ({card.rarity_stars})",
+                value=base_stats_text,
                 inline=False
             )
 
-            # Base stats at default rarity
-            if card.base_speed is not None:
-                base_stats_text = (
-                    f"{EMOJI_SPEED} {card.base_speed}  |  "
-                    f"{EMOJI_STAMINA} {card.base_stamina}  |  "
-                    f"{EMOJI_POWER} {card.base_power}  |  "
-                    f"{EMOJI_GUTS} {card.base_guts}  |  "
-                    f"{EMOJI_WIT} {card.base_wit}"
-                )
-                embed.add_field(
-                    name=f"📊 Base Stats ({card.rarity_stars})",
-                    value=base_stats_text,
-                    inline=False
-                )
+        # Base stats at max rarity (5)
+        if card.max_base_speed is not None:
+            max_stats_text = (
+                f"{EMOJI_SPEED} {card.max_base_speed}  |  "
+                f"{EMOJI_STAMINA} {card.max_base_stamina}  |  "
+                f"{EMOJI_POWER} {card.max_base_power}  |  "
+                f"{EMOJI_GUTS} {card.max_base_guts}  |  "
+                f"{EMOJI_WIT} {card.max_base_wit}"
+            )
+            embed.add_field(
+                name="📈 Base Stats (★★★★★)",
+                value=max_stats_text,
+                inline=False
+            )
 
-            # Base stats at max rarity (5)
-            if card.max_base_speed is not None:
-                max_stats_text = (
-                    f"{EMOJI_SPEED} {card.max_base_speed}  |  "
-                    f"{EMOJI_STAMINA} {card.max_base_stamina}  |  "
-                    f"{EMOJI_POWER} {card.max_base_power}  |  "
-                    f"{EMOJI_GUTS} {card.max_base_guts}  |  "
-                    f"{EMOJI_WIT} {card.max_base_wit}"
-                )
-                embed.add_field(
-                    name="📈 Base Stats (★★★★★)",
-                    value=max_stats_text,
-                    inline=False
-                )
+        # Aptitudes - Distance
+        if card.apt_distance_short is not None:
+            distance_apt = (
+                f"Sprint: {card.aptitude_to_grade(card.apt_distance_short)} | "
+                f"Mile: {card.aptitude_to_grade(card.apt_distance_mile)} | "
+                f"Medium: {card.aptitude_to_grade(card.apt_distance_middle)} | "
+                f"Long: {card.aptitude_to_grade(card.apt_distance_long)}"
+            )
+            embed.add_field(
+                name="🏁 Distance Aptitude",
+                value=distance_apt,
+                inline=False
+            )
 
-            # Aptitudes - Distance
-            if card.apt_distance_short is not None:
-                distance_apt = (
-                    f"Sprint: {card.aptitude_to_grade(card.apt_distance_short)} | "
-                    f"Mile: {card.aptitude_to_grade(card.apt_distance_mile)} | "
-                    f"Medium: {card.aptitude_to_grade(card.apt_distance_middle)} | "
-                    f"Long: {card.aptitude_to_grade(card.apt_distance_long)}"
-                )
-                embed.add_field(
-                    name="🏁 Distance Aptitude",
-                    value=distance_apt,
-                    inline=False
-                )
+        # Aptitudes - Running Style
+        if card.apt_style_front_runner is not None:
+            style_apt = (
+                f"{EMOJI_FRONT_RUNNER} Front Runner: {card.aptitude_to_grade(card.apt_style_front_runner)} | "
+                f"{EMOJI_PACE_CHASER} Pace Chaser: {card.aptitude_to_grade(card.apt_style_pace_chaser)}\n"
+                f"{EMOJI_LATE} Late: {card.aptitude_to_grade(card.apt_style_late)} | "
+                f"{EMOJI_END_CLOSER} End Closer: {card.aptitude_to_grade(card.apt_style_end_closer)}"
+            )
+            embed.add_field(
+                name="🎽 Running Style Aptitude",
+                value=style_apt,
+                inline=False
+            )
 
-            # Aptitudes - Running Style
-            if card.apt_style_front_runner is not None:
-                style_apt = (
-                    f"{EMOJI_FRONT_RUNNER} Front Runner: {card.aptitude_to_grade(card.apt_style_front_runner)} | "
-                    f"{EMOJI_PACE_CHASER} Pace Chaser: {card.aptitude_to_grade(card.apt_style_pace_chaser)}\n"
-                    f"{EMOJI_LATE} Late: {card.aptitude_to_grade(card.apt_style_late)} | "
-                    f"{EMOJI_END_CLOSER} End Closer: {card.aptitude_to_grade(card.apt_style_end_closer)}"
-                )
-                embed.add_field(
-                    name="🎽 Running Style Aptitude",
-                    value=style_apt,
-                    inline=False
-                )
+        # Aptitudes - Ground
+        if card.apt_ground_turf is not None:
+            ground_apt = (
+                f"Turf: {card.aptitude_to_grade(card.apt_ground_turf)} | "
+                f"Dirt: {card.aptitude_to_grade(card.apt_ground_dirt)}"
+            )
+            embed.add_field(
+                name="🌱 Ground Aptitude",
+                value=ground_apt,
+                inline=False
+            )
 
-            # Aptitudes - Ground
-            if card.apt_ground_turf is not None:
-                ground_apt = (
-                    f"Turf: {card.aptitude_to_grade(card.apt_ground_turf)} | "
-                    f"Dirt: {card.aptitude_to_grade(card.apt_ground_dirt)}"
-                )
-                embed.add_field(
-                    name="🌱 Ground Aptitude",
-                    value=ground_apt,
-                    inline=False
-                )
+        # Card image
+        embed.set_image(url=card.image_url)
+        embed.set_footer(text=f"Uma Musume Pretty Derby • Page 1/2")
 
-            # Character info
-            if self.character.birth_date:
-                embed.add_field(name="Birthday", value=self.character.birth_date, inline=True)
+        return embed
 
-            # Card image
-            embed.set_image(url=card.image_url)
-            embed.set_footer(text=f"Uma Musume Pretty Derby • {self.character.display_name}")
+    def create_skills_embed(self) -> discord.Embed:
+        """Create the skills page embed."""
+        card = self.card
+        embed = discord.Embed(
+            title=f"{card.running_style_emoji} {self.character.display_name}",
+            description=f"📄 Page 2/2: Skills",
+            color=self.character.get_hex_color()
+        )
 
-            # Update the message
-            await interaction.response.edit_message(embed=embed, view=self)
+        # Card title
+        if card.card_title:
+            embed.add_field(name="Card", value=f"{card.rarity_stars} {card.card_title}", inline=False)
 
-        return callback
+        # Skills
+        if card.skills:
+            skills_text = ""
+            for skill in card.skills:
+                skills_text += f"{skill.rank_emoji} {skill.skill_name}\n"
+
+            embed.add_field(
+                name=f"✨ Available Skills ({len(card.skills)})",
+                value=skills_text,
+                inline=False
+            )
+        else:
+            embed.add_field(
+                name="✨ Available Skills",
+                value="No skills found for this card.",
+                inline=False
+            )
+
+        # Card image
+        embed.set_image(url=card.image_url)
+        embed.set_footer(text=f"Uma Musume Pretty Derby • Page 2/2")
+
+        return embed
 
 class Characters(commands.Cog):
     """Character lookup and information commands."""
