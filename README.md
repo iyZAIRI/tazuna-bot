@@ -1,6 +1,6 @@
 # 🏇 Uma Musume Pretty Derby Discord Bot
 
-A Discord bot for the Uma Musume Pretty Derby English Global Release! This bot provides character information, gacha simulation, and more features for trainers.
+A modern Discord bot for Uma Musume Pretty Derby with **slash commands** support! Features comprehensive character, skill, support card, and race databases from the actual game files.
 
 ## ✨ Features
 
@@ -32,6 +32,12 @@ A Discord bot for the Uma Musume Pretty Derby English Global Release! This bot p
 - **Real Game Data**: Uses actual game database (master.mdb)
 - **EN/JP Support**: Works with both English and Japanese databases
 - **Database Explorer**: Explore 574 tables via Discord commands
+
+### Modern Interface
+- **Slash Commands**: Modern `/` commands with autocomplete
+- **Discoverable**: See all commands by typing `/`
+- **Parameter Validation**: Discord validates inputs automatically
+- **Rich Embeds**: Beautiful, color-coded information displays
 
 ## 📋 Prerequisites
 
@@ -83,46 +89,36 @@ python bot.py
 
 You should see output indicating the bot has logged in successfully!
 
-## 🎮 Commands
+## 🎮 Commands (Slash Commands)
+
+**💡 Tip:** Type `/` in Discord to see all commands with autocomplete!
 
 ### General Commands
-- `!ping` - Check bot latency
-- `!info` - Display bot information
-- `!invite` - Get bot invite link
-- `!help` - Show all available commands
+- `/ping` - Check bot latency
+- `/info` - Display bot information
+- `/help` - Show all available commands
 
 ### Character Commands
-- `!character <name>` - Look up character information
-- `!list [page]` - List all characters (paginated)
-- `!random` - Get a random character
-- `!search <query>` - Search for characters
-- `!ssr` - List all SSR characters
+- `/character name:<name>` - Look up character information
+- `/characters [page]` - List all characters (paginated)
+- `/randomchar` - Get a random character
+- `/ssrchars` - List all SSR characters
 
 ### Skill Commands
-- `!skill <name>` - Look up skill information
-- `!skills [rarity]` - List skills by rarity (1-3)
-- `!searchskill <query>` - Search for skills
-- `!topskills [limit]` - Show top skills by grade value
+- `/skill name:<name>` - Look up skill information
+- `/skills [rarity]` - List skills by rarity (R/SR/SSR)
+- `/topskills [limit]` - Show top skills by grade value
 
 ### Support Card Commands
-- `!support <name>` - Look up support card
-- `!supports [type]` - List support cards by type
-  - Types: speed, stamina, power, guts, wisdom, friend
-- `!ssrsupports` - List all SSR support cards
-- `!searchsupport <query>` - Search for support cards
+- `/support name:<name>` - Look up support card
+- `/supports [type]` - List support cards by type
+  - Types: Speed, Stamina, Power, Guts, Wisdom, Friend
+- `/ssrsupports` - List all SSR support cards
 
 ### Race Commands
-- `!race <name>` - Look up race information
-- `!races [grade]` - List races by grade (1-5)
-  - 1=Pre-Open, 2=Open, 3=G3, 4=G2, 5=G1
-- `!g1races` - List all G1 races
-- `!searchrace <query>` - Search for races
-
-### Database Commands
-- `!dbstatus` - Check database connection status
-- `!dbtables [search]` - List all database tables
-- `!dbschema <table>` - Show table structure
-- `!dbquery <sql>` - Run SELECT query (owner only)
+- `/race name:<name>` - Look up race information
+- `/races [grade]` - List races by grade (Pre-Open/Open/G3/G2/G1)
+- `/g1races` - List all G1 races
 
 ## 🔧 Getting a Discord Bot Token
 

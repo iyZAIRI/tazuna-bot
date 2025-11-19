@@ -1,9 +1,11 @@
-"""Race commands using the database."""
+"""Race commands using slash commands and the database."""
 import discord
+from discord import app_commands
 from discord.ext import commands
 import config
 import sys
 from pathlib import Path
+from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -22,17 +24,16 @@ class Races(commands.Cog):
         """Clean up when cog is unloaded."""
         self.manager.close()
 
-    @commands.command(name='race')
-    async def race(self, ctx, *, name: str):
-        """Look up information about a race.
+    @app_commands.command(name="race", description="Look up information about a race")
+    @app_commands.describe(name="Race name (partial match supported)")
+    async def race(self, interaction: discord.Interaction, name: str):
+        """Look up information about a race."""
+        await interaction.response.defer()
 
-        Usage: !race <name>
-        Example: !race Japan Cup
-        """
         race = self.manager.get_by_name(name)
 
         if not race:
-            await ctx.send(f"❌ Race '{name}' not found.")
+            await interaction.followup.send(f"❌ Race '{name}' not found.")
             return
 
         embed = discord.Embed(
@@ -47,20 +48,22 @@ class Races(commands.Cog):
         embed.add_field(name="Race ID", value=race.race_id, inline=True)
 
         embed.set_footer(text="Uma Musume Pretty Derby • Race Database")
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-    @commands.command(name='races', aliases=['racelist'])
-    async def races_list(self, ctx, grade: int = None):
-        """List races, optionally filtered by grade.
+    @app_commands.command(name="races", description="List races by grade")
+    @app_commands.describe(grade="Race grade")
+    @app_commands.choices(grade=[
+        app_commands.Choice(name="🥉 Pre-Open", value=1),
+        app_commands.Choice(name="🥈 Open", value=2),
+        app_commands.Choice(name="🥉 G3", value=3),
+        app_commands.Choice(name="🥈 G2", value=4),
+        app_commands.Choice(name="🥇 G1", value=5),
+    ])
+    async def races_list(self, interaction: discord.Interaction, grade: Optional[int] = None):
+        """List races, optionally filtered by grade."""
+        await interaction.response.defer()
 
-        Usage: !races [grade]
-        Grades: 1 (Pre-Open), 2 (Open), 3 (G3), 4 (G2), 5 (G1)
-        Example: !races 5
-        """
         if grade is not None:
-            if grade < 1 or grade > 5:
-                await ctx.send("❌ Grade must be between 1 and 5")
-                return
             races = self.manager.get_by_grade(grade)
             race_obj = races[0] if races else None
             title = f"{race_obj.grade_emoji} {race_obj.grade_name} Races" if race_obj else "Races"
@@ -69,7 +72,7 @@ class Races(commands.Cog):
             title = "🥇 G1 Races"
 
         if not races:
-            await ctx.send("❌ No races found")
+            await interaction.followup.send("❌ No races found")
             return
 
         # Sort by distance
@@ -91,15 +94,17 @@ class Races(commands.Cog):
         if len(races) > 25:
             embed.set_footer(text=f"Showing 25 of {len(races)} races")
 
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-    @commands.command(name='g1races', aliases=['g1'])
-    async def g1_races(self, ctx):
+    @app_commands.command(name="g1races", description="List all G1 races")
+    async def g1_races(self, interaction: discord.Interaction):
         """List all G1 races."""
+        await interaction.response.defer()
+
         races = self.manager.get_g1_races()
 
         if not races:
-            await ctx.send("❌ No G1 races found")
+            await interaction.followup.send("❌ No G1 races found")
             return
 
         races.sort(key=lambda r: r.distance)
@@ -111,12 +116,12 @@ class Races(commands.Cog):
         )
 
         race_list = []
-        for race in races:
+        for race in races[:30]:  # Limit to 30
             race_list.append(
                 f"🏆 **{race.display_name}** - {race.formatted_distance} {race.ground_emoji}"
             )
 
-        # Split into columns if too many
+        # Split into columns if needed
         mid = len(race_list) // 2
         if race_list:
             embed.add_field(
@@ -131,38 +136,10 @@ class Races(commands.Cog):
                     inline=True
                 )
 
-        await ctx.send(embed=embed)
+        if len(races) > 30:
+            embed.set_footer(text=f"Showing 30 of {len(races)} races")
 
-    @commands.command(name='searchrace', aliases=['findrace'])
-    async def search_race(self, ctx, *, query: str):
-        """Search for races by name.
-
-        Usage: !searchrace <query>
-        Example: !searchrace cup
-        """
-        results = self.manager.search(query)
-
-        if not results:
-            await ctx.send(f"❌ No races found matching '{query}'")
-            return
-
-        embed = discord.Embed(
-            title=f"🔍 Race Search: '{query}'",
-            description=f"Found {len(results)} race(s)",
-            color=config.EMBED_COLOR
-        )
-
-        for race in results[:20]:
-            embed.add_field(
-                name=f"{race.grade_emoji} {race.display_name}",
-                value=f"{race.formatted_distance} • {race.ground_emoji}",
-                inline=True
-            )
-
-        if len(results) > 20:
-            embed.set_footer(text=f"Showing 20 of {len(results)} results")
-
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
 async def setup(bot):
     """Setup function for cog."""

@@ -1,9 +1,11 @@
-"""Support card commands using the database."""
+"""Support card commands using slash commands and the database."""
 import discord
+from discord import app_commands
 from discord.ext import commands
 import config
 import sys
 from pathlib import Path
+from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -22,17 +24,16 @@ class SupportCards(commands.Cog):
         """Clean up when cog is unloaded."""
         self.manager.close()
 
-    @commands.command(name='support', aliases=['supportcard', 'sc'])
-    async def support(self, ctx, *, name: str):
-        """Look up information about a support card.
+    @app_commands.command(name="support", description="Look up information about a support card")
+    @app_commands.describe(name="Support card name (partial match supported)")
+    async def support(self, interaction: discord.Interaction, name: str):
+        """Look up information about a support card."""
+        await interaction.response.defer()
 
-        Usage: !support <name>
-        Example: !support Special Week
-        """
         card = self.manager.get_by_name(name)
 
         if not card:
-            await ctx.send(f"❌ Support card '{name}' not found.")
+            await interaction.followup.send(f"❌ Support card '{name}' not found.")
             return
 
         embed = discord.Embed(
@@ -50,32 +51,24 @@ class SupportCards(commands.Cog):
         embed.add_field(name="Character ID", value=card.chara_id, inline=True)
 
         embed.set_footer(text="Uma Musume Pretty Derby • Support Cards")
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-    @commands.command(name='supports', aliases=['supportlist', 'sclist'])
-    async def supports_list(self, ctx, filter_type: str = None):
-        """List support cards, optionally filtered by type.
+    @app_commands.command(name="supports", description="List support cards by type")
+    @app_commands.describe(card_type="Support card type")
+    @app_commands.choices(card_type=[
+        app_commands.Choice(name="💨 Speed", value=1),
+        app_commands.Choice(name="🔋 Stamina", value=2),
+        app_commands.Choice(name="💪 Power", value=3),
+        app_commands.Choice(name="❤️ Guts", value=4),
+        app_commands.Choice(name="🧠 Wisdom", value=5),
+        app_commands.Choice(name="👥 Friend", value=6),
+    ])
+    async def supports_list(self, interaction: discord.Interaction, card_type: Optional[int] = None):
+        """List support cards, optionally filtered by type."""
+        await interaction.response.defer()
 
-        Usage: !supports [type]
-        Types: speed, stamina, power, guts, wisdom, friend
-        Example: !supports speed
-        """
-        if filter_type:
-            type_map = {
-                'speed': 1,
-                'stamina': 2,
-                'power': 3,
-                'guts': 4,
-                'wisdom': 5,
-                'friend': 6
-            }
-
-            type_lower = filter_type.lower()
-            if type_lower not in type_map:
-                await ctx.send(f"❌ Invalid type. Use: {', '.join(type_map.keys())}")
-                return
-
-            cards = self.manager.get_by_type(type_map[type_lower])
+        if card_type:
+            cards = self.manager.get_by_type(card_type)
             title = f"{cards[0].type_emoji} {cards[0].type_name} Support Cards" if cards else "Support Cards"
             color = cards[0].type_color if cards else config.EMBED_COLOR
         else:
@@ -84,7 +77,7 @@ class SupportCards(commands.Cog):
             color = 0xFFD700
 
         if not cards:
-            await ctx.send("❌ No support cards found")
+            await interaction.followup.send("❌ No support cards found")
             return
 
         # Sort by rarity descending
@@ -106,15 +99,17 @@ class SupportCards(commands.Cog):
         if len(cards) > 25:
             embed.set_footer(text=f"Showing 25 of {len(cards)} cards")
 
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-    @commands.command(name='ssrsupports')
-    async def ssr_supports(self, ctx):
+    @app_commands.command(name="ssrsupports", description="List all SSR support cards")
+    async def ssr_supports(self, interaction: discord.Interaction):
         """List all SSR support cards."""
+        await interaction.response.defer()
+
         cards = self.manager.get_ssr_cards()
 
         if not cards:
-            await ctx.send("❌ No SSR support cards found")
+            await interaction.followup.send("❌ No SSR support cards found")
             return
 
         embed = discord.Embed(
@@ -141,38 +136,7 @@ class SupportCards(commands.Cog):
                     inline=True
                 )
 
-        await ctx.send(embed=embed)
-
-    @commands.command(name='searchsupport', aliases=['findsupport'])
-    async def search_support(self, ctx, *, query: str):
-        """Search for support cards.
-
-        Usage: !searchsupport <query>
-        Example: !searchsupport vodka
-        """
-        results = self.manager.search(query)
-
-        if not results:
-            await ctx.send(f"❌ No support cards found matching '{query}'")
-            return
-
-        embed = discord.Embed(
-            title=f"🔍 Support Card Search: '{query}'",
-            description=f"Found {len(results)} card(s)",
-            color=config.EMBED_COLOR
-        )
-
-        for card in results[:20]:
-            embed.add_field(
-                name=f"{card.rarity_stars} {card.character_name or 'Unknown'}",
-                value=f"{card.type_emoji} {card.type_name}",
-                inline=True
-            )
-
-        if len(results) > 20:
-            embed.set_footer(text=f"Showing 20 of {len(results)} results")
-
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
 async def setup(bot):
     """Setup function for cog."""
