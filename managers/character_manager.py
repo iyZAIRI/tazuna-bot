@@ -89,7 +89,17 @@ class CharacterManager:
                 cr_max.stamina as max_base_stamina,
                 cr_max.pow as max_base_pow,
                 cr_max.guts as max_base_guts,
-                cr_max.wiz as max_base_wiz
+                cr_max.wiz as max_base_wiz,
+                cr_default.proper_distance_short as apt_distance_short,
+                cr_default.proper_distance_mile as apt_distance_mile,
+                cr_default.proper_distance_middle as apt_distance_middle,
+                cr_default.proper_distance_long as apt_distance_long,
+                cr_default.proper_running_style_nige as apt_style_front_runner,
+                cr_default.proper_running_style_senko as apt_style_pace_chaser,
+                cr_default.proper_running_style_sashi as apt_style_late,
+                cr_default.proper_running_style_oikomi as apt_style_end_closer,
+                cr_default.proper_ground_turf as apt_ground_turf,
+                cr_default.proper_ground_dirt as apt_ground_dirt
             FROM card_data c
             JOIN chara_data cd ON c.chara_id = cd.id
             LEFT JOIN card_rarity_data cr_default ON c.id = cr_default.card_id AND cr_default.rarity = c.default_rarity
@@ -127,7 +137,7 @@ class CharacterManager:
                     # Index by name (lowercase for search)
                     self.name_index[name_en.lower()] = chara_id
 
-                # Add card with base stats
+                # Add card with base stats and aptitudes
                 card = CharacterCard(
                     card_id=row['card_id'],
                     chara_id=chara_id,
@@ -147,7 +157,17 @@ class CharacterManager:
                     max_base_stamina=row.get('max_base_stamina'),
                     max_base_power=row.get('max_base_pow'),
                     max_base_guts=row.get('max_base_guts'),
-                    max_base_wit=row.get('max_base_wiz')
+                    max_base_wit=row.get('max_base_wiz'),
+                    apt_distance_short=row.get('apt_distance_short'),
+                    apt_distance_mile=row.get('apt_distance_mile'),
+                    apt_distance_middle=row.get('apt_distance_middle'),
+                    apt_distance_long=row.get('apt_distance_long'),
+                    apt_style_front_runner=row.get('apt_style_front_runner'),
+                    apt_style_pace_chaser=row.get('apt_style_pace_chaser'),
+                    apt_style_late=row.get('apt_style_late'),
+                    apt_style_end_closer=row.get('apt_style_end_closer'),
+                    apt_ground_turf=row.get('apt_ground_turf'),
+                    apt_ground_dirt=row.get('apt_ground_dirt')
                 )
                 self.characters[chara_id].cards.append(card)
 

@@ -79,6 +79,46 @@ class CardSelectorView(discord.ui.View):
                     inline=False
                 )
 
+            # Aptitudes - Distance
+            if card.apt_distance_short is not None:
+                distance_apt = (
+                    f"Short: {card.aptitude_to_grade(card.apt_distance_short)} | "
+                    f"Mile: {card.aptitude_to_grade(card.apt_distance_mile)} | "
+                    f"Middle: {card.aptitude_to_grade(card.apt_distance_middle)} | "
+                    f"Long: {card.aptitude_to_grade(card.apt_distance_long)}"
+                )
+                embed.add_field(
+                    name="🏁 Distance Aptitude",
+                    value=distance_apt,
+                    inline=False
+                )
+
+            # Aptitudes - Running Style
+            if card.apt_style_front_runner is not None:
+                style_apt = (
+                    f"🏃 Front Runner: {card.aptitude_to_grade(card.apt_style_front_runner)} | "
+                    f"👑 Pace Chaser: {card.aptitude_to_grade(card.apt_style_pace_chaser)}\n"
+                    f"🎯 Late: {card.aptitude_to_grade(card.apt_style_late)} | "
+                    f"⚡ End Closer: {card.aptitude_to_grade(card.apt_style_end_closer)}"
+                )
+                embed.add_field(
+                    name="🎽 Running Style Aptitude",
+                    value=style_apt,
+                    inline=False
+                )
+
+            # Aptitudes - Ground
+            if card.apt_ground_turf is not None:
+                ground_apt = (
+                    f"Turf: {card.aptitude_to_grade(card.apt_ground_turf)} | "
+                    f"Dirt: {card.aptitude_to_grade(card.apt_ground_dirt)}"
+                )
+                embed.add_field(
+                    name="🌱 Ground Aptitude",
+                    value=ground_apt,
+                    inline=False
+                )
+
             # Character info
             if self.character.birth_date:
                 embed.add_field(name="Birthday", value=self.character.birth_date, inline=True)

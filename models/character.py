@@ -56,6 +56,25 @@ class CharacterCard:
     max_base_power: Optional[int] = None
     max_base_guts: Optional[int] = None
     max_base_wit: Optional[int] = None
+    # Aptitudes (1-7 scale, at default rarity)
+    apt_distance_short: Optional[int] = None
+    apt_distance_mile: Optional[int] = None
+    apt_distance_middle: Optional[int] = None
+    apt_distance_long: Optional[int] = None
+    apt_style_front_runner: Optional[int] = None
+    apt_style_pace_chaser: Optional[int] = None
+    apt_style_late: Optional[int] = None
+    apt_style_end_closer: Optional[int] = None
+    apt_ground_turf: Optional[int] = None
+    apt_ground_dirt: Optional[int] = None
+
+    @staticmethod
+    def aptitude_to_grade(value: Optional[int]) -> str:
+        """Convert aptitude value (1-7) to letter grade (G-A)."""
+        if value is None:
+            return "?"
+        grades = {1: "G", 2: "F", 3: "E", 4: "D", 5: "C", 6: "B", 7: "A"}
+        return grades.get(value, "?")
 
     @property
     def rarity_stars(self) -> str:
