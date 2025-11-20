@@ -51,6 +51,7 @@ class SkillManager:
                 s.skill_category,
                 s.condition_1,
                 s.icon_id,
+                s.tag_id,
                 t1.text as name,
                 t2.text as description
             FROM skill_data s
@@ -74,6 +75,7 @@ class SkillManager:
                     description=row['description'],
                     condition=row['condition_1'],
                     icon_id=row.get('icon_id', 0),
+                    tag_id=row.get('tag_id', ''),
                     is_character_unique=row['id'] in character_unique_ids
                 )
                 self.skills[skill.skill_id] = skill

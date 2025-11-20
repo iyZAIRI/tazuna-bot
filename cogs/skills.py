@@ -103,6 +103,11 @@ class SkillDetailView(discord.ui.View):
         if skill.is_character_unique:
             embed.add_field(name="Character Unique", value="💎", inline=True)
 
+        # Display skill types
+        if skill.skill_types:
+            types_str = ", ".join(skill.skill_types)
+            embed.add_field(name="Type", value=types_str, inline=False)
+
         if skill.condition:
             condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
             embed.add_field(
@@ -161,6 +166,11 @@ class Skills(commands.Cog):
 
         if skill.is_character_unique:
             embed.add_field(name="Character Unique", value="💎", inline=True)
+
+        # Display skill types
+        if skill.skill_types:
+            types_str = ", ".join(skill.skill_types)
+            embed.add_field(name="Type", value=types_str, inline=False)
 
         if skill.condition:
             condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition

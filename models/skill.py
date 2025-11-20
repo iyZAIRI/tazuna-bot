@@ -7,7 +7,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from constants import get_skill_icon_emoji
+from constants import get_skill_icon_emoji, get_skill_types
 
 @dataclass
 class Skill:
@@ -22,6 +22,7 @@ class Skill:
     description: Optional[str] = None
     condition: Optional[str] = None
     icon_id: int = 0
+    tag_id: str = ""
     is_character_unique: bool = False  # True if this skill is a character's unique skill
 
     @property
@@ -40,3 +41,8 @@ class Skill:
     def icon_emoji(self) -> str:
         """Get skill icon Discord emoji."""
         return get_skill_icon_emoji(self.icon_id)
+
+    @property
+    def skill_types(self) -> list:
+        """Get list of skill type names from tag_id."""
+        return get_skill_types(self.tag_id)
