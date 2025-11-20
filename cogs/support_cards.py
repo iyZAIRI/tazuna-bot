@@ -104,51 +104,81 @@ class SupportCardListView(discord.ui.View):
 class SupportCardSelectorView(discord.ui.View):
     """View for selecting a support card when multiple matches are found."""
 
-    def __init__(self, cards: List[SupportCard]):
+    def __init__(self, cards: List[SupportCard], search_query: str):
         super().__init__(timeout=180)
         self.cards = cards
+        self.search_query = search_query
 
-        # Create select menu options (limit to 25 - Discord limit)
-        options = []
-        for card in cards[:25]:
-            options.append(
-                discord.SelectOption(
-                    label=f"{card.character_name} - {card.type_name}",
-                    value=str(card.card_id),
-                    description=f"{card.rarity_emoji} {card.type_emoji}",
-                    emoji=card.rarity_emoji
-                )
+        # Create buttons for each card (limit to 25 - Discord limit)
+        for idx, card in enumerate(cards[:25]):
+            button = discord.ui.Button(
+                label=f"{card.character_name} - {card.type_name}",
+                style=discord.ButtonStyle.secondary,
+                emoji=card.rarity_emoji,
+                custom_id=f"support_{card.card_id}",
+                row=idx // 5  # Group into rows of 5
             )
+            button.callback = self.create_card_callback(card)
+            self.add_item(button)
 
-        # Create select menu
-        select = discord.ui.Select(
-            placeholder="Select a support card...",
-            options=options
+    def create_card_callback(self, card):
+        """Create a callback for a specific card button."""
+        async def callback(interaction: discord.Interaction):
+            # Create detail view with back button
+            detail_view = SupportCardDetailView(card, self)
+            embed = detail_view.create_embed()
+            await interaction.response.edit_message(embed=embed, view=detail_view)
+
+        return callback
+
+    def create_selector_embed(self) -> discord.Embed:
+        """Create the selector embed showing all matching cards."""
+        embed = discord.Embed(
+            title="🎴 Multiple Support Cards Found",
+            description=f"Found {len(self.cards)} support cards matching '{self.search_query}'. Select one:",
+            color=config.EMBED_COLOR
         )
-        select.callback = self.card_selected
-        self.add_item(select)
 
-    async def card_selected(self, interaction: discord.Interaction):
-        """Handle card selection."""
-        card_id = int(interaction.data['values'][0])
+        # Show preview of matches (up to 10)
+        preview_list = []
+        for i, card in enumerate(self.cards[:10], 1):
+            preview_list.append(f"{i}. {card.display_name}")
 
-        # Find the selected card
-        selected_card = None
-        for card in self.cards:
-            if card.card_id == card_id:
-                selected_card = card
-                break
+        embed.add_field(
+            name="Matches",
+            value="\n".join(preview_list),
+            inline=False
+        )
 
-        if not selected_card:
-            await interaction.response.send_message("❌ Card not found", ephemeral=True)
-            return
+        if len(self.cards) > 10:
+            embed.set_footer(text=f"Showing 10 of {len(self.cards)} matches • Select a card below")
+        else:
+            embed.set_footer(text="Select a card below")
 
-        # Show card details
-        embed = self.create_card_embed(selected_card)
-        await interaction.response.edit_message(embed=embed, view=None)
+        return embed
 
-    def create_card_embed(self, card: SupportCard) -> discord.Embed:
+
+class SupportCardDetailView(discord.ui.View):
+    """View for displaying support card details with back button."""
+
+    def __init__(self, card: SupportCard, parent_selector: SupportCardSelectorView):
+        super().__init__(timeout=180)
+        self.card = card
+        self.parent_selector = parent_selector
+
+        # Back button
+        back_button = discord.ui.Button(label="⬅ Back to Cards", style=discord.ButtonStyle.primary)
+        back_button.callback = self.go_back
+        self.add_item(back_button)
+
+    async def go_back(self, interaction: discord.Interaction):
+        """Go back to card selector."""
+        embed = self.parent_selector.create_selector_embed()
+        await interaction.response.edit_message(embed=embed, view=self.parent_selector)
+
+    def create_embed(self) -> discord.Embed:
         """Create detailed embed for a support card."""
+        card = self.card
         embed = discord.Embed(
             title=card.display_name,
             description=f"Card ID: {card.card_id}",
@@ -168,31 +198,6 @@ class SupportCardSelectorView(discord.ui.View):
 
         embed.set_image(url=card.image_url)
         embed.set_footer(text="Uma Musume Pretty Derby • Support Cards")
-        return embed
-
-    def create_selector_embed(self) -> discord.Embed:
-        """Create embed for card selection."""
-        embed = discord.Embed(
-            title="🎴 Multiple Support Cards Found",
-            description=f"Found {len(self.cards)} support cards. Please select one:",
-            color=config.EMBED_COLOR
-        )
-
-        # Show preview of cards
-        preview_lines = []
-        for card in self.cards[:10]:  # Show first 10
-            preview_lines.append(card.display_name)
-
-        if preview_lines:
-            embed.add_field(
-                name="Available Cards",
-                value="\n".join(preview_lines),
-                inline=False
-            )
-
-        if len(self.cards) > 10:
-            embed.set_footer(text=f"Showing 10 of {len(self.cards)} cards in dropdown")
-
         return embed
 
 
@@ -222,7 +227,7 @@ class SupportCards(commands.Cog):
             await interaction.followup.send(f"❌ No support cards found for '{name}'.")
             return
 
-        # If single match, show directly
+        # If single match, show directly (no back button needed)
         if len(cards) == 1:
             card = cards[0]
             embed = discord.Embed(
@@ -247,8 +252,8 @@ class SupportCards(commands.Cog):
             await interaction.followup.send(embed=embed)
             return
 
-        # Multiple matches - show selector
-        view = SupportCardSelectorView(cards)
+        # Multiple matches - show selector with buttons
+        view = SupportCardSelectorView(cards, name)
         embed = view.create_selector_embed()
         await interaction.followup.send(embed=embed, view=view)
 
