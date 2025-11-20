@@ -32,11 +32,12 @@ class SkillManager:
             return False
 
         try:
-            # First, get all character unique skill IDs
+            # First, get all character unique skill IDs (same way as character loading)
             unique_skill_query = """
-            SELECT DISTINCT skill_id1
-            FROM skill_set
-            WHERE skill_id1 > 0
+            SELECT DISTINCT ss.skill_id1
+            FROM card_rarity_data cr
+            JOIN skill_set ss ON cr.skill_set = ss.id
+            WHERE cr.rarity = 3 AND ss.skill_id1 > 0
             """
             unique_results = self.db.query(unique_skill_query)
             character_unique_ids = {row['skill_id1'] for row in unique_results}
