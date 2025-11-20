@@ -101,12 +101,7 @@ class SkillDetailView(discord.ui.View):
         embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
 
         if skill.is_character_unique:
-            embed.add_field(name="Type", value="💎 Character Unique", inline=True)
-        elif skill.is_debuff:
-            embed.add_field(name="Type", value="❌ Debuff", inline=True)
-        else:
-            # Add category emoji as type
-            embed.add_field(name="Category", value=skill.category_emoji, inline=True)
+            embed.add_field(name="Character Unique", value="💎", inline=True)
 
         if skill.condition:
             condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
@@ -165,12 +160,7 @@ class Skills(commands.Cog):
         embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
 
         if skill.is_character_unique:
-            embed.add_field(name="Type", value="💎 Character Unique", inline=True)
-        elif skill.is_debuff:
-            embed.add_field(name="Type", value="❌ Debuff", inline=True)
-        else:
-            # Add category emoji as type
-            embed.add_field(name="Category", value=skill.category_emoji, inline=True)
+            embed.add_field(name="Character Unique", value="💎", inline=True)
 
         if skill.condition:
             condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
