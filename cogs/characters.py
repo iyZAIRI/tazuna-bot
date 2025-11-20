@@ -400,22 +400,43 @@ class SkillDetailView(discord.ui.View):
             color=config.EMBED_COLOR
         )
 
-        embed.add_field(name="Rarity", value=skill.rarity_stars, inline=True)
-        embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
-        embed.add_field(name="Skill ID", value=skill.skill_id, inline=True)
+        # Display activation type
+        activation_type = "Wisdom Check" if skill.requires_wisdom else "Guaranteed"
+        embed.add_field(name="Activation", value=activation_type, inline=True)
 
-        if skill.condition:
-            condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
+        # Display SP cost (only for non-unique skills)
+        if skill.sp_cost is not None:
+            embed.add_field(name="SP Cost", value=str(skill.sp_cost), inline=True)
+
+        if skill.is_character_unique:
+            char_display = skill.unique_character_name if skill.unique_character_name else "💎"
+            embed.add_field(name="Character Unique", value=char_display, inline=True)
+
+        # Display effects
+        effect_lines = []
+        has_multiple_abilities = skill.ability_1 and skill.ability_2
+
+        if skill.ability_1:
+            ability_1_lines = skill.ability_1.get_effect_lines()
+            if ability_1_lines:
+                if has_multiple_abilities:
+                    effect_lines.append("**Trigger 1:**")
+                effect_lines.extend(ability_1_lines)
+
+        if skill.ability_2:
+            ability_2_lines = skill.ability_2.get_effect_lines()
+            if ability_2_lines:
+                if effect_lines:
+                    effect_lines.append("")  # Blank line between triggers
+                effect_lines.append("**Trigger 2:**")
+                effect_lines.extend(ability_2_lines)
+
+        if effect_lines:
             embed.add_field(
-                name="Activation Condition",
-                value=f"```{condition_text}```",
+                name="Effect",
+                value="\n".join(effect_lines),
                 inline=False
             )
-
-        if skill.is_unique:
-            embed.add_field(name="Type", value="✨ Unique Skill", inline=True)
-        elif skill.is_debuff:
-            embed.add_field(name="Type", value="❌ Debuff", inline=True)
 
         embed.set_footer(text="Uma Musume Pretty Derby • Skill Details")
         return embed
