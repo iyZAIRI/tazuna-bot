@@ -19,7 +19,7 @@ class SkillManager:
         self.db_path = db_path
         self.db = MasterDBReader(db_path)
         self.skills: Dict[int, Skill] = {}
-        self.name_index: Dict[str, int] = {}
+        self.name_index: Dict[str, List[int]] = {}  # Changed to List[int] to support duplicates
         self._loaded = False
 
     def load(self) -> bool:
@@ -66,9 +66,12 @@ class SkillManager:
                 )
                 self.skills[skill.skill_id] = skill
 
-                # Index by name
+                # Index by name (support multiple skills with same name)
                 if row['name']:
-                    self.name_index[row['name'].lower()] = skill.skill_id
+                    name_lower = row['name'].lower()
+                    if name_lower not in self.name_index:
+                        self.name_index[name_lower] = []
+                    self.name_index[name_lower].append(skill.skill_id)
 
             self._loaded = True
             logger.info(f"Loaded {len(self.skills)} skills")
@@ -85,20 +88,26 @@ class SkillManager:
         return self.skills.get(skill_id)
 
     def get_by_name(self, name: str) -> Optional[Skill]:
-        """Get skill by name (partial match)."""
+        """Get skill by name (partial match). Returns first match."""
         if not self._loaded:
             self.load()
 
         name_lower = name.lower()
 
-        # Exact match
+        # Exact match - return highest rarity/grade
         if name_lower in self.name_index:
-            return self.skills[self.name_index[name_lower]]
+            skill_ids = self.name_index[name_lower]
+            # Return the highest quality version (by rarity, then grade)
+            skills = [self.skills[sid] for sid in skill_ids]
+            best = max(skills, key=lambda s: (s.rarity, s.grade_value))
+            return best
 
-        # Partial match
-        for indexed_name, skill_id in self.name_index.items():
+        # Partial match - return first highest quality match
+        for indexed_name, skill_ids in self.name_index.items():
             if name_lower in indexed_name:
-                return self.skills[skill_id]
+                skills = [self.skills[sid] for sid in skill_ids]
+                best = max(skills, key=lambda s: (s.rarity, s.grade_value))
+                return best
 
         return None
 
@@ -121,17 +130,24 @@ class SkillManager:
         return [s for s in self.skills.values() if s.skill_category == category]
 
     def search(self, query: str) -> List[Skill]:
-        """Search skills by name."""
+        """Search skills by name. Returns all matching skills sorted by quality."""
         if not self._loaded:
             self.load()
 
         query_lower = query.lower()
         results = []
+        seen_ids = set()
 
-        for name, skill_id in self.name_index.items():
+        for name, skill_ids in self.name_index.items():
             if query_lower in name:
-                results.append(self.skills[skill_id])
+                # Add all skills with this name
+                for skill_id in skill_ids:
+                    if skill_id not in seen_ids:
+                        results.append(self.skills[skill_id])
+                        seen_ids.add(skill_id)
 
+        # Sort by rarity and grade (highest first)
+        results.sort(key=lambda s: (s.rarity, s.grade_value), reverse=True)
         return results
 
     def get_top(self, limit: int = 10) -> List[Skill]:
