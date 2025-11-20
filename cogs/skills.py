@@ -97,8 +97,9 @@ class SkillDetailView(discord.ui.View):
             color=config.EMBED_COLOR
         )
 
-        embed.add_field(name="Rarity", value=skill.rarity_stars, inline=True)
-        embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
+        # Display activation type
+        activation_type = "Wisdom Check" if skill.requires_wisdom else "Guaranteed"
+        embed.add_field(name="Activation", value=activation_type, inline=True)
 
         if skill.is_character_unique:
             char_display = skill.unique_character_name if skill.unique_character_name else "💎"
@@ -175,8 +176,9 @@ class Skills(commands.Cog):
             color=config.EMBED_COLOR
         )
 
-        embed.add_field(name="Rarity", value=skill.rarity_stars, inline=True)
-        embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
+        # Display activation type
+        activation_type = "Wisdom Check" if skill.requires_wisdom else "Guaranteed"
+        embed.add_field(name="Activation", value=activation_type, inline=True)
 
         if skill.is_character_unique:
             char_display = skill.unique_character_name if skill.unique_character_name else "💎"

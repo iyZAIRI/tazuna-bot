@@ -62,6 +62,7 @@ class SkillManager:
                 s.condition_1,
                 s.condition_2,
                 s.icon_id,
+                s.activate_lot,
                 s.float_ability_time_1,
                 s.float_cooldown_time_1,
                 s.ability_type_1_1,
@@ -143,6 +144,7 @@ class SkillManager:
                     icon_id=row.get('icon_id', 0),
                     is_character_unique=row['id'] in character_unique_ids,
                     unique_character_name=skill_to_character.get(row['id']),
+                    requires_wisdom=row.get('activate_lot', 0) == 1,
                     ability_1=ability_1,
                     ability_2=ability_2
                 )
