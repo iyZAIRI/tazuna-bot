@@ -11,11 +11,12 @@ from constants import get_skill_icon_emoji, get_ability_type_name
 
 @dataclass
 class SkillAbility:
-    """Represents a skill ability effect."""
+    """Represents a skill ability effect (trigger)."""
     ability_types: List[int]  # ability_type_X_1, ability_type_X_2, ability_type_X_3
     ability_values: List[float]  # float_ability_value_X_1, X_2, X_3
     duration: float  # float_ability_time_X (in seconds)
     cooldown: float  # float_cooldown_time_X (in seconds)
+    condition: Optional[str] = None  # condition_X - activation condition for this trigger
 
     def get_effect_lines(self) -> List[str]:
         """Get formatted effect lines with duration/cooldown first, then effects."""
@@ -32,6 +33,10 @@ class SkillAbility:
             if ab_type > 0:
                 type_name = get_ability_type_name(ab_type)
                 lines.append(f"{type_name}: {ab_value:+.2f}")
+
+        # Show activation condition if exists
+        if self.condition:
+            lines.append(f"**Condition:** `{self.condition}`")
 
         return lines
 

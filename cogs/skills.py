@@ -111,29 +111,21 @@ class SkillDetailView(discord.ui.View):
             ability_1_lines = skill.ability_1.get_effect_lines()
             if ability_1_lines:
                 if has_multiple_abilities:
-                    effect_lines.append("**Ability 1:**")
+                    effect_lines.append("**Trigger 1:**")
                 effect_lines.extend(ability_1_lines)
 
         if skill.ability_2:
             ability_2_lines = skill.ability_2.get_effect_lines()
             if ability_2_lines:
                 if effect_lines:
-                    effect_lines.append("")  # Blank line between abilities
-                effect_lines.append("**Ability 2:**")
+                    effect_lines.append("")  # Blank line between triggers
+                effect_lines.append("**Trigger 2:**")
                 effect_lines.extend(ability_2_lines)
 
         if effect_lines:
             embed.add_field(
                 name="Effect",
                 value="\n".join(effect_lines),
-                inline=False
-            )
-
-        if skill.condition:
-            condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
-            embed.add_field(
-                name="Activation Condition",
-                value=f"```{condition_text}```",
                 inline=False
             )
 
@@ -196,29 +188,21 @@ class Skills(commands.Cog):
             ability_1_lines = skill.ability_1.get_effect_lines()
             if ability_1_lines:
                 if has_multiple_abilities:
-                    effect_lines.append("**Ability 1:**")
+                    effect_lines.append("**Trigger 1:**")
                 effect_lines.extend(ability_1_lines)
 
         if skill.ability_2:
             ability_2_lines = skill.ability_2.get_effect_lines()
             if ability_2_lines:
                 if effect_lines:
-                    effect_lines.append("")  # Blank line between abilities
-                effect_lines.append("**Ability 2:**")
+                    effect_lines.append("")  # Blank line between triggers
+                effect_lines.append("**Trigger 2:**")
                 effect_lines.extend(ability_2_lines)
 
         if effect_lines:
             embed.add_field(
                 name="Effect",
                 value="\n".join(effect_lines),
-                inline=False
-            )
-
-        if skill.condition:
-            condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
-            embed.add_field(
-                name="Activation Condition",
-                value=f"```{condition_text}```",
                 inline=False
             )
 

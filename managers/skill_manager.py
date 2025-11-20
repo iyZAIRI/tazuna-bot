@@ -50,6 +50,7 @@ class SkillManager:
                 s.grade_value,
                 s.skill_category,
                 s.condition_1,
+                s.condition_2,
                 s.icon_id,
                 s.float_ability_time_1,
                 s.float_cooldown_time_1,
@@ -95,7 +96,8 @@ class SkillManager:
                             (row.get('float_ability_value_1_3', 0) or 0) / 10000.0
                         ],
                         duration=(row.get('float_ability_time_1', 0) or 0) / 10000.0,
-                        cooldown=(row.get('float_cooldown_time_1', 0) or 0) / 10000.0
+                        cooldown=(row.get('float_cooldown_time_1', 0) or 0) / 10000.0,
+                        condition=row.get('condition_1')
                     )
 
                 # Parse ability 2
@@ -114,7 +116,8 @@ class SkillManager:
                             (row.get('float_ability_value_2_3', 0) or 0) / 10000.0
                         ],
                         duration=(row.get('float_ability_time_2', 0) or 0) / 10000.0,
-                        cooldown=(row.get('float_cooldown_time_2', 0) or 0) / 10000.0
+                        cooldown=(row.get('float_cooldown_time_2', 0) or 0) / 10000.0,
+                        condition=row.get('condition_2')
                     )
 
                 skill = Skill(
@@ -126,7 +129,7 @@ class SkillManager:
                     grade_value=row['grade_value'],
                     skill_category=row['skill_category'] or 0,
                     description=row['description'],
-                    condition=row['condition_1'],
+                    condition=row.get('condition_1'),  # Keep for single-ability skills
                     icon_id=row.get('icon_id', 0),
                     is_character_unique=row['id'] in character_unique_ids,
                     ability_1=ability_1,
