@@ -15,16 +15,24 @@ class SkillAbility:
     ability_types: List[int]  # ability_type_X_1, ability_type_X_2, ability_type_X_3
     ability_values: List[float]  # float_ability_value_X_1, X_2, X_3
     duration: float  # float_ability_time_X (in seconds)
+    cooldown: float  # float_cooldown_time_X (in seconds)
 
     def get_effect_lines(self) -> List[str]:
-        """Get formatted effect lines."""
+        """Get formatted effect lines with duration/cooldown first, then effects."""
         lines = []
+
+        # Show duration and cooldown first
+        if self.duration > 0:
+            lines.append(f"Base Duration: {self.duration:.1f}s")
+        if self.cooldown > 0:
+            lines.append(f"Base Cooldown: {self.cooldown:.1f}s")
+
+        # Then show the effects
         for ab_type, ab_value in zip(self.ability_types, self.ability_values):
             if ab_type > 0:
                 type_name = get_ability_type_name(ab_type)
                 lines.append(f"{type_name}: {ab_value:+.2f}")
-        if self.duration > 0:
-            lines.append(f"Base Duration: {self.duration:.1f}s")
+
         return lines
 
 @dataclass

@@ -52,6 +52,7 @@ class SkillManager:
                 s.condition_1,
                 s.icon_id,
                 s.float_ability_time_1,
+                s.float_cooldown_time_1,
                 s.ability_type_1_1,
                 s.ability_type_1_2,
                 s.ability_type_1_3,
@@ -59,6 +60,7 @@ class SkillManager:
                 s.float_ability_value_1_2,
                 s.float_ability_value_1_3,
                 s.float_ability_time_2,
+                s.float_cooldown_time_2,
                 s.ability_type_2_1,
                 s.ability_type_2_2,
                 s.ability_type_2_3,
@@ -92,7 +94,8 @@ class SkillManager:
                             (row.get('float_ability_value_1_2', 0) or 0) / 10000.0,
                             (row.get('float_ability_value_1_3', 0) or 0) / 10000.0
                         ],
-                        duration=(row.get('float_ability_time_1', 0) or 0) / 10000.0
+                        duration=(row.get('float_ability_time_1', 0) or 0) / 10000.0,
+                        cooldown=(row.get('float_cooldown_time_1', 0) or 0) / 10000.0
                     )
 
                 # Parse ability 2
@@ -110,7 +113,8 @@ class SkillManager:
                             (row.get('float_ability_value_2_2', 0) or 0) / 10000.0,
                             (row.get('float_ability_value_2_3', 0) or 0) / 10000.0
                         ],
-                        duration=(row.get('float_ability_time_2', 0) or 0) / 10000.0
+                        duration=(row.get('float_ability_time_2', 0) or 0) / 10000.0,
+                        cooldown=(row.get('float_cooldown_time_2', 0) or 0) / 10000.0
                     )
 
                 skill = Skill(
