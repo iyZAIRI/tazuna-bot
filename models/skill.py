@@ -37,7 +37,9 @@ class SkillAbility:
                     type_name += " Up"
                 elif ab_value < 0:
                     type_name += " Down"
-                lines.append(f"{type_name}: {ab_value:+.3f}")
+                # Format with 3 decimals, then strip trailing zeros
+                value_str = f"{ab_value:+.3f}".rstrip('0').rstrip('.')
+                lines.append(f"{type_name}: {value_str}")
 
         # Show activation condition if exists
         if self.condition:
