@@ -105,10 +105,13 @@ class SkillDetailView(discord.ui.View):
 
         # Display effects
         effect_lines = []
+        has_multiple_abilities = skill.ability_1 and skill.ability_2
+
         if skill.ability_1:
             ability_1_lines = skill.ability_1.get_effect_lines()
             if ability_1_lines:
-                effect_lines.append("**Ability 1:**")
+                if has_multiple_abilities:
+                    effect_lines.append("**Ability 1:**")
                 effect_lines.extend(ability_1_lines)
 
         if skill.ability_2:
@@ -187,10 +190,13 @@ class Skills(commands.Cog):
 
         # Display effects
         effect_lines = []
+        has_multiple_abilities = skill.ability_1 and skill.ability_2
+
         if skill.ability_1:
             ability_1_lines = skill.ability_1.get_effect_lines()
             if ability_1_lines:
-                effect_lines.append("**Ability 1:**")
+                if has_multiple_abilities:
+                    effect_lines.append("**Ability 1:**")
                 effect_lines.extend(ability_1_lines)
 
         if skill.ability_2:
