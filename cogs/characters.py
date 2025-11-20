@@ -317,7 +317,7 @@ class CardDetailView(discord.ui.View):
         if card.unique_skill:
             embed.add_field(
                 name="💎 Unique Skill",
-                value=f"⭐ {card.unique_skill.skill_name}\n*Unlocked at rarity 3+*",
+                value=f"{card.unique_skill.icon_emoji} {card.unique_skill.skill_name}\n*Unlocked at rarity 3+*",
                 inline=False
             )
 
@@ -329,7 +329,7 @@ class CardDetailView(discord.ui.View):
         if innate_skills:
             innate_text = ""
             for skill in innate_skills:
-                innate_text += f"🔓 {skill.skill_name}\n"
+                innate_text += f"{skill.icon_emoji} {skill.skill_name}\n"
 
             embed.add_field(
                 name=f"✨ Innate Skills ({len(innate_skills)})",
@@ -341,7 +341,7 @@ class CardDetailView(discord.ui.View):
         if awakening_skills:
             awakening_text = ""
             for skill in awakening_skills:
-                awakening_text += f"{skill.rank_emoji} {skill.skill_name}\n"
+                awakening_text += f"{skill.icon_emoji} {skill.skill_name} {skill.rank_emoji}\n"
 
             embed.add_field(
                 name=f"⭐ Awakening Skills ({len(awakening_skills)})",
@@ -395,7 +395,7 @@ class SkillDetailView(discord.ui.View):
             )
 
         embed = discord.Embed(
-            title=f"{skill.category_emoji} {skill.display_name}",
+            title=f"{skill.icon_emoji} {skill.display_name}",
             description=skill.description or "No description available",
             color=config.EMBED_COLOR
         )

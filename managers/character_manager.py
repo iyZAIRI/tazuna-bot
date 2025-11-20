@@ -193,9 +193,11 @@ class CharacterManager:
                     a.available_skill_set_id,
                     a.skill_id,
                     a.need_rank,
-                    t.text as skill_name
+                    t.text as skill_name,
+                    s.icon_id
                 FROM available_skill_set a
                 LEFT JOIN text_data t ON t.category = 47 AND t.[index] = a.skill_id
+                LEFT JOIN skill_data s ON s.id = a.skill_id
                 WHERE a.available_skill_set_id IN ({placeholders})
                 ORDER BY a.available_skill_set_id, a.need_rank
                 """
@@ -214,7 +216,8 @@ class CharacterManager:
                                 skill = CardSkill(
                                     skill_id=skill_row['skill_id'],
                                     skill_name=skill_row['skill_name'] or f"Skill {skill_row['skill_id']}",
-                                    need_rank=skill_row['need_rank']
+                                    need_rank=skill_row['need_rank'],
+                                    icon_id=skill_row.get('icon_id', 0)
                                 )
                                 card.skills.append(skill)
                                 break
@@ -250,10 +253,12 @@ class CharacterManager:
             SELECT
                 cr.card_id,
                 ss.skill_id1 as unique_skill_id,
-                t.text as skill_name
+                t.text as skill_name,
+                s.icon_id
             FROM card_rarity_data cr
             JOIN skill_set ss ON cr.skill_set = ss.id
             LEFT JOIN text_data t ON t.category = 47 AND t.[index] = ss.skill_id1
+            LEFT JOIN skill_data s ON s.id = ss.skill_id1
             WHERE cr.card_id IN ({placeholders})
               AND cr.rarity = 3
               AND ss.skill_id1 > 0
@@ -272,7 +277,8 @@ class CharacterManager:
                             card.unique_skill = CardSkill(
                                 skill_id=skill_row['unique_skill_id'],
                                 skill_name=skill_row['skill_name'] or f"Skill {skill_row['unique_skill_id']}",
-                                need_rank=0  # Unique skills unlock at rarity 3, not bond level
+                                need_rank=0,  # Unique skills unlock at rarity 3, not bond level
+                                icon_id=skill_row.get('icon_id', 0)
                             )
                             break
 

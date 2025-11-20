@@ -2,6 +2,13 @@
 from dataclasses import dataclass
 from typing import Optional
 from enum import IntEnum
+import sys
+from pathlib import Path
+
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from constants import get_skill_icon_emoji
 
 class SkillCategory(IntEnum):
     """Skill category enum."""
@@ -47,6 +54,7 @@ class Skill:
     skill_category: int = 0
     description: Optional[str] = None
     condition: Optional[str] = None
+    icon_id: int = 0
 
     @property
     def display_name(self) -> str:
@@ -74,3 +82,8 @@ class Skill:
     def is_debuff(self) -> bool:
         """Check if skill is a debuff."""
         return self.skill_category == SkillCategory.DEBUFF
+
+    @property
+    def icon_emoji(self) -> str:
+        """Get skill icon Discord emoji."""
+        return get_skill_icon_emoji(self.icon_id)

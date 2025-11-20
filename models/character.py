@@ -19,6 +19,7 @@ class CardSkill:
     skill_id: int
     skill_name: str
     need_rank: int  # Bond level required to unlock (0-5)
+    icon_id: int = 0  # Skill icon ID
 
     @property
     def rank_emoji(self) -> str:
@@ -26,6 +27,12 @@ class CardSkill:
         if self.need_rank == 0:
             return "🔓"
         return f"🔒{self.need_rank}"
+
+    @property
+    def icon_emoji(self) -> str:
+        """Get skill icon Discord emoji."""
+        from constants import get_skill_icon_emoji
+        return get_skill_icon_emoji(self.icon_id)
 
 class RunningStyle(IntEnum):
     """Running style enum."""

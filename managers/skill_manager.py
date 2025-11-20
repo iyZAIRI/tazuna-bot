@@ -39,6 +39,7 @@ class SkillManager:
                 s.grade_value,
                 s.skill_category,
                 s.condition_1,
+                s.icon_id,
                 t1.text as name,
                 t2.text as description
             FROM skill_data s
@@ -60,7 +61,8 @@ class SkillManager:
                     grade_value=row['grade_value'],
                     skill_category=row['skill_category'] or 0,
                     description=row['description'],
-                    condition=row['condition_1']
+                    condition=row['condition_1'],
+                    icon_id=row.get('icon_id', 0)
                 )
                 self.skills[skill.skill_id] = skill
 
