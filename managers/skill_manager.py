@@ -52,6 +52,14 @@ class SkillManager:
                     skill_to_character[skill_id] = char_name
             character_unique_ids = set(skill_to_character.keys())
 
+            # Load SP costs for skills
+            sp_cost_query = """
+            SELECT id, need_skill_point
+            FROM single_mode_skill_need_point
+            """
+            sp_cost_results = self.db.query(sp_cost_query)
+            skill_sp_costs = {row['id']: row['need_skill_point'] for row in sp_cost_results}
+
             # Load all skills with ability data
             query = """
             SELECT
@@ -145,6 +153,7 @@ class SkillManager:
                     is_character_unique=row['id'] in character_unique_ids,
                     unique_character_name=skill_to_character.get(row['id']),
                     requires_wisdom=row.get('activate_lot', 0) == 1,
+                    sp_cost=skill_sp_costs.get(row['id']),
                     ability_1=ability_1,
                     ability_2=ability_2
                 )

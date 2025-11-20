@@ -56,6 +56,7 @@ class Skill:
     is_character_unique: bool = False
     unique_character_name: Optional[str] = None  # Name of character who owns this unique skill
     requires_wisdom: bool = False  # True if skill requires wisdom check (activate_lot=1), False if guaranteed (activate_lot=0)
+    sp_cost: Optional[int] = None  # Skill point cost (None for character unique skills)
     ability_1: Optional[SkillAbility] = None
     ability_2: Optional[SkillAbility] = None
 

@@ -101,6 +101,10 @@ class SkillDetailView(discord.ui.View):
         activation_type = "Wisdom Check" if skill.requires_wisdom else "Guaranteed"
         embed.add_field(name="Activation", value=activation_type, inline=True)
 
+        # Display SP cost (only for non-unique skills)
+        if skill.sp_cost is not None:
+            embed.add_field(name="SP Cost", value=str(skill.sp_cost), inline=True)
+
         if skill.is_character_unique:
             char_display = skill.unique_character_name if skill.unique_character_name else "💎"
             embed.add_field(name="Character Unique", value=char_display, inline=True)
@@ -179,6 +183,10 @@ class Skills(commands.Cog):
         # Display activation type
         activation_type = "Wisdom Check" if skill.requires_wisdom else "Guaranteed"
         embed.add_field(name="Activation", value=activation_type, inline=True)
+
+        # Display SP cost (only for non-unique skills)
+        if skill.sp_cost is not None:
+            embed.add_field(name="SP Cost", value=str(skill.sp_cost), inline=True)
 
         if skill.is_character_unique:
             char_display = skill.unique_character_name if skill.unique_character_name else "💎"
