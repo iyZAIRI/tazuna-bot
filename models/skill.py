@@ -36,7 +36,7 @@ class SkillAbility:
 
         # Show activation condition if exists
         if self.condition:
-            lines.append(f"**Condition:** `{self.condition}`")
+            lines.append(f"**Condition:**\n```\n{self.condition}\n```")
 
         return lines
 
