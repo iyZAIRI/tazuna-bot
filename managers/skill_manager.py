@@ -32,24 +32,31 @@ class SkillManager:
             return False
 
         try:
-            # First, get all character unique skill IDs with character names
+            # First, get all character unique skill IDs with character names and card titles
             unique_skill_query = """
-            SELECT DISTINCT ss.skill_id1, cd.chara_id, t.text as char_name
+            SELECT DISTINCT ss.skill_id1, cd.chara_id, t1.text as char_name, t2.text as card_title
             FROM card_rarity_data cr
             JOIN skill_set ss ON cr.skill_set = ss.id
             JOIN card_data cd ON cr.card_id = cd.id
-            LEFT JOIN text_data t ON t.category = 6 AND t.[index] = cd.chara_id
+            LEFT JOIN text_data t1 ON t1.category = 6 AND t1.[index] = cd.chara_id
+            LEFT JOIN text_data t2 ON t2.category = 5 AND t2.[index] = cr.card_id
             WHERE cr.rarity = 3 AND ss.skill_id1 > 0
             """
             unique_results = self.db.query(unique_skill_query)
-            # Map skill_id -> character name
+            # Map skill_id -> character display (title + name)
             skill_to_character = {}
             for row in unique_results:
                 skill_id = row['skill_id1']
                 char_name = row.get('char_name', 'Unknown')
+                card_title = row.get('card_title')
+                # Format as "[Title] Name" if title exists, otherwise just name
+                if card_title:
+                    display = f"{card_title} {char_name}"
+                else:
+                    display = char_name
                 # If multiple characters have the same skill, just use the first one
                 if skill_id not in skill_to_character:
-                    skill_to_character[skill_id] = char_name
+                    skill_to_character[skill_id] = display
             character_unique_ids = set(skill_to_character.keys())
 
             # Load SP costs for skills
