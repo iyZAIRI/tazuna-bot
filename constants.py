@@ -16,6 +16,14 @@ EMOJI_RANK_E = "<:Rank_E:1440798367805341796>"
 EMOJI_RANK_F = "<:Rank_F:1440798384721104906>"
 EMOJI_RANK_G = "<:Rank_G:1440798401267499221>"
 
+# Rarity Emojis
+EMOJI_SSR = "<:ssr:1441158280184467670>"
+EMOJI_SR = "<:sr:1441158302435246281>"
+EMOJI_R = "<:r_:1441158255995916319>"
+
+# Support Card Type Emojis
+EMOJI_PAL = "<:pal:1441157673008632099>"
+
 # Running Style Emojis
 EMOJI_FRONT_RUNNER = "🏃"
 EMOJI_PACE_CHASER = "👑"
@@ -115,3 +123,35 @@ SKILL_ICON_EMOJIS = {
 def get_skill_icon_emoji(icon_id: int) -> str:
     """Get Discord emoji for skill icon ID."""
     return SKILL_ICON_EMOJIS.get(icon_id, "🎯")  # Default to target emoji if not found
+
+# Support Card Command ID Mapping (Training/Stat Types)
+SUPPORT_CARD_TYPES = {
+    101: "Speed",
+    102: "Power",
+    103: "Guts",
+    105: "Stamina",
+    106: "Wit",
+    0: "Pal"  # Friendship/Group cards
+}
+
+def get_support_card_type_emoji(command_id: int) -> str:
+    """Get emoji for support card training type."""
+    emoji_map = {
+        101: EMOJI_SPEED,
+        102: EMOJI_POWER,
+        103: EMOJI_GUTS,
+        105: EMOJI_STAMINA,
+        106: EMOJI_WIT,
+        0: EMOJI_PAL
+    }
+    return emoji_map.get(command_id, "❓")
+
+def get_rarity_emoji(rarity: int) -> str:
+    """Get emoji for card rarity."""
+    if rarity == 3:
+        return EMOJI_SSR
+    elif rarity == 2:
+        return EMOJI_SR
+    elif rarity == 1:
+        return EMOJI_R
+    return f"★{rarity}"  # Fallback for unexpected rarities
