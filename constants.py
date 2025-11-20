@@ -36,12 +36,12 @@ RANK_EMOJIS = {
 
 # Skill Ability Type Mapping
 SKILL_ABILITY_TYPES = {
-    1: "Track Aptitude",
-    2: "Racecourse Aptitude",
-    3: "Ground Condition",
-    4: "Weather Aptitude",
-    5: "Post Position",
-    6: "Strategy Effect",
+    1: "Speed Stat Up",
+    2: "Stamina Stat Up",
+    3: "Power Stat Up",
+    4: "Guts Stat Up",
+    5: "Wit Stat Up",
+    6: "Strategy Change",
     8: "Vision",
     9: "Stamina Recovery",
     10: "Gate Start",
