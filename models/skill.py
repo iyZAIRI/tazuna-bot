@@ -32,6 +32,11 @@ class SkillAbility:
         for ab_type, ab_value in zip(self.ability_types, self.ability_values):
             if ab_type > 0:
                 type_name = get_ability_type_name(ab_type)
+                # Add "Up" or "Down" suffix based on value sign
+                if ab_value > 0:
+                    type_name += " Up"
+                elif ab_value < 0:
+                    type_name += " Down"
                 lines.append(f"{type_name}: {ab_value:+.2f}")
 
         # Show activation condition if exists
