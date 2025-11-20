@@ -37,7 +37,7 @@ class Skills(commands.Cog):
             return
 
         embed = discord.Embed(
-            title=f"{skill.category_emoji} {skill.display_name}",
+            title=f"{skill.icon_emoji} {skill.display_name}",
             description=skill.description or "No description available",
             color=config.EMBED_COLOR
         )
@@ -92,8 +92,8 @@ class Skills(commands.Cog):
 
         for skill in skills[:25]:  # Limit to 25
             embed.add_field(
-                name=f"{skill.rarity_stars} {skill.display_name}",
-                value=f"Grade: {skill.grade_value} {skill.category_emoji}",
+                name=f"{skill.icon_emoji} {skill.rarity_stars} {skill.display_name}",
+                value=f"Grade: {skill.grade_value}",
                 inline=True
             )
 
@@ -127,7 +127,7 @@ class Skills(commands.Cog):
         skill_list = []
         for i, skill in enumerate(skills, 1):
             skill_list.append(
-                f"{i}. {skill.rarity_stars} **{skill.display_name}** ({skill.grade_value})"
+                f"{i}. {skill.icon_emoji} {skill.rarity_stars} **{skill.display_name}** ({skill.grade_value})"
             )
 
         embed.add_field(
