@@ -19,7 +19,7 @@ class SupportCardManager:
         self.db_path = db_path
         self.db = MasterDBReader(db_path)
         self.cards: Dict[int, SupportCard] = {}
-        self.name_index: Dict[str, int] = {}
+        self.character_index: Dict[str, List[int]] = {}  # character_name -> list of card_ids
         self._loaded = False
 
     def load(self) -> bool:
@@ -37,13 +37,15 @@ class SupportCardManager:
                 sc.id,
                 sc.chara_id,
                 sc.rarity,
+                sc.command_id,
                 sc.support_card_type,
-                t1.text as card_name,
-                t2.text as chara_name
+                sc.skill_set_id,
+                sc.effect_table_id,
+                sc.unique_effect_id,
+                t.text as chara_name
             FROM support_card_data sc
-            LEFT JOIN text_data t1 ON t1.category = 75 AND t1.[index] = sc.id
-            LEFT JOIN text_data t2 ON t2.category = 6 AND t2.[index] = sc.chara_id
-            ORDER BY sc.rarity DESC, sc.id
+            LEFT JOIN text_data t ON t.category = 6 AND t.[index] = sc.chara_id
+            ORDER BY sc.rarity DESC, sc.command_id, sc.id
             """
 
             results = self.db.query(query)
@@ -52,18 +54,22 @@ class SupportCardManager:
                 card = SupportCard(
                     card_id=row['id'],
                     chara_id=row['chara_id'],
-                    name=row['card_name'] or f"Support {row['id']}",
+                    character_name=row['chara_name'] or "Unknown",
                     rarity=row['rarity'],
-                    support_type=row['support_card_type'],
-                    name_en=row['card_name'],
-                    name_jp=row['card_name'],
-                    character_name=row['chara_name']
+                    command_id=row.get('command_id', 0),
+                    support_card_type=row['support_card_type'],
+                    skill_set_id=row.get('skill_set_id'),
+                    effect_table_id=row.get('effect_table_id'),
+                    unique_effect_id=row.get('unique_effect_id')
                 )
                 self.cards[card.card_id] = card
 
-                # Index by name
-                if row['card_name']:
-                    self.name_index[row['card_name'].lower()] = card.card_id
+                # Index by character name
+                if row['chara_name']:
+                    char_name_lower = row['chara_name'].lower()
+                    if char_name_lower not in self.character_index:
+                        self.character_index[char_name_lower] = []
+                    self.character_index[char_name_lower].append(card.card_id)
 
             self._loaded = True
             logger.info(f"Loaded {len(self.cards)} support cards")
@@ -79,23 +85,21 @@ class SupportCardManager:
             self.load()
         return self.cards.get(card_id)
 
-    def get_by_name(self, name: str) -> Optional[SupportCard]:
-        """Get support card by name (partial match)."""
+    def get_by_character_name(self, name: str) -> List[SupportCard]:
+        """Get support cards by character name (partial match)."""
         if not self._loaded:
             self.load()
 
         name_lower = name.lower()
+        matching_cards = []
 
-        # Exact match
-        if name_lower in self.name_index:
-            return self.cards[self.name_index[name_lower]]
-
-        # Partial match
-        for indexed_name, card_id in self.name_index.items():
+        # Search for partial matches
+        for indexed_name, card_ids in self.character_index.items():
             if name_lower in indexed_name:
-                return self.cards[card_id]
+                for card_id in card_ids:
+                    matching_cards.append(self.cards[card_id])
 
-        return None
+        return matching_cards
 
     def get_all(self) -> List[SupportCard]:
         """Get all support cards."""
@@ -109,35 +113,27 @@ class SupportCardManager:
             self.load()
         return [c for c in self.cards.values() if c.rarity == rarity]
 
-    def get_by_type(self, support_type: int) -> List[SupportCard]:
-        """Get support cards by type."""
+    def get_by_type(self, command_id: int) -> List[SupportCard]:
+        """Get support cards by training type (command_id)."""
         if not self._loaded:
             self.load()
-        return [c for c in self.cards.values() if c.support_type == support_type]
+        return [c for c in self.cards.values() if c.command_id == command_id]
 
-    def get_by_character(self, chara_id: int) -> List[SupportCard]:
+    def get_by_character_id(self, chara_id: int) -> List[SupportCard]:
         """Get support cards for a specific character."""
         if not self._loaded:
             self.load()
         return [c for c in self.cards.values() if c.chara_id == chara_id]
 
-    def search(self, query: str) -> List[SupportCard]:
-        """Search support cards by name."""
-        if not self._loaded:
-            self.load()
-
-        query_lower = query.lower()
-        results = []
-
-        for name, card_id in self.name_index.items():
-            if query_lower in name:
-                results.append(self.cards[card_id])
-
-        return results
-
     def get_ssr_cards(self) -> List[SupportCard]:
         """Get all SSR support cards."""
         return self.get_by_rarity(3)
+
+    def get_pal_cards(self) -> List[SupportCard]:
+        """Get all Pal support cards."""
+        if not self._loaded:
+            self.load()
+        return [c for c in self.cards.values() if c.is_pal]
 
     def close(self):
         """Close database connection."""
