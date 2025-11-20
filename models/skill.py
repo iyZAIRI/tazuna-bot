@@ -54,6 +54,7 @@ class Skill:
     condition: Optional[str] = None
     icon_id: int = 0
     is_character_unique: bool = False
+    unique_character_name: Optional[str] = None  # Name of character who owns this unique skill
     ability_1: Optional[SkillAbility] = None
     ability_2: Optional[SkillAbility] = None
 

@@ -101,7 +101,8 @@ class SkillDetailView(discord.ui.View):
         embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
 
         if skill.is_character_unique:
-            embed.add_field(name="Character Unique", value="💎", inline=True)
+            char_display = skill.unique_character_name if skill.unique_character_name else "💎"
+            embed.add_field(name="Character Unique", value=char_display, inline=True)
 
         # Display effects
         effect_lines = []
@@ -178,7 +179,8 @@ class Skills(commands.Cog):
         embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
 
         if skill.is_character_unique:
-            embed.add_field(name="Character Unique", value="💎", inline=True)
+            char_display = skill.unique_character_name if skill.unique_character_name else "💎"
+            embed.add_field(name="Character Unique", value=char_display, inline=True)
 
         # Display effects
         effect_lines = []

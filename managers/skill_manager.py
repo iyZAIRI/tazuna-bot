@@ -32,15 +32,25 @@ class SkillManager:
             return False
 
         try:
-            # First, get all character unique skill IDs (same way as character loading)
+            # First, get all character unique skill IDs with character names
             unique_skill_query = """
-            SELECT DISTINCT ss.skill_id1
+            SELECT DISTINCT ss.skill_id1, cd.chara_id, t.text as char_name
             FROM card_rarity_data cr
             JOIN skill_set ss ON cr.skill_set = ss.id
+            JOIN card_data cd ON cr.card_id = cd.id
+            LEFT JOIN text_data t ON t.category = 6 AND t.[index] = cd.chara_id
             WHERE cr.rarity = 3 AND ss.skill_id1 > 0
             """
             unique_results = self.db.query(unique_skill_query)
-            character_unique_ids = {row['skill_id1'] for row in unique_results}
+            # Map skill_id -> character name
+            skill_to_character = {}
+            for row in unique_results:
+                skill_id = row['skill_id1']
+                char_name = row.get('char_name', 'Unknown')
+                # If multiple characters have the same skill, just use the first one
+                if skill_id not in skill_to_character:
+                    skill_to_character[skill_id] = char_name
+            character_unique_ids = set(skill_to_character.keys())
 
             # Load all skills with ability data
             query = """
@@ -132,6 +142,7 @@ class SkillManager:
                     condition=row.get('condition_1'),  # Keep for single-ability skills
                     icon_id=row.get('icon_id', 0),
                     is_character_unique=row['id'] in character_unique_ids,
+                    unique_character_name=skill_to_character.get(row['id']),
                     ability_1=ability_1,
                     ability_2=ability_2
                 )
