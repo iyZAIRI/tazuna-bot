@@ -55,6 +55,7 @@ class Skill:
     description: Optional[str] = None
     condition: Optional[str] = None
     icon_id: int = 0
+    is_character_unique: bool = False  # True if this skill is a character's unique skill
 
     @property
     def display_name(self) -> str:

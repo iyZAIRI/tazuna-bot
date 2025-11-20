@@ -99,7 +99,14 @@ class SkillDetailView(discord.ui.View):
 
         embed.add_field(name="Rarity", value=skill.rarity_stars, inline=True)
         embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
-        embed.add_field(name="Skill ID", value=skill.skill_id, inline=True)
+
+        if skill.is_character_unique:
+            embed.add_field(name="Type", value="💎 Character Unique", inline=True)
+        elif skill.is_debuff:
+            embed.add_field(name="Type", value="❌ Debuff", inline=True)
+        else:
+            # Add category emoji as type
+            embed.add_field(name="Category", value=skill.category_emoji, inline=True)
 
         if skill.condition:
             condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
@@ -108,11 +115,6 @@ class SkillDetailView(discord.ui.View):
                 value=f"```{condition_text}```",
                 inline=False
             )
-
-        if skill.is_unique:
-            embed.add_field(name="Type", value="✨ Unique Skill", inline=True)
-        elif skill.is_debuff:
-            embed.add_field(name="Type", value="❌ Debuff", inline=True)
 
         embed.set_footer(text="Uma Musume Pretty Derby • Skill Database")
         return embed
@@ -161,7 +163,14 @@ class Skills(commands.Cog):
 
         embed.add_field(name="Rarity", value=skill.rarity_stars, inline=True)
         embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
-        embed.add_field(name="Skill ID", value=skill.skill_id, inline=True)
+
+        if skill.is_character_unique:
+            embed.add_field(name="Type", value="💎 Character Unique", inline=True)
+        elif skill.is_debuff:
+            embed.add_field(name="Type", value="❌ Debuff", inline=True)
+        else:
+            # Add category emoji as type
+            embed.add_field(name="Category", value=skill.category_emoji, inline=True)
 
         if skill.condition:
             condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
@@ -170,11 +179,6 @@ class Skills(commands.Cog):
                 value=f"```{condition_text}```",
                 inline=False
             )
-
-        if skill.is_unique:
-            embed.add_field(name="Type", value="✨ Unique Skill", inline=True)
-        elif skill.is_debuff:
-            embed.add_field(name="Type", value="❌ Debuff", inline=True)
 
         embed.set_footer(text="Uma Musume Pretty Derby • Skill Database")
         await interaction.followup.send(embed=embed)

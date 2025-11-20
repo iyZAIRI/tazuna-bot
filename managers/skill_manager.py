@@ -32,6 +32,16 @@ class SkillManager:
             return False
 
         try:
+            # First, get all character unique skill IDs
+            unique_skill_query = """
+            SELECT DISTINCT skill_id1
+            FROM skill_set
+            WHERE skill_id1 > 0
+            """
+            unique_results = self.db.query(unique_skill_query)
+            character_unique_ids = {row['skill_id1'] for row in unique_results}
+
+            # Load all skills
             query = """
             SELECT
                 s.id,
@@ -62,7 +72,8 @@ class SkillManager:
                     skill_category=row['skill_category'] or 0,
                     description=row['description'],
                     condition=row['condition_1'],
-                    icon_id=row.get('icon_id', 0)
+                    icon_id=row.get('icon_id', 0),
+                    is_character_unique=row['id'] in character_unique_ids
                 )
                 self.skills[skill.skill_id] = skill
 
@@ -74,7 +85,7 @@ class SkillManager:
                     self.name_index[name_lower].append(skill.skill_id)
 
             self._loaded = True
-            logger.info(f"Loaded {len(self.skills)} skills")
+            logger.info(f"Loaded {len(self.skills)} skills ({len(character_unique_ids)} character uniques)")
             return True
 
         except Exception as e:
