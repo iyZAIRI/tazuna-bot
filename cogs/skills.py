@@ -11,31 +11,38 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from managers.skill_manager import SkillManager
 
-class Skills(commands.Cog):
-    """Skill lookup and information commands."""
+class SkillSelectorView(discord.ui.View):
+    """View for selecting a skill when multiple matches are found."""
 
-    def __init__(self, bot):
-        self.bot = bot
-        self.manager = SkillManager()
-        if not self.manager.load():
-            print("⚠️  Failed to load skill data")
+    def __init__(self, skills: list):
+        super().__init__(timeout=180)
+        self.skills = skills
 
-    def cog_unload(self):
-        """Clean up when cog is unloaded."""
-        self.manager.close()
+        # Add a button for each skill (limit to 25 - Discord limit)
+        for idx, skill in enumerate(skills[:25]):
+            # Create button label with skill name and rarity
+            label = f"{skill.rarity_stars} {skill.display_name[:60]}"  # Truncate if needed
 
-    @app_commands.command(name="skill", description="Look up information about a skill")
-    @app_commands.describe(name="Skill name (partial match supported)")
-    async def skill(self, interaction: discord.Interaction, name: str):
-        """Look up information about a skill."""
-        await interaction.response.defer()
+            button = discord.ui.Button(
+                label=label,
+                style=discord.ButtonStyle.primary,
+                custom_id=f"skill_{skill.skill_id}",
+                row=idx // 5  # Group into rows of 5
+            )
+            button.callback = self.create_skill_callback(skill)
+            self.add_item(button)
 
-        skill = self.manager.get_by_name(name)
+    def create_skill_callback(self, skill):
+        """Create a callback for a specific skill button."""
+        async def callback(interaction: discord.Interaction):
+            embed = self.create_skill_embed(skill)
+            await interaction.response.edit_message(embed=embed, view=None)
 
-        if not skill:
-            await interaction.followup.send(f"❌ Skill '{name}' not found.")
-            return
+        return callback
 
+    @staticmethod
+    def create_skill_embed(skill) -> discord.Embed:
+        """Create skill detail embed."""
         embed = discord.Embed(
             title=f"{skill.icon_emoji} {skill.display_name}",
             description=skill.description or "No description available",
@@ -60,6 +67,66 @@ class Skills(commands.Cog):
             embed.add_field(name="Type", value="❌ Debuff", inline=True)
 
         embed.set_footer(text="Uma Musume Pretty Derby • Skill Database")
+        return embed
+
+
+class Skills(commands.Cog):
+    """Skill lookup and information commands."""
+
+    def __init__(self, bot):
+        self.bot = bot
+        self.manager = SkillManager()
+        if not self.manager.load():
+            print("⚠️  Failed to load skill data")
+
+    def cog_unload(self):
+        """Clean up when cog is unloaded."""
+        self.manager.close()
+
+    @app_commands.command(name="skill", description="Look up information about a skill")
+    @app_commands.describe(name="Skill name (partial match supported)")
+    async def skill(self, interaction: discord.Interaction, name: str):
+        """Look up information about a skill."""
+        await interaction.response.defer()
+
+        # Search for skills matching the query
+        skills = self.manager.search(name)
+
+        if not skills:
+            await interaction.followup.send(f"❌ No skills found matching '{name}'.")
+            return
+
+        # If multiple matches, show selector
+        if len(skills) > 1:
+            embed = discord.Embed(
+                title="🎯 Multiple Skills Found",
+                description=f"Found {len(skills)} skills matching '{name}'. Select one:",
+                color=config.EMBED_COLOR
+            )
+
+            # Show preview of matches (up to 10)
+            preview_list = []
+            for i, skill in enumerate(skills[:10], 1):
+                preview_list.append(f"{i}. {skill.icon_emoji} {skill.rarity_stars} **{skill.display_name}**")
+
+            embed.add_field(
+                name="Matches",
+                value="\n".join(preview_list),
+                inline=False
+            )
+
+            if len(skills) > 10:
+                embed.set_footer(text=f"Showing 10 of {len(skills)} matches • Select a skill below")
+            else:
+                embed.set_footer(text="Select a skill below")
+
+            view = SkillSelectorView(skills)
+            await interaction.followup.send(embed=embed, view=view)
+            return
+
+        # Single match - show directly
+        skill = skills[0]
+        embed = SkillSelectorView.create_skill_embed(skill)
         await interaction.followup.send(embed=embed)
 
     @app_commands.command(name="skills", description="List skills by rarity")
