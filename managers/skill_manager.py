@@ -42,7 +42,7 @@ class SkillManager:
             unique_results = self.db.query(unique_skill_query)
             character_unique_ids = {row['skill_id1'] for row in unique_results}
 
-            # Load all skills
+            # Load all skills with ability data
             query = """
             SELECT
                 s.id,
@@ -51,7 +51,20 @@ class SkillManager:
                 s.skill_category,
                 s.condition_1,
                 s.icon_id,
-                s.tag_id,
+                s.float_ability_time_1,
+                s.ability_type_1_1,
+                s.ability_type_1_2,
+                s.ability_type_1_3,
+                s.float_ability_value_1_1,
+                s.float_ability_value_1_2,
+                s.float_ability_value_1_3,
+                s.float_ability_time_2,
+                s.ability_type_2_1,
+                s.ability_type_2_2,
+                s.ability_type_2_3,
+                s.float_ability_value_2_1,
+                s.float_ability_value_2_2,
+                s.float_ability_value_2_3,
                 t1.text as name,
                 t2.text as description
             FROM skill_data s
@@ -64,6 +77,42 @@ class SkillManager:
             results = self.db.query(query)
 
             for row in results:
+                # Parse ability 1
+                ability_1 = None
+                if row.get('ability_type_1_1', 0) > 0:
+                    from models.skill import SkillAbility
+                    ability_1 = SkillAbility(
+                        ability_types=[
+                            row.get('ability_type_1_1', 0),
+                            row.get('ability_type_1_2', 0),
+                            row.get('ability_type_1_3', 0)
+                        ],
+                        ability_values=[
+                            (row.get('float_ability_value_1_1', 0) or 0) / 10000.0,
+                            (row.get('float_ability_value_1_2', 0) or 0) / 10000.0,
+                            (row.get('float_ability_value_1_3', 0) or 0) / 10000.0
+                        ],
+                        duration=(row.get('float_ability_time_1', 0) or 0) / 10000.0
+                    )
+
+                # Parse ability 2
+                ability_2 = None
+                if row.get('ability_type_2_1', 0) > 0:
+                    from models.skill import SkillAbility
+                    ability_2 = SkillAbility(
+                        ability_types=[
+                            row.get('ability_type_2_1', 0),
+                            row.get('ability_type_2_2', 0),
+                            row.get('ability_type_2_3', 0)
+                        ],
+                        ability_values=[
+                            (row.get('float_ability_value_2_1', 0) or 0) / 10000.0,
+                            (row.get('float_ability_value_2_2', 0) or 0) / 10000.0,
+                            (row.get('float_ability_value_2_3', 0) or 0) / 10000.0
+                        ],
+                        duration=(row.get('float_ability_time_2', 0) or 0) / 10000.0
+                    )
+
                 skill = Skill(
                     skill_id=row['id'],
                     name=row['name'] or f"Skill {row['id']}",
@@ -75,8 +124,9 @@ class SkillManager:
                     description=row['description'],
                     condition=row['condition_1'],
                     icon_id=row.get('icon_id', 0),
-                    tag_id=row.get('tag_id', ''),
-                    is_character_unique=row['id'] in character_unique_ids
+                    is_character_unique=row['id'] in character_unique_ids,
+                    ability_1=ability_1,
+                    ability_2=ability_2
                 )
                 self.skills[skill.skill_id] = skill
 

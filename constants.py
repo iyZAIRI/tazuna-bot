@@ -34,48 +34,28 @@ RANK_EMOJIS = {
     "?": "❓"
 }
 
-# Skill Type Tags (from text_data category 55)
-SKILL_TYPE_TAGS = {
-    101: "Speed",
-    102: "Power",
-    103: "Guts",
-    105: "Stamina",
-    106: "Wit",
-    108: "Hydrate",
-    109: "Recreation",
-    301: "Riverside",
-    302: "Karaoke",
-    303: "Shrine",
-    304: "Beach",
-    305: "Hot Springs",
-    601: "Speed",
-    602: "Stamina",
-    603: "Power",
-    604: "Guts",
-    605: "Wit",
+# Skill Ability Type Mapping
+SKILL_ABILITY_TYPES = {
+    1: "Track Aptitude",
+    2: "Racecourse Aptitude",
+    3: "Ground Condition",
+    4: "Weather Aptitude",
+    5: "Post Position",
+    6: "Strategy Effect",
+    8: "Vision",
+    9: "Stamina Recovery",
+    10: "Gate Start",
+    13: "Rush Time (Debuff)",
+    21: "Velocity (Debuff)",
+    27: "Velocity",
+    28: "Maneuverability",
+    31: "Acceleration",
+    35: "Surrounded Avoidance",
 }
 
-def get_skill_types(tag_id_str: str) -> list:
-    """Parse tag_id string and return list of skill type names."""
-    if not tag_id_str:
-        return []
-
-    tags = tag_id_str.split('/')
-    skill_types = []
-    seen = set()  # Avoid duplicates (e.g., 101 and 601 both = Speed)
-
-    for tag in tags:
-        try:
-            tag_num = int(tag)
-            if tag_num in SKILL_TYPE_TAGS:
-                type_name = SKILL_TYPE_TAGS[tag_num]
-                if type_name not in seen:
-                    skill_types.append(type_name)
-                    seen.add(type_name)
-        except ValueError:
-            pass
-
-    return skill_types
+def get_ability_type_name(ability_type: int) -> str:
+    """Get ability type name from ability_type number."""
+    return SKILL_ABILITY_TYPES.get(ability_type, f"Unknown ({ability_type})")
 
 # Skill Icon Emojis (icon_id -> Discord emoji)
 SKILL_ICON_EMOJIS = {

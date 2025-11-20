@@ -1,13 +1,31 @@
 """Skill data models."""
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 import sys
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from constants import get_skill_icon_emoji, get_skill_types
+from constants import get_skill_icon_emoji, get_ability_type_name
+
+@dataclass
+class SkillAbility:
+    """Represents a skill ability effect."""
+    ability_types: List[int]  # ability_type_X_1, ability_type_X_2, ability_type_X_3
+    ability_values: List[float]  # float_ability_value_X_1, X_2, X_3
+    duration: float  # float_ability_time_X (in seconds)
+
+    def get_effect_lines(self) -> List[str]:
+        """Get formatted effect lines."""
+        lines = []
+        for ab_type, ab_value in zip(self.ability_types, self.ability_values):
+            if ab_type > 0:
+                type_name = get_ability_type_name(ab_type)
+                lines.append(f"{type_name}: {ab_value:+.2f}")
+        if self.duration > 0:
+            lines.append(f"Base Duration: {self.duration:.1f}s")
+        return lines
 
 @dataclass
 class Skill:
@@ -22,8 +40,9 @@ class Skill:
     description: Optional[str] = None
     condition: Optional[str] = None
     icon_id: int = 0
-    tag_id: str = ""
-    is_character_unique: bool = False  # True if this skill is a character's unique skill
+    is_character_unique: bool = False
+    ability_1: Optional[SkillAbility] = None
+    ability_2: Optional[SkillAbility] = None
 
     @property
     def display_name(self) -> str:
@@ -41,8 +60,3 @@ class Skill:
     def icon_emoji(self) -> str:
         """Get skill icon Discord emoji."""
         return get_skill_icon_emoji(self.icon_id)
-
-    @property
-    def skill_types(self) -> list:
-        """Get list of skill type names from tag_id."""
-        return get_skill_types(self.tag_id)

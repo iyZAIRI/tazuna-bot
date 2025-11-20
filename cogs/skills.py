@@ -103,10 +103,28 @@ class SkillDetailView(discord.ui.View):
         if skill.is_character_unique:
             embed.add_field(name="Character Unique", value="💎", inline=True)
 
-        # Display skill types
-        if skill.skill_types:
-            types_str = ", ".join(skill.skill_types)
-            embed.add_field(name="Type", value=types_str, inline=False)
+        # Display effects
+        effect_lines = []
+        if skill.ability_1:
+            ability_1_lines = skill.ability_1.get_effect_lines()
+            if ability_1_lines:
+                effect_lines.append("**Ability 1:**")
+                effect_lines.extend(ability_1_lines)
+
+        if skill.ability_2:
+            ability_2_lines = skill.ability_2.get_effect_lines()
+            if ability_2_lines:
+                if effect_lines:
+                    effect_lines.append("")  # Blank line between abilities
+                effect_lines.append("**Ability 2:**")
+                effect_lines.extend(ability_2_lines)
+
+        if effect_lines:
+            embed.add_field(
+                name="Effect",
+                value="\n".join(effect_lines),
+                inline=False
+            )
 
         if skill.condition:
             condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
@@ -167,10 +185,28 @@ class Skills(commands.Cog):
         if skill.is_character_unique:
             embed.add_field(name="Character Unique", value="💎", inline=True)
 
-        # Display skill types
-        if skill.skill_types:
-            types_str = ", ".join(skill.skill_types)
-            embed.add_field(name="Type", value=types_str, inline=False)
+        # Display effects
+        effect_lines = []
+        if skill.ability_1:
+            ability_1_lines = skill.ability_1.get_effect_lines()
+            if ability_1_lines:
+                effect_lines.append("**Ability 1:**")
+                effect_lines.extend(ability_1_lines)
+
+        if skill.ability_2:
+            ability_2_lines = skill.ability_2.get_effect_lines()
+            if ability_2_lines:
+                if effect_lines:
+                    effect_lines.append("")  # Blank line between abilities
+                effect_lines.append("**Ability 2:**")
+                effect_lines.extend(ability_2_lines)
+
+        if effect_lines:
+            embed.add_field(
+                name="Effect",
+                value="\n".join(effect_lines),
+                inline=False
+            )
 
         if skill.condition:
             condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
