@@ -11,6 +11,134 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from managers.skill_manager import SkillManager
 
+class SkillSelectorView(discord.ui.View):
+    """View for selecting a skill when multiple matches are found."""
+
+    def __init__(self, skills: list, search_query: str = ""):
+        super().__init__(timeout=180)
+        self.skills = skills
+        self.search_query = search_query
+
+        # Add a button for each skill (limit to 25 - Discord limit)
+        for idx, skill in enumerate(skills[:25]):
+            # Create button label with skill name and rarity
+            label = f"{skill.rarity_stars} {skill.display_name[:60]}"  # Truncate if needed
+
+            button = discord.ui.Button(
+                label=label,
+                style=discord.ButtonStyle.primary,
+                custom_id=f"skill_{skill.skill_id}",
+                row=idx // 5  # Group into rows of 5
+            )
+            button.callback = self.create_skill_callback(skill)
+            self.add_item(button)
+
+    def create_skill_callback(self, skill):
+        """Create a callback for a specific skill button."""
+        async def callback(interaction: discord.Interaction):
+            # Create detail view with back button
+            detail_view = SkillDetailView(skill, self)
+            embed = detail_view.create_embed()
+            await interaction.response.edit_message(embed=embed, view=detail_view)
+
+        return callback
+
+    def create_selector_embed(self) -> discord.Embed:
+        """Create the selector embed showing all matching skills."""
+        embed = discord.Embed(
+            title="🎯 Multiple Skills Found",
+            description=f"Found {len(self.skills)} skills matching '{self.search_query}'. Select one:",
+            color=config.EMBED_COLOR
+        )
+
+        # Show preview of matches (up to 10)
+        preview_list = []
+        for i, skill in enumerate(self.skills[:10], 1):
+            preview_list.append(f"{i}. {skill.icon_emoji} {skill.rarity_stars} **{skill.display_name}**")
+
+        embed.add_field(
+            name="Matches",
+            value="\n".join(preview_list),
+            inline=False
+        )
+
+        if len(self.skills) > 10:
+            embed.set_footer(text=f"Showing 10 of {len(self.skills)} matches • Select a skill below")
+        else:
+            embed.set_footer(text="Select a skill below")
+
+        return embed
+
+
+class SkillDetailView(discord.ui.View):
+    """View for displaying skill details with back button."""
+
+    def __init__(self, skill, parent_selector: SkillSelectorView):
+        super().__init__(timeout=180)
+        self.skill = skill
+        self.parent_selector = parent_selector
+
+        # Back button
+        back_button = discord.ui.Button(label="⬅ Back to Skills", style=discord.ButtonStyle.primary)
+        back_button.callback = self.go_back
+        self.add_item(back_button)
+
+    async def go_back(self, interaction: discord.Interaction):
+        """Go back to skill selector."""
+        embed = self.parent_selector.create_selector_embed()
+        await interaction.response.edit_message(embed=embed, view=self.parent_selector)
+
+    def create_embed(self) -> discord.Embed:
+        """Create skill detail embed."""
+        skill = self.skill
+        embed = discord.Embed(
+            title=f"{skill.icon_emoji} {skill.display_name}",
+            description=skill.description or "No description available",
+            color=config.EMBED_COLOR
+        )
+
+        # Display activation type
+        activation_type = "Wisdom Check" if skill.requires_wisdom else "Guaranteed"
+        embed.add_field(name="Activation", value=activation_type, inline=True)
+
+        # Display SP cost (only for non-unique skills)
+        if skill.sp_cost is not None:
+            embed.add_field(name="SP Cost", value=str(skill.sp_cost), inline=True)
+
+        if skill.is_character_unique:
+            char_display = skill.unique_character_name if skill.unique_character_name else "💎"
+            embed.add_field(name="Character Unique", value=char_display, inline=True)
+
+        # Display effects
+        effect_lines = []
+        has_multiple_abilities = skill.ability_1 and skill.ability_2
+
+        if skill.ability_1:
+            ability_1_lines = skill.ability_1.get_effect_lines()
+            if ability_1_lines:
+                if has_multiple_abilities:
+                    effect_lines.append("**Trigger 1:**")
+                effect_lines.extend(ability_1_lines)
+
+        if skill.ability_2:
+            ability_2_lines = skill.ability_2.get_effect_lines()
+            if ability_2_lines:
+                if effect_lines:
+                    effect_lines.append("")  # Blank line between triggers
+                effect_lines.append("**Trigger 2:**")
+                effect_lines.extend(ability_2_lines)
+
+        if effect_lines:
+            embed.add_field(
+                name="Effect",
+                value="\n".join(effect_lines),
+                inline=False
+            )
+
+        embed.set_footer(text="Uma Musume Pretty Derby • Skill Database")
+        return embed
+
+
 class Skills(commands.Cog):
     """Skill lookup and information commands."""
 
@@ -30,34 +158,65 @@ class Skills(commands.Cog):
         """Look up information about a skill."""
         await interaction.response.defer()
 
-        skill = self.manager.get_by_name(name)
+        # Search for skills matching the query
+        skills = self.manager.search(name)
 
-        if not skill:
-            await interaction.followup.send(f"❌ Skill '{name}' not found.")
+        if not skills:
+            await interaction.followup.send(f"❌ No skills found matching '{name}'.")
             return
 
+        # If multiple matches, show selector
+        if len(skills) > 1:
+            view = SkillSelectorView(skills, name)
+            embed = view.create_selector_embed()
+            await interaction.followup.send(embed=embed, view=view)
+            return
+
+        # Single match - show directly (no back button needed)
+        skill = skills[0]
         embed = discord.Embed(
-            title=f"{skill.category_emoji} {skill.display_name}",
+            title=f"{skill.icon_emoji} {skill.display_name}",
             description=skill.description or "No description available",
             color=config.EMBED_COLOR
         )
 
-        embed.add_field(name="Rarity", value=skill.rarity_stars, inline=True)
-        embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
-        embed.add_field(name="Skill ID", value=skill.skill_id, inline=True)
+        # Display activation type
+        activation_type = "Wisdom Check" if skill.requires_wisdom else "Guaranteed"
+        embed.add_field(name="Activation", value=activation_type, inline=True)
 
-        if skill.condition:
-            condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
+        # Display SP cost (only for non-unique skills)
+        if skill.sp_cost is not None:
+            embed.add_field(name="SP Cost", value=str(skill.sp_cost), inline=True)
+
+        if skill.is_character_unique:
+            char_display = skill.unique_character_name if skill.unique_character_name else "💎"
+            embed.add_field(name="Character Unique", value=char_display, inline=True)
+
+        # Display effects
+        effect_lines = []
+        has_multiple_abilities = skill.ability_1 and skill.ability_2
+
+        if skill.ability_1:
+            ability_1_lines = skill.ability_1.get_effect_lines()
+            if ability_1_lines:
+                if has_multiple_abilities:
+                    effect_lines.append("**Trigger 1:**")
+                effect_lines.extend(ability_1_lines)
+
+        if skill.ability_2:
+            ability_2_lines = skill.ability_2.get_effect_lines()
+            if ability_2_lines:
+                if effect_lines:
+                    effect_lines.append("")  # Blank line between triggers
+                effect_lines.append("**Trigger 2:**")
+                effect_lines.extend(ability_2_lines)
+
+        if effect_lines:
             embed.add_field(
-                name="Activation Condition",
-                value=f"```{condition_text}```",
+                name="Effect",
+                value="\n".join(effect_lines),
                 inline=False
             )
-
-        if skill.is_unique:
-            embed.add_field(name="Type", value="✨ Unique Skill", inline=True)
-        elif skill.is_debuff:
-            embed.add_field(name="Type", value="❌ Debuff", inline=True)
 
         embed.set_footer(text="Uma Musume Pretty Derby • Skill Database")
         await interaction.followup.send(embed=embed)
@@ -92,8 +251,8 @@ class Skills(commands.Cog):
 
         for skill in skills[:25]:  # Limit to 25
             embed.add_field(
-                name=f"{skill.rarity_stars} {skill.display_name}",
-                value=f"Grade: {skill.grade_value} {skill.category_emoji}",
+                name=f"{skill.icon_emoji} {skill.rarity_stars} {skill.display_name}",
+                value=f"Grade: {skill.grade_value}",
                 inline=True
             )
 
@@ -127,7 +286,7 @@ class Skills(commands.Cog):
         skill_list = []
         for i, skill in enumerate(skills, 1):
             skill_list.append(
-                f"{i}. {skill.rarity_stars} **{skill.display_name}** ({skill.grade_value})"
+                f"{i}. {skill.icon_emoji} {skill.rarity_stars} **{skill.display_name}** ({skill.grade_value})"
             )
 
         embed.add_field(
