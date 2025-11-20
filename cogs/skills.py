@@ -14,9 +14,10 @@ from managers.skill_manager import SkillManager
 class SkillSelectorView(discord.ui.View):
     """View for selecting a skill when multiple matches are found."""
 
-    def __init__(self, skills: list):
+    def __init__(self, skills: list, search_query: str = ""):
         super().__init__(timeout=180)
         self.skills = skills
+        self.search_query = search_query
 
         # Add a button for each skill (limit to 25 - Discord limit)
         for idx, skill in enumerate(skills[:25]):
@@ -35,14 +36,61 @@ class SkillSelectorView(discord.ui.View):
     def create_skill_callback(self, skill):
         """Create a callback for a specific skill button."""
         async def callback(interaction: discord.Interaction):
-            embed = self.create_skill_embed(skill)
-            await interaction.response.edit_message(embed=embed, view=None)
+            # Create detail view with back button
+            detail_view = SkillDetailView(skill, self)
+            embed = detail_view.create_embed()
+            await interaction.response.edit_message(embed=embed, view=detail_view)
 
         return callback
 
-    @staticmethod
-    def create_skill_embed(skill) -> discord.Embed:
+    def create_selector_embed(self) -> discord.Embed:
+        """Create the selector embed showing all matching skills."""
+        embed = discord.Embed(
+            title="🎯 Multiple Skills Found",
+            description=f"Found {len(self.skills)} skills matching '{self.search_query}'. Select one:",
+            color=config.EMBED_COLOR
+        )
+
+        # Show preview of matches (up to 10)
+        preview_list = []
+        for i, skill in enumerate(self.skills[:10], 1):
+            preview_list.append(f"{i}. {skill.icon_emoji} {skill.rarity_stars} **{skill.display_name}**")
+
+        embed.add_field(
+            name="Matches",
+            value="\n".join(preview_list),
+            inline=False
+        )
+
+        if len(self.skills) > 10:
+            embed.set_footer(text=f"Showing 10 of {len(self.skills)} matches • Select a skill below")
+        else:
+            embed.set_footer(text="Select a skill below")
+
+        return embed
+
+
+class SkillDetailView(discord.ui.View):
+    """View for displaying skill details with back button."""
+
+    def __init__(self, skill, parent_selector: SkillSelectorView):
+        super().__init__(timeout=180)
+        self.skill = skill
+        self.parent_selector = parent_selector
+
+        # Back button
+        back_button = discord.ui.Button(label="⬅ Back to Skills", style=discord.ButtonStyle.primary)
+        back_button.callback = self.go_back
+        self.add_item(back_button)
+
+    async def go_back(self, interaction: discord.Interaction):
+        """Go back to skill selector."""
+        embed = self.parent_selector.create_selector_embed()
+        await interaction.response.edit_message(embed=embed, view=self.parent_selector)
+
+    def create_embed(self) -> discord.Embed:
         """Create skill detail embed."""
+        skill = self.skill
         embed = discord.Embed(
             title=f"{skill.icon_emoji} {skill.display_name}",
             description=skill.description or "No description available",
@@ -98,35 +146,37 @@ class Skills(commands.Cog):
 
         # If multiple matches, show selector
         if len(skills) > 1:
-            embed = discord.Embed(
-                title="🎯 Multiple Skills Found",
-                description=f"Found {len(skills)} skills matching '{name}'. Select one:",
-                color=config.EMBED_COLOR
-            )
-
-            # Show preview of matches (up to 10)
-            preview_list = []
-            for i, skill in enumerate(skills[:10], 1):
-                preview_list.append(f"{i}. {skill.icon_emoji} {skill.rarity_stars} **{skill.display_name}**")
-
-            embed.add_field(
-                name="Matches",
-                value="\n".join(preview_list),
-                inline=False
-            )
-
-            if len(skills) > 10:
-                embed.set_footer(text=f"Showing 10 of {len(skills)} matches • Select a skill below")
-            else:
-                embed.set_footer(text="Select a skill below")
-
-            view = SkillSelectorView(skills)
+            view = SkillSelectorView(skills, name)
+            embed = view.create_selector_embed()
             await interaction.followup.send(embed=embed, view=view)
             return
 
-        # Single match - show directly
+        # Single match - show directly (no back button needed)
         skill = skills[0]
-        embed = SkillSelectorView.create_skill_embed(skill)
+        embed = discord.Embed(
+            title=f"{skill.icon_emoji} {skill.display_name}",
+            description=skill.description or "No description available",
+            color=config.EMBED_COLOR
+        )
+
+        embed.add_field(name="Rarity", value=skill.rarity_stars, inline=True)
+        embed.add_field(name="Grade Value", value=skill.grade_value, inline=True)
+        embed.add_field(name="Skill ID", value=skill.skill_id, inline=True)
+
+        if skill.condition:
+            condition_text = skill.condition[:200] + "..." if len(skill.condition) > 200 else skill.condition
+            embed.add_field(
+                name="Activation Condition",
+                value=f"```{condition_text}```",
+                inline=False
+            )
+
+        if skill.is_unique:
+            embed.add_field(name="Type", value="✨ Unique Skill", inline=True)
+        elif skill.is_debuff:
+            embed.add_field(name="Type", value="❌ Debuff", inline=True)
+
+        embed.set_footer(text="Uma Musume Pretty Derby • Skill Database")
         await interaction.followup.send(embed=embed)
 
     @app_commands.command(name="skills", description="List skills by rarity")
