@@ -37,7 +37,7 @@ class SkillAbility:
                     type_name += " Up"
                 elif ab_value < 0:
                     type_name += " Down"
-                lines.append(f"{type_name}: {ab_value:+.2f}")
+                lines.append(f"{type_name}: {ab_value:+.3f}")
 
         # Show activation condition if exists
         if self.condition:
