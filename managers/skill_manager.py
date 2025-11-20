@@ -130,23 +130,32 @@ class SkillManager:
         return [s for s in self.skills.values() if s.skill_category == category]
 
     def search(self, query: str) -> List[Skill]:
-        """Search skills by name. Returns all matching skills sorted by quality."""
+        """Search skills by name. Returns highest rarity version for each unique name."""
         if not self._loaded:
             self.load()
 
         query_lower = query.lower()
-        results = []
-        seen_ids = set()
+        best_by_name = {}  # Track best skill for each unique display name
 
         for name, skill_ids in self.name_index.items():
             if query_lower in name:
-                # Add all skills with this name
-                for skill_id in skill_ids:
-                    if skill_id not in seen_ids:
-                        results.append(self.skills[skill_id])
-                        seen_ids.add(skill_id)
+                # Get all skills with this indexed name
+                skills_with_name = [self.skills[sid] for sid in skill_ids]
 
-        # Sort by rarity and grade (highest first)
+                # For each skill, keep only the best version per display name
+                for skill in skills_with_name:
+                    skill_name = skill.display_name.lower()
+
+                    if skill_name not in best_by_name:
+                        best_by_name[skill_name] = skill
+                    else:
+                        # Compare with existing and keep the better one
+                        existing = best_by_name[skill_name]
+                        if (skill.rarity, skill.grade_value) > (existing.rarity, existing.grade_value):
+                            best_by_name[skill_name] = skill
+
+        # Convert to list and sort by quality (highest first)
+        results = list(best_by_name.values())
         results.sort(key=lambda s: (s.rarity, s.grade_value), reverse=True)
         return results
 
