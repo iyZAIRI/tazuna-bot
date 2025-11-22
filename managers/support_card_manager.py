@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from utils.db_reader import MasterDBReader
 from models.support_card import SupportCard
+from models.skill import Skill
 
 logger = logging.getLogger('UmaMusumeBot.SupportCardManager')
 
@@ -134,6 +135,39 @@ class SupportCardManager:
         if not self._loaded:
             self.load()
         return [c for c in self.cards.values() if c.is_pal]
+
+    def get_skills_for_skill_set(self, skill_set_id: int, skill_manager) -> List[Skill]:
+        """Get skills for a given skill_set_id."""
+        if not skill_set_id:
+            return []
+
+        try:
+            query = """
+            SELECT skill_id1, skill_id2, skill_id3
+            FROM skill_set
+            WHERE id = ?
+            """
+            results = self.db.query(query, (skill_set_id,))
+
+            if not results:
+                return []
+
+            row = results[0]
+            skills = []
+
+            # Get each skill from the skill manager
+            for skill_field in ['skill_id1', 'skill_id2', 'skill_id3']:
+                skill_id = row.get(skill_field)
+                if skill_id and skill_id > 0:
+                    skill = skill_manager.get_by_id(skill_id)
+                    if skill:
+                        skills.append(skill)
+
+            return skills
+
+        except Exception as e:
+            logger.error(f"Failed to get skills for skill_set_id {skill_set_id}: {e}")
+            return []
 
     def close(self):
         """Close database connection."""

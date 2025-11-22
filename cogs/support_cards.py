@@ -4,13 +4,15 @@ from discord import app_commands
 from discord.ext import commands
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 import math
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from managers.support_card_manager import SupportCardManager
+from managers.skill_manager import SkillManager
 from models.support_card import SupportCard
+from constants import get_skill_icon_emoji
 import config
 
 class SupportCardListView(discord.ui.View):
@@ -104,10 +106,13 @@ class SupportCardListView(discord.ui.View):
 class SupportCardSelectorView(discord.ui.View):
     """View for selecting a support card when multiple matches are found."""
 
-    def __init__(self, cards: List[SupportCard], search_query: str):
+    def __init__(self, cards: List[SupportCard], search_query: str,
+                 support_manager: SupportCardManager, skill_manager: SkillManager):
         super().__init__(timeout=180)
         self.cards = cards
         self.search_query = search_query
+        self.support_manager = support_manager
+        self.skill_manager = skill_manager
 
         # Create buttons for each card (limit to 25 - Discord limit)
         for idx, card in enumerate(cards[:25]):
@@ -125,7 +130,7 @@ class SupportCardSelectorView(discord.ui.View):
         """Create a callback for a specific card button."""
         async def callback(interaction: discord.Interaction):
             # Create detail view with back button
-            detail_view = SupportCardDetailView(card, self)
+            detail_view = SupportCardDetailView(card, self, self.support_manager, self.skill_manager)
             embed = detail_view.create_embed()
             await interaction.response.edit_message(embed=embed, view=detail_view)
 
@@ -159,35 +164,74 @@ class SupportCardSelectorView(discord.ui.View):
 
 
 class SupportCardDetailView(discord.ui.View):
-    """View for displaying support card details with back button."""
+    """View for displaying support card details with pagination (Card Info ↔ Skills)."""
 
-    def __init__(self, card: SupportCard, parent_selector: SupportCardSelectorView):
+    def __init__(self, card: SupportCard, parent_selector: Optional[SupportCardSelectorView],
+                 support_manager: SupportCardManager, skill_manager: SkillManager):
         super().__init__(timeout=180)
         self.card = card
         self.parent_selector = parent_selector
+        self.support_manager = support_manager
+        self.skill_manager = skill_manager
+        self.current_page = 0
 
-        # Back button
-        back_button = discord.ui.Button(label="⬅ Back to Cards", style=discord.ButtonStyle.primary)
-        back_button.callback = self.go_back
-        self.add_item(back_button)
+        # Add navigation buttons
+        self.prev_button = discord.ui.Button(label="◀ Prev", style=discord.ButtonStyle.secondary, disabled=True)
+        self.prev_button.callback = self.prev_page
+        self.add_item(self.prev_button)
+
+        self.next_button = discord.ui.Button(label="Skills ▶", style=discord.ButtonStyle.secondary)
+        self.next_button.callback = self.next_page
+        self.add_item(self.next_button)
+
+        # Only add back button if we have a parent selector
+        if parent_selector:
+            self.back_button = discord.ui.Button(label="⬅ Back to Cards", style=discord.ButtonStyle.primary)
+            self.back_button.callback = self.go_back
+            self.add_item(self.back_button)
+
+    async def prev_page(self, interaction: discord.Interaction):
+        """Go to previous page."""
+        self.current_page = 0
+        await self.update_view(interaction)
+
+    async def next_page(self, interaction: discord.Interaction):
+        """Go to next page."""
+        self.current_page = 1
+        await self.update_view(interaction)
 
     async def go_back(self, interaction: discord.Interaction):
         """Go back to card selector."""
         embed = self.parent_selector.create_selector_embed()
         await interaction.response.edit_message(embed=embed, view=self.parent_selector)
 
-    def create_embed(self) -> discord.Embed:
-        """Create detailed embed for a support card."""
+    async def update_view(self, interaction: discord.Interaction):
+        """Update the embed based on current page."""
+        # Update button states
+        self.prev_button.disabled = (self.current_page == 0)
+        self.next_button.disabled = (self.current_page == 1)
+        self.prev_button.label = "◀ Card Info" if self.current_page == 1 else "◀ Prev"
+        self.next_button.label = "Skills ▶" if self.current_page == 0 else "Next ▶"
+
+        if self.current_page == 0:
+            embed = self.create_card_info_embed()
+        else:
+            embed = self.create_skills_embed()
+
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    def create_card_info_embed(self) -> discord.Embed:
+        """Create the card info page embed (Page 1)."""
         card = self.card
         embed = discord.Embed(
             title=card.display_name,
-            description=f"Card ID: {card.card_id}",
+            description=f"📄 Page 1/2: Card Information",
             color=config.EMBED_COLOR
         )
 
         embed.add_field(name="Type", value=f"{card.type_emoji} {card.type_name}", inline=True)
         embed.add_field(name="Character", value=card.character_name, inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
+        embed.add_field(name="Card ID", value=card.card_id, inline=True)
 
         if card.skill_set_id:
             embed.add_field(name="Skill Set ID", value=card.skill_set_id, inline=True)
@@ -197,8 +241,51 @@ class SupportCardDetailView(discord.ui.View):
             embed.add_field(name="Unique Effect ID", value=card.unique_effect_id, inline=True)
 
         embed.set_image(url=card.image_url)
-        embed.set_footer(text="Uma Musume Pretty Derby • Support Cards")
+        embed.set_footer(text="Uma Musume Pretty Derby • Page 1/2")
         return embed
+
+    def create_skills_embed(self) -> discord.Embed:
+        """Create the skills page embed (Page 2)."""
+        card = self.card
+        embed = discord.Embed(
+            title=card.display_name,
+            description=f"📄 Page 2/2: Skills",
+            color=config.EMBED_COLOR
+        )
+
+        # Get skills for this card's skill set
+        skills = []
+        if card.skill_set_id:
+            skills = self.support_manager.get_skills_for_skill_set(card.skill_set_id, self.skill_manager)
+
+        if skills:
+            skills_text = ""
+            for skill in skills:
+                icon_emoji = get_skill_icon_emoji(skill.icon_id)
+                skills_text += f"{icon_emoji} {skill.display_name}\n"
+
+            embed.add_field(
+                name=f"✨ Support Skills ({len(skills)})",
+                value=skills_text,
+                inline=False
+            )
+        else:
+            embed.add_field(
+                name="✨ Support Skills",
+                value="No skills found for this support card.",
+                inline=False
+            )
+
+        embed.set_image(url=card.image_url)
+        embed.set_footer(text="Uma Musume Pretty Derby • Page 2/2")
+        return embed
+
+    def create_embed(self) -> discord.Embed:
+        """Create embed for the current page."""
+        if self.current_page == 0:
+            return self.create_card_info_embed()
+        else:
+            return self.create_skills_embed()
 
 
 class SupportCards(commands.Cog):
@@ -207,12 +294,16 @@ class SupportCards(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.manager = SupportCardManager()
+        self.skill_manager = SkillManager()
         if not self.manager.load():
             print("⚠️  Failed to load support card data")
+        if not self.skill_manager.load():
+            print("⚠️  Failed to load skill data")
 
     def cog_unload(self):
         """Clean up when cog is unloaded."""
         self.manager.close()
+        self.skill_manager.close()
 
     @app_commands.command(name="support", description="Look up a specific support card")
     @app_commands.describe(name="Character name to search for")
@@ -227,33 +318,16 @@ class SupportCards(commands.Cog):
             await interaction.followup.send(f"❌ No support cards found for '{name}'.")
             return
 
-        # If single match, show directly (no back button needed)
+        # If single match, show directly with pagination (no back button)
         if len(cards) == 1:
             card = cards[0]
-            embed = discord.Embed(
-                title=card.display_name,
-                description=f"Card ID: {card.card_id}",
-                color=config.EMBED_COLOR
-            )
-
-            embed.add_field(name="Type", value=f"{card.type_emoji} {card.type_name}", inline=True)
-            embed.add_field(name="Character", value=card.character_name, inline=True)
-            embed.add_field(name="\u200b", value="\u200b", inline=True)  # Spacer
-
-            if card.skill_set_id:
-                embed.add_field(name="Skill Set ID", value=card.skill_set_id, inline=True)
-            if card.effect_table_id:
-                embed.add_field(name="Effect Table ID", value=card.effect_table_id, inline=True)
-            if card.unique_effect_id:
-                embed.add_field(name="Unique Effect ID", value=card.unique_effect_id, inline=True)
-
-            embed.set_image(url=card.image_url)
-            embed.set_footer(text="Uma Musume Pretty Derby • Support Cards")
-            await interaction.followup.send(embed=embed)
+            view = SupportCardDetailView(card, None, self.manager, self.skill_manager)
+            embed = view.create_embed()
+            await interaction.followup.send(embed=embed, view=view)
             return
 
         # Multiple matches - show selector with buttons
-        view = SupportCardSelectorView(cards, name)
+        view = SupportCardSelectorView(cards, name, self.manager, self.skill_manager)
         embed = view.create_selector_embed()
         await interaction.followup.send(embed=embed, view=view)
 
