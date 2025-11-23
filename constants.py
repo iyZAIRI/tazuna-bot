@@ -191,3 +191,23 @@ def get_unique_effect_name(effect_type: int) -> str:
     """Get unique effect type name from database."""
     names = _load_effect_names()
     return names.get(effect_type, f"Effect {effect_type}")
+
+# Effect types that should be displayed as flat values (not percentages)
+# According to game mechanics:
+# - Initial Stats (9-13), Max Stats (20-24), Hint Levels (17),
+# - Energy Recovery (25), Stat Bonuses (3-7), Specialty Priority (19)
+FLAT_VALUE_EFFECT_TYPES = {
+    3, 4, 5, 6, 7,      # Speed/Stamina/Power/Guts/Wit Bonus
+    9, 10, 11, 12, 13,  # Initial Stats
+    17,                  # Hint Levels
+    19,                  # Specialty Priority
+    20, 21, 22, 23, 24, # Max Stats
+    25,                  # Energy Recovery
+}
+
+def format_effect_value(effect_type: int, value: int) -> str:
+    """Format effect value with appropriate suffix (% or flat)."""
+    if effect_type in FLAT_VALUE_EFFECT_TYPES:
+        return str(value)
+    else:
+        return f"{value}%"

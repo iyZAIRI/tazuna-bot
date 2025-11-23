@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from managers.support_card_manager import SupportCardManager
 from managers.skill_manager import SkillManager
 from models.support_card import SupportCard
-from constants import get_skill_icon_emoji, get_effect_type_name, get_unique_effect_name
+from constants import get_skill_icon_emoji, get_effect_type_name, get_unique_effect_name, format_effect_value
 import config
 
 class SupportCardListView(discord.ui.View):
@@ -226,14 +226,21 @@ class SupportCardDetailView(discord.ui.View):
 
     def update_button_states(self):
         """Update button visibility based on current page."""
-        # On card info page (0): show Effects and Skills buttons, hide Card Info button
-        # On other pages (1, 2): hide Effects and Skills buttons, show Card Info button
+        # Allow direct switching between any page
+        # Disable the button for the current page to show where you are
         if self.current_page == 0:
+            # Card Info page: show Effects and Skills, hide Card Info
             self.effects_button.disabled = False
             self.skills_button.disabled = False
             self.card_info_button.disabled = True
-        else:
+        elif self.current_page == 1:
+            # Effects page: show Skills and Card Info, hide Effects
             self.effects_button.disabled = True
+            self.skills_button.disabled = False
+            self.card_info_button.disabled = False
+        else:
+            # Skills page: show Effects and Card Info, hide Skills
+            self.effects_button.disabled = False
             self.skills_button.disabled = True
             self.card_info_button.disabled = False
 
@@ -296,7 +303,8 @@ class SupportCardDetailView(discord.ui.View):
                 for col, label in level_cols.items():
                     val = effect.get(col, -1)
                     if val > 0:
-                        levels.append(f"{val}")
+                        formatted_val = format_effect_value(effect['type'], val)
+                        levels.append(formatted_val)
 
                 if levels:
                     # Show progression
@@ -323,14 +331,16 @@ class SupportCardDetailView(discord.ui.View):
                     effect_name = get_unique_effect_name(ue['type_0'])
                     value = ue.get('value_0', 0)
                     if value > 0:
-                        unique_text += f"**{effect_name}**: {value}\n"
+                        formatted_val = format_effect_value(ue['type_0'], value)
+                        unique_text += f"**{effect_name}**: {formatted_val}\n"
 
                 # Effect 1
                 if ue.get('type_1', 0) > 0:
                     effect_name = get_unique_effect_name(ue['type_1'])
                     value = ue.get('value_1', 0)
                     if value > 0:
-                        unique_text += f"**{effect_name}**: {value}\n"
+                        formatted_val = format_effect_value(ue['type_1'], value)
+                        unique_text += f"**{effect_name}**: {formatted_val}\n"
 
                 if unique_text:
                     embed.add_field(
