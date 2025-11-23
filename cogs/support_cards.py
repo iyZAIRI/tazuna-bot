@@ -255,14 +255,6 @@ class SupportCardDetailView(discord.ui.View):
 
         embed.add_field(name="Type", value=f"{card.type_emoji} {card.type_name}", inline=True)
         embed.add_field(name="Character", value=card.character_name, inline=True)
-        embed.add_field(name="Card ID", value=card.card_id, inline=True)
-
-        if card.skill_set_id:
-            embed.add_field(name="Skill Set ID", value=card.skill_set_id, inline=True)
-        if card.effect_table_id:
-            embed.add_field(name="Effect Table ID", value=card.effect_table_id, inline=True)
-        if card.unique_effect_id:
-            embed.add_field(name="Unique Effect ID", value=card.unique_effect_id, inline=True)
 
         embed.set_image(url=card.image_url)
         embed.set_footer(text="Uma Musume Pretty Derby • Page 1/3")
