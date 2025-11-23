@@ -164,7 +164,7 @@ class SupportCardSelectorView(discord.ui.View):
 
 
 class SupportCardDetailView(discord.ui.View):
-    """View for displaying support card details with pagination (Card Info ↔ Skills)."""
+    """View for displaying support card details with pagination (Card Info ↔ Effects/Skills)."""
 
     def __init__(self, card: SupportCard, parent_selector: Optional[SupportCardSelectorView],
                  support_manager: SupportCardManager, skill_manager: SkillManager):
@@ -176,62 +176,66 @@ class SupportCardDetailView(discord.ui.View):
         self.current_page = 0
 
         # Add navigation buttons
-        self.prev_button = discord.ui.Button(label="◀ Prev", style=discord.ButtonStyle.secondary, disabled=True)
-        self.prev_button.callback = self.prev_page
-        self.add_item(self.prev_button)
+        # Row 0: Effects and Skills buttons (for quick access from card info)
+        self.effects_button = discord.ui.Button(label="Effects", style=discord.ButtonStyle.secondary, row=0)
+        self.effects_button.callback = self.go_to_effects
+        self.add_item(self.effects_button)
 
-        self.next_button = discord.ui.Button(label="Effects ▶", style=discord.ButtonStyle.secondary)
-        self.next_button.callback = self.next_page
-        self.add_item(self.next_button)
+        self.skills_button = discord.ui.Button(label="Skills", style=discord.ButtonStyle.secondary, row=0)
+        self.skills_button.callback = self.go_to_skills
+        self.add_item(self.skills_button)
+
+        # Row 1: Back to Card Info button
+        self.card_info_button = discord.ui.Button(label="◀ Card Info", style=discord.ButtonStyle.primary, row=1)
+        self.card_info_button.callback = self.go_to_card_info
+        self.add_item(self.card_info_button)
 
         # Only add back button if we have a parent selector
         if parent_selector:
-            self.back_button = discord.ui.Button(label="⬅ Back to Cards", style=discord.ButtonStyle.primary)
+            self.back_button = discord.ui.Button(label="⬅ Back to Cards", style=discord.ButtonStyle.primary, row=1)
             self.back_button.callback = self.go_back
             self.add_item(self.back_button)
 
-    async def prev_page(self, interaction: discord.Interaction):
-        """Go to previous page."""
-        if self.current_page > 0:
-            self.current_page -= 1
-        await self.update_view(interaction)
+        self.update_button_states()
 
-    async def next_page(self, interaction: discord.Interaction):
-        """Go to next page."""
-        if self.current_page < 2:
-            self.current_page += 1
-        await self.update_view(interaction)
+    async def go_to_effects(self, interaction: discord.Interaction):
+        """Go to effects page."""
+        self.current_page = 1
+        self.update_button_states()
+        embed = self.create_effects_embed()
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    async def go_to_skills(self, interaction: discord.Interaction):
+        """Go to skills page."""
+        self.current_page = 2
+        self.update_button_states()
+        embed = self.create_skills_embed()
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    async def go_to_card_info(self, interaction: discord.Interaction):
+        """Go back to card info page."""
+        self.current_page = 0
+        self.update_button_states()
+        embed = self.create_card_info_embed()
+        await interaction.response.edit_message(embed=embed, view=self)
 
     async def go_back(self, interaction: discord.Interaction):
         """Go back to card selector."""
         embed = self.parent_selector.create_selector_embed()
         await interaction.response.edit_message(embed=embed, view=self.parent_selector)
 
-    async def update_view(self, interaction: discord.Interaction):
-        """Update the embed based on current page."""
-        # Update button states
-        self.prev_button.disabled = (self.current_page == 0)
-        self.next_button.disabled = (self.current_page == 2)
-
-        # Update button labels dynamically
+    def update_button_states(self):
+        """Update button visibility based on current page."""
+        # On card info page (0): show Effects and Skills buttons, hide Card Info button
+        # On other pages (1, 2): hide Effects and Skills buttons, show Card Info button
         if self.current_page == 0:
-            self.prev_button.label = "◀ Prev"
-            self.next_button.label = "Effects ▶"
-        elif self.current_page == 1:
-            self.prev_button.label = "◀ Card Info"
-            self.next_button.label = "Skills ▶"
-        else:  # page 2
-            self.prev_button.label = "◀ Effects"
-            self.next_button.label = "Next ▶"
-
-        if self.current_page == 0:
-            embed = self.create_card_info_embed()
-        elif self.current_page == 1:
-            embed = self.create_effects_embed()
+            self.effects_button.disabled = False
+            self.skills_button.disabled = False
+            self.card_info_button.disabled = True
         else:
-            embed = self.create_skills_embed()
-
-        await interaction.response.edit_message(embed=embed, view=self)
+            self.effects_button.disabled = True
+            self.skills_button.disabled = True
+            self.card_info_button.disabled = False
 
     def create_card_info_embed(self) -> discord.Embed:
         """Create the card info page embed (Page 1)."""
