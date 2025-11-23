@@ -117,9 +117,9 @@ class SupportCardSelectorView(discord.ui.View):
         # Create buttons for each card (limit to 25 - Discord limit)
         for idx, card in enumerate(cards[:25]):
             button = discord.ui.Button(
-                label=card.character_name,
+                label=f"{card.character_name} - {card.type_name}",
                 style=discord.ButtonStyle.secondary,
-                emoji=card.type_emoji,
+                emoji=card.rarity_emoji,
                 custom_id=f"support_{card.card_id}",
                 row=idx // 5  # Group into rows of 5
             )
@@ -144,12 +144,10 @@ class SupportCardSelectorView(discord.ui.View):
             color=config.EMBED_COLOR
         )
 
-        # Show preview of matches (up to 10) with multi-line format
+        # Show preview of matches (up to 10)
         preview_list = []
-        for card in self.cards[:10]:
-            preview_list.append(f"{card.rarity_emoji}")
-            preview_list.append(f" {card.type_emoji}")
-            preview_list.append(f" {card.character_name}")
+        for i, card in enumerate(self.cards[:10], 1):
+            preview_list.append(f"{i}. {card.display_name}")
 
         embed.add_field(
             name="Matches",
