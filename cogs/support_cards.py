@@ -87,10 +87,12 @@ class SupportCardListView(discord.ui.View):
         end_idx = min(start_idx + self.per_page, len(self.cards))
         page_cards = self.cards[start_idx:end_idx]
 
-        # Group cards by character
+        # Group cards by character with multi-line format
         cards_text = []
         for card in page_cards:
-            cards_text.append(card.display_name)
+            cards_text.append(f"{card.rarity_emoji}")
+            cards_text.append(f" {card.type_emoji}")
+            cards_text.append(f" {card.character_name}")
 
         if cards_text:
             embed.add_field(
@@ -144,10 +146,12 @@ class SupportCardSelectorView(discord.ui.View):
             color=config.EMBED_COLOR
         )
 
-        # Show preview of matches (up to 10)
+        # Show preview of matches (up to 10) with multi-line format
         preview_list = []
-        for i, card in enumerate(self.cards[:10], 1):
-            preview_list.append(f"{i}. {card.display_name}")
+        for card in self.cards[:10]:
+            preview_list.append(f"{card.rarity_emoji}")
+            preview_list.append(f" {card.type_emoji}")
+            preview_list.append(f" {card.character_name}")
 
         embed.add_field(
             name="Matches",
