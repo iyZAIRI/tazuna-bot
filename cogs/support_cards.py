@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from managers.support_card_manager import SupportCardManager
 from managers.skill_manager import SkillManager
 from models.support_card import SupportCard
-from constants import get_skill_icon_emoji
+from constants import get_skill_icon_emoji, get_effect_type_name, get_unique_effect_name
 import config
 
 class SupportCardListView(discord.ui.View):
@@ -180,7 +180,7 @@ class SupportCardDetailView(discord.ui.View):
         self.prev_button.callback = self.prev_page
         self.add_item(self.prev_button)
 
-        self.next_button = discord.ui.Button(label="Skills ▶", style=discord.ButtonStyle.secondary)
+        self.next_button = discord.ui.Button(label="Effects ▶", style=discord.ButtonStyle.secondary)
         self.next_button.callback = self.next_page
         self.add_item(self.next_button)
 
@@ -211,12 +211,12 @@ class SupportCardDetailView(discord.ui.View):
         self.prev_button.disabled = (self.current_page == 0)
         self.next_button.disabled = (self.current_page == 1)
         self.prev_button.label = "◀ Card Info" if self.current_page == 1 else "◀ Prev"
-        self.next_button.label = "Skills ▶" if self.current_page == 0 else "Next ▶"
+        self.next_button.label = "Effects ▶" if self.current_page == 0 else "Next ▶"
 
         if self.current_page == 0:
             embed = self.create_card_info_embed()
         else:
-            embed = self.create_skills_embed()
+            embed = self.create_effects_embed()
 
         await interaction.response.edit_message(embed=embed, view=self)
 
@@ -244,37 +244,71 @@ class SupportCardDetailView(discord.ui.View):
         embed.set_footer(text="Uma Musume Pretty Derby • Page 1/2")
         return embed
 
-    def create_skills_embed(self) -> discord.Embed:
-        """Create the skills page embed (Page 2)."""
+    def create_effects_embed(self) -> discord.Embed:
+        """Create the effects page embed (Page 2)."""
         card = self.card
         embed = discord.Embed(
             title=card.display_name,
-            description=f"📄 Page 2/2: Skills",
+            description=f"📄 Page 2/2: Effects & Bonuses",
             color=config.EMBED_COLOR
         )
 
-        # Get skills for this card's skill set
-        skills = []
-        if card.skill_set_id:
-            skills = self.support_manager.get_skills_for_skill_set(
-                card.skill_set_id, self.skill_manager, card.card_id
-            )
+        # Get training effects
+        training_effects = self.support_manager.get_training_effects(card.effect_table_id)
+        if training_effects:
+            effects_text = ""
+            for effect in training_effects[:10]:  # Limit to avoid embed size issues
+                effect_name = get_effect_type_name(effect['type'])
+                init_val = effect.get('init', -1)
+                lv40_val = effect.get('limit_lv40', -1)
 
-        if skills:
-            skills_text = ""
-            for skill in skills:
-                icon_emoji = get_skill_icon_emoji(skill.icon_id)
-                skills_text += f"{icon_emoji} {skill.display_name}\n"
+                # Show initial and max values (lv40 is common max)
+                if init_val > 0:
+                    if lv40_val > 0:
+                        effects_text += f"**{effect_name}**: {init_val}% → {lv40_val}%\n"
+                    else:
+                        effects_text += f"**{effect_name}**: {init_val}%\n"
+                elif lv40_val > 0:
+                    effects_text += f"**{effect_name}**: {lv40_val}% (Max)\n"
 
+            if effects_text:
+                embed.add_field(
+                    name=f"💎 Training Bonuses",
+                    value=effects_text,
+                    inline=False
+                )
+
+        # Get unique effects
+        unique_effects = self.support_manager.get_unique_effects(card.unique_effect_id)
+        if unique_effects:
+            for ue in unique_effects:
+                unique_text = ""
+
+                # Effect 0
+                if ue.get('type_0', 0) > 0:
+                    effect_name = get_unique_effect_name(ue['type_0'])
+                    value = ue.get('value_0', 0)
+                    if value > 0:
+                        unique_text += f"**{effect_name}**: {value}\n"
+
+                # Effect 1
+                if ue.get('type_1', 0) > 0:
+                    effect_name = get_unique_effect_name(ue['type_1'])
+                    value = ue.get('value_1', 0)
+                    if value > 0:
+                        unique_text += f"**{effect_name}**: {value}\n"
+
+                if unique_text:
+                    embed.add_field(
+                        name=f"⭐ Unique Effect (Lv{ue.get('lv', 0)})",
+                        value=unique_text,
+                        inline=False
+                    )
+
+        if not training_effects and not unique_effects:
             embed.add_field(
-                name=f"✨ Support Skills ({len(skills)})",
-                value=skills_text,
-                inline=False
-            )
-        else:
-            embed.add_field(
-                name="✨ Support Skills",
-                value="No skills found for this support card.",
+                name="Effects",
+                value="No effect data found for this support card.",
                 inline=False
             )
 
@@ -287,7 +321,7 @@ class SupportCardDetailView(discord.ui.View):
         if self.current_page == 0:
             return self.create_card_info_embed()
         else:
-            return self.create_skills_embed()
+            return self.create_effects_embed()
 
 
 class SupportCards(commands.Cog):
