@@ -256,7 +256,9 @@ class SupportCardDetailView(discord.ui.View):
         # Get skills for this card's skill set
         skills = []
         if card.skill_set_id:
-            skills = self.support_manager.get_skills_for_skill_set(card.skill_set_id, self.skill_manager)
+            skills = self.support_manager.get_skills_for_skill_set(
+                card.skill_set_id, self.skill_manager, card.card_id
+            )
 
         if skills:
             skills_text = ""

@@ -136,28 +136,33 @@ class SupportCardManager:
             self.load()
         return [c for c in self.cards.values() if c.is_pal]
 
-    def get_skills_for_skill_set(self, skill_set_id: int, skill_manager) -> List[Skill]:
-        """Get skills for a given skill_set_id."""
+    def get_skills_for_skill_set(self, skill_set_id: int, skill_manager, support_card_id: int) -> List[Skill]:
+        """Get hint skills for a given support card.
+
+        Support cards provide skill hints through the single_mode_hint_gain table.
+        The skill_set_id corresponds to hint_id in that table.
+        """
         if not skill_set_id:
             return []
 
         try:
             query = """
-            SELECT skill_id1, skill_id2, skill_id3
-            FROM skill_set
-            WHERE id = ?
+            SELECT DISTINCT hint_value_1 as skill_id
+            FROM single_mode_hint_gain
+            WHERE hint_id = ?
+            AND support_card_id = ?
+            AND hint_gain_type = 0
+            ORDER BY hint_group
             """
-            results = self.db.query(query, (skill_set_id,))
+            results = self.db.query(query, (skill_set_id, support_card_id))
 
             if not results:
                 return []
 
-            row = results[0]
             skills = []
-
             # Get each skill from the skill manager
-            for skill_field in ['skill_id1', 'skill_id2', 'skill_id3']:
-                skill_id = row.get(skill_field)
+            for row in results:
+                skill_id = row.get('skill_id')
                 if skill_id and skill_id > 0:
                     skill = skill_manager.get_by_id(skill_id)
                     if skill:
