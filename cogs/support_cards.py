@@ -180,7 +180,7 @@ class SupportCardDetailView(discord.ui.View):
         self.prev_button.callback = self.prev_page
         self.add_item(self.prev_button)
 
-        self.next_button = discord.ui.Button(label="Effects & Skills ▶", style=discord.ButtonStyle.secondary)
+        self.next_button = discord.ui.Button(label="Effects ▶", style=discord.ButtonStyle.secondary)
         self.next_button.callback = self.next_page
         self.add_item(self.next_button)
 
@@ -192,12 +192,14 @@ class SupportCardDetailView(discord.ui.View):
 
     async def prev_page(self, interaction: discord.Interaction):
         """Go to previous page."""
-        self.current_page = 0
+        if self.current_page > 0:
+            self.current_page -= 1
         await self.update_view(interaction)
 
     async def next_page(self, interaction: discord.Interaction):
         """Go to next page."""
-        self.current_page = 1
+        if self.current_page < 2:
+            self.current_page += 1
         await self.update_view(interaction)
 
     async def go_back(self, interaction: discord.Interaction):
@@ -209,14 +211,25 @@ class SupportCardDetailView(discord.ui.View):
         """Update the embed based on current page."""
         # Update button states
         self.prev_button.disabled = (self.current_page == 0)
-        self.next_button.disabled = (self.current_page == 1)
-        self.prev_button.label = "◀ Card Info" if self.current_page == 1 else "◀ Prev"
-        self.next_button.label = "Effects & Skills ▶" if self.current_page == 0 else "Next ▶"
+        self.next_button.disabled = (self.current_page == 2)
+
+        # Update button labels dynamically
+        if self.current_page == 0:
+            self.prev_button.label = "◀ Prev"
+            self.next_button.label = "Effects ▶"
+        elif self.current_page == 1:
+            self.prev_button.label = "◀ Card Info"
+            self.next_button.label = "Skills ▶"
+        else:  # page 2
+            self.prev_button.label = "◀ Effects"
+            self.next_button.label = "Next ▶"
 
         if self.current_page == 0:
             embed = self.create_card_info_embed()
-        else:
+        elif self.current_page == 1:
             embed = self.create_effects_embed()
+        else:
+            embed = self.create_skills_embed()
 
         await interaction.response.edit_message(embed=embed, view=self)
 
@@ -225,7 +238,7 @@ class SupportCardDetailView(discord.ui.View):
         card = self.card
         embed = discord.Embed(
             title=card.display_name,
-            description=f"📄 Page 1/2: Card Information",
+            description=f"📄 Page 1/3: Card Information",
             color=config.EMBED_COLOR
         )
 
@@ -241,7 +254,7 @@ class SupportCardDetailView(discord.ui.View):
             embed.add_field(name="Unique Effect ID", value=card.unique_effect_id, inline=True)
 
         embed.set_image(url=card.image_url)
-        embed.set_footer(text="Uma Musume Pretty Derby • Page 1/2")
+        embed.set_footer(text="Uma Musume Pretty Derby • Page 1/3")
         return embed
 
     def create_effects_embed(self) -> discord.Embed:
@@ -249,7 +262,7 @@ class SupportCardDetailView(discord.ui.View):
         card = self.card
         embed = discord.Embed(
             title=card.display_name,
-            description=f"📄 Page 2/2: Effects & Skills",
+            description=f"📄 Page 2/3: Effects & Bonuses",
             color=config.EMBED_COLOR
         )
 
@@ -322,6 +335,26 @@ class SupportCardDetailView(discord.ui.View):
                         inline=False
                     )
 
+        if not training_effects and not unique_effects:
+            embed.add_field(
+                name="Effects",
+                value="No effect data found for this support card.",
+                inline=False
+            )
+
+        embed.set_image(url=card.image_url)
+        embed.set_footer(text="Uma Musume Pretty Derby • Page 2/3")
+        return embed
+
+    def create_skills_embed(self) -> discord.Embed:
+        """Create the skills page embed (Page 3)."""
+        card = self.card
+        embed = discord.Embed(
+            title=card.display_name,
+            description=f"📄 Page 3/3: Hint Skills",
+            color=config.EMBED_COLOR
+        )
+
         # Get skills for this card's skill set
         skills = []
         if card.skill_set_id:
@@ -340,24 +373,25 @@ class SupportCardDetailView(discord.ui.View):
                 value=skills_text,
                 inline=False
             )
-
-        if not training_effects and not unique_effects and not skills:
+        else:
             embed.add_field(
-                name="Data",
-                value="No effect or skill data found for this support card.",
+                name="✨ Hint Skills",
+                value="No hint skills found for this support card.",
                 inline=False
             )
 
         embed.set_image(url=card.image_url)
-        embed.set_footer(text="Uma Musume Pretty Derby • Page 2/2")
+        embed.set_footer(text="Uma Musume Pretty Derby • Page 3/3")
         return embed
 
     def create_embed(self) -> discord.Embed:
         """Create embed for the current page."""
         if self.current_page == 0:
             return self.create_card_info_embed()
-        else:
+        elif self.current_page == 1:
             return self.create_effects_embed()
+        else:
+            return self.create_skills_embed()
 
 
 class SupportCards(commands.Cog):
