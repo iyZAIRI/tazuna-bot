@@ -156,59 +156,38 @@ def get_rarity_emoji(rarity: int) -> str:
         return EMOJI_R
     return f"★{rarity}"  # Fallback for unexpected rarities
 
-# Support Card Effect Types (Training Bonuses)
-SUPPORT_EFFECT_TYPES = {
-    1: "Friend Bonus",
-    2: "Motivation Bonus",
-    3: "Training Gain (Speed)",
-    4: "Training Gain (Stamina)",
-    5: "Initial Friendship Gauge",
-    6: "Training Gain (Power)",
-    7: "Training Gain (Guts)",
-    8: "Training Gain (Wit)",
-    9: "Training Failure Rate Down",
-    10: "Training Vitality Bonus",
-    11: "Hint Trigger Rate",
-    12: "Hint Level Bonus",
-    13: "Training Stat Gain",
-    14: "Skills Gained Up",
-    15: "SP Gauge Gain",
-    16: "Race Bonus",
-    17: "Fan Gain Bonus",
-    18: "Rival Defeat Bonus",
-    19: "Outing Effect Up",
-    25: "Wisdom Friendship Gain",
-    26: "Wisdom Training Gain",
-    27: "Starting Position Rate",
-    28: "Wisdom Effect Up",
-    30: "Unique Bonus",
-    31: "Initial Bond"
-}
+# Support Card Effect Types - Loaded from text_data category 151
+# This cache will be populated on first use from the database
+_SUPPORT_EFFECT_NAMES_CACHE = None
 
-# Unique Effect Types
-UNIQUE_EFFECT_TYPES = {
-    1: "Friend Training Stat Bonus",
-    2: "Friend Training Skill Pts",
-    3: "Same Type Training Bonus",
-    4: "Motivation Stat Gain",
-    5: "HP Recovery on Training",
-    6: "Skill Activation Rate",
-    7: "Fan Gain Multiplier",
-    8: "Event Stat Gain",
-    9: "Event Skill Pts",
-    10: "Race Stat Gain",
-    11: "Race Skill Pts",
-    12: "Training Failure Reduction",
-    13: "Hint Level Bonus",
-    14: "Skill Activation Power",
-    15: "Wisdom Training Bonus",
-    30: "Special Effect"
-}
+def _load_effect_names():
+    """Load effect names from database (category 151 for official names)."""
+    global _SUPPORT_EFFECT_NAMES_CACHE
+    if _SUPPORT_EFFECT_NAMES_CACHE is not None:
+        return _SUPPORT_EFFECT_NAMES_CACHE
+
+    try:
+        from utils.db_reader import MasterDBReader
+        db = MasterDBReader("./data/master.mdb")
+        if db.connect():
+            # Category 151 has official short effect names
+            results = db.query("SELECT [index], text FROM text_data WHERE category = 151")
+            _SUPPORT_EFFECT_NAMES_CACHE = {row['index']: row['text'] for row in results}
+            db.close()
+            return _SUPPORT_EFFECT_NAMES_CACHE
+    except Exception as e:
+        print(f"⚠️  Failed to load effect names from database: {e}")
+
+    # Fallback to empty dict if loading fails
+    _SUPPORT_EFFECT_NAMES_CACHE = {}
+    return _SUPPORT_EFFECT_NAMES_CACHE
 
 def get_effect_type_name(effect_type: int) -> str:
-    """Get training effect type name."""
-    return SUPPORT_EFFECT_TYPES.get(effect_type, f"Effect {effect_type}")
+    """Get training effect type name from database."""
+    names = _load_effect_names()
+    return names.get(effect_type, f"Effect {effect_type}")
 
 def get_unique_effect_name(effect_type: int) -> str:
-    """Get unique effect type name."""
-    return UNIQUE_EFFECT_TYPES.get(effect_type, f"Effect {effect_type}")
+    """Get unique effect type name from database."""
+    names = _load_effect_names()
+    return names.get(effect_type, f"Effect {effect_type}")
