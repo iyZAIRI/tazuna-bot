@@ -119,7 +119,7 @@ class SupportCardSelectorView(discord.ui.View):
         # Create buttons for each card (limit to 25 - Discord limit)
         for idx, card in enumerate(cards[:25]):
             button = discord.ui.Button(
-                label=f"{card.character_name} - {card.type_name}",
+                label=f"{card.type_emoji} {card.character_name}",
                 style=discord.ButtonStyle.secondary,
                 emoji=card.rarity_emoji,
                 custom_id=f"support_{card.card_id}",
