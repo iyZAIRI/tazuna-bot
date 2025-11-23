@@ -87,12 +87,10 @@ class SupportCardListView(discord.ui.View):
         end_idx = min(start_idx + self.per_page, len(self.cards))
         page_cards = self.cards[start_idx:end_idx]
 
-        # Group cards by character with multi-line format
+        # Group cards by character
         cards_text = []
         for card in page_cards:
-            cards_text.append(f"{card.rarity_emoji}")
-            cards_text.append(f" {card.type_emoji}")
-            cards_text.append(f" {card.character_name}")
+            cards_text.append(card.display_name)
 
         if cards_text:
             embed.add_field(
@@ -119,9 +117,9 @@ class SupportCardSelectorView(discord.ui.View):
         # Create buttons for each card (limit to 25 - Discord limit)
         for idx, card in enumerate(cards[:25]):
             button = discord.ui.Button(
-                label=f"{card.type_emoji} {card.character_name}",
+                label=card.character_name,
                 style=discord.ButtonStyle.secondary,
-                emoji=card.rarity_emoji,
+                emoji=card.type_emoji,
                 custom_id=f"support_{card.card_id}",
                 row=idx // 5  # Group into rows of 5
             )
