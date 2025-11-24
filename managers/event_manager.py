@@ -76,11 +76,6 @@ class EventManager:
                 desc = desc_query[0]['text']
                 # Extract the main event name before ":"
                 event_name = desc.split(':')[0].strip()
-                # Clean up common prefixes
-                if 'Pt ' in event_name:
-                    event_name = event_name.split('Pt ')[0].strip()
-                elif 'Day ' in event_name:
-                    event_name = event_name.split('Day ')[0].strip()
 
                 # Ensure event name is not empty after all the processing
                 if not event_name or len(event_name) == 0:
