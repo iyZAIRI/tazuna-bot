@@ -45,7 +45,7 @@ def generate_emoji_codes(emoji_dir: str, output_file: str = None, per_line: int 
     for emoji_file in emoji_files:
         # Remove extension to get emoji name
         emoji_name = emoji_file.stem
-        emoji_code = f":{emoji_name}:"
+        emoji_code = f"\:{emoji_name}:"
         emoji_codes.append(emoji_code)
 
     # Format output
