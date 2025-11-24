@@ -12,6 +12,7 @@ class EventManager:
     def __init__(self, db_path: str = "./data/master.mdb"):
         self.db_path = db_path
         self._emoji_cache = None
+        self._support_card_cache = None
 
     def _load_emoji_mappings(self) -> Dict[int, str]:
         """Load emoji mappings from emoji_codes.txt."""
@@ -46,40 +47,53 @@ class EventManager:
         emoji_map = self._load_emoji_mappings()
         return emoji_map.get(item_id, f"❓ Item {item_id}")
 
+    def _load_support_cards(self) -> Dict[int, Dict]:
+        """Load support card data and cache it."""
+        if self._support_card_cache is not None:
+            return self._support_card_cache
+
+        db = MasterDBReader(self.db_path)
+        card_map = {}
+
+        if db.connect():
+            # Get all support cards with their data
+            cards = db.query('''
+                SELECT sc.id, sc.chara_id, sc.rarity, sc.command_id, t.text as name
+                FROM support_card_data sc
+                LEFT JOIN text_data t ON t.category = 75 AND t.[index] = sc.id
+            ''')
+
+            for card in cards:
+                card_map[card['id']] = {
+                    'id': card['id'],
+                    'chara_id': card['chara_id'],
+                    'rarity': card['rarity'],
+                    'command_id': card['command_id'],
+                    'name': card['name'] if card['name'] else f"Support Card {card['id']}"
+                }
+
+            db.close()
+
+        self._support_card_cache = card_map
+        return card_map
+
     def format_reward(self, reward_category: int, reward_item_id: int, reward_amount: int) -> str:
         """Format a mission reward based on its category."""
         # Category 51 = Support Cards
         if reward_category == 51:
-            db = MasterDBReader(self.db_path)
-            if db.connect():
-                # Get support card info
-                card_query = db.query(f'''
-                    SELECT id, chara_id, rarity, command_id
-                    FROM support_card_data
-                    WHERE id = {reward_item_id}
-                ''')
+            # Get card from cache
+            card_cache = self._load_support_cards()
+            card = card_cache.get(reward_item_id)
 
-                if card_query:
-                    card = card_query[0]
-                    # Get card name from text_data category 75 (full name with title)
-                    name_query = db.query(f'''
-                        SELECT text FROM text_data
-                        WHERE category = 75 AND [index] = {card['id']}
-                    ''')
+            if card:
+                # Get rarity and type emojis
+                from constants import get_rarity_emoji, get_support_card_type_emoji
+                rarity_emoji = get_rarity_emoji(card['rarity'])
+                type_emoji = get_support_card_type_emoji(card['command_id'])
 
-                    card_name = name_query[0]['text'] if name_query and name_query[0]['text'] else f"Support Card {reward_item_id}"
-
-                    # Get rarity and type emojis
-                    from constants import get_rarity_emoji, get_support_card_type_emoji
-                    rarity_emoji = get_rarity_emoji(card['rarity'])
-                    type_emoji = get_support_card_type_emoji(card['command_id'])
-
-                    db.close()
-                    if reward_amount > 1:
-                        return f"{rarity_emoji} {type_emoji} {card_name} x{reward_amount}"
-                    return f"{rarity_emoji} {type_emoji} {card_name}"
-
-                db.close()
+                if reward_amount > 1:
+                    return f"{rarity_emoji} {type_emoji} {card['name']} x{reward_amount}"
+                return f"{rarity_emoji} {type_emoji} {card['name']}"
 
             # Fallback if card not found
             return f"🎴 Support Card {reward_item_id} x{reward_amount}"
