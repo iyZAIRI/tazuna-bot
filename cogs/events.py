@@ -23,8 +23,11 @@ class EventListView(discord.ui.View):
 
         # Create buttons for each event (limit to 25 - Discord limit)
         for idx, event in enumerate(events[:25]):
+            # Ensure label is not empty (Discord requirement)
+            label = event['name'] if event['name'] else f"Event {event['event_id']}"
+
             button = discord.ui.Button(
-                label=event['name'],
+                label=label,
                 style=discord.ButtonStyle.primary,
                 custom_id=f"event_{event['event_id']}",
                 row=idx // 5
