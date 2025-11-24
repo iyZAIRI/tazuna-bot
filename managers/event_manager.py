@@ -56,7 +56,11 @@ class EventManager:
             start_timestamp = self._parse_datetime(first_mission[0]['start_date'])
             end_timestamp = self._parse_datetime(first_mission[0]['end_date'])
 
-            # Skip inactive events
+            # Skip inactive events or events ending in 2050+ (permanent missions)
+            end_year = datetime.datetime.fromtimestamp(end_timestamp).year if end_timestamp > 0 else 0
+            if end_year >= 2050:
+                continue
+
             if not (start_timestamp <= current_time <= end_timestamp):
                 continue
 
@@ -182,6 +186,63 @@ class EventManager:
             # Parse dates and check if active
             start_ts = self._parse_datetime(mission['start_date'])
             end_ts = self._parse_datetime(mission['end_date'])
+
+            if not (start_ts <= current_time <= end_ts):
+                continue
+
+            # Get mission description from text_data category 67
+            desc_query = db.query(f'''
+                SELECT text FROM text_data
+                WHERE category = 67 AND [index] = {mission['id']}
+            ''')
+
+            if desc_query and desc_query[0]['text']:
+                description = desc_query[0]['text']
+            else:
+                description = f"Mission {mission['id']}"
+
+            result.append({
+                'mission_id': mission['id'],
+                'type': mission['mission_type'],
+                'condition_type': mission['condition_type'],
+                'condition_num': mission['condition_num'],
+                'description': description,
+                'reward_category': mission['item_category'],
+                'reward_item_id': mission['item_id'],
+                'reward_amount': mission['item_num']
+            })
+
+        db.close()
+        return result
+
+    def get_event_missions(self, event_id: int) -> List[Dict]:
+        """Get all missions for an event directly (simplified - no groups)."""
+        db = MasterDBReader(self.db_path)
+        if not db.connect():
+            return []
+
+        current_time = int(time.time())
+
+        missions = db.query(f'''
+            SELECT id, mission_type, condition_type, condition_num,
+                   step_order, disp_order,
+                   item_category, item_id, item_num,
+                   start_date, end_date
+            FROM mission_data
+            WHERE event_id = {event_id}
+            ORDER BY disp_order, step_order
+        ''')
+
+        result = []
+        for mission in missions:
+            # Parse dates and check if active
+            start_ts = self._parse_datetime(mission['start_date'])
+            end_ts = self._parse_datetime(mission['end_date'])
+
+            # Skip missions ending in 2050+ (permanent missions)
+            end_year = datetime.datetime.fromtimestamp(end_ts).year if end_ts > 0 else 0
+            if end_year >= 2050:
+                continue
 
             if not (start_ts <= current_time <= end_ts):
                 continue

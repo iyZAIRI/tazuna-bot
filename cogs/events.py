@@ -38,9 +38,9 @@ class EventListView(discord.ui.View):
     def create_event_callback(self, event):
         """Create a callback for a specific event button."""
         async def callback(interaction: discord.Interaction):
-            # Get mission groups for this event
-            groups = self.event_manager.get_event_mission_groups(event['event_id'])
-            view = EventDetailView(event, groups, self, self.event_manager)
+            # Get missions directly for this event
+            missions = self.event_manager.get_event_missions(event['event_id'])
+            view = MissionDetailView(event, missions, self, self.event_manager)
             embed = view.create_embed()
             await interaction.response.edit_message(embed=embed, view=view)
 
@@ -74,51 +74,24 @@ class EventListView(discord.ui.View):
         return embed
 
 
-class EventDetailView(discord.ui.View):
-    """View for displaying event details with mission group buttons."""
+class MissionDetailView(discord.ui.View):
+    """View for displaying missions for an event."""
 
-    def __init__(self, event: dict, groups: List[dict], parent_list: EventListView,
-                 event_manager: EventManager):
+    def __init__(self, event: dict, missions: List[dict],
+                 parent_list: EventListView, event_manager: EventManager):
         super().__init__(timeout=180)
         self.event = event
-        self.groups = groups
+        self.missions = missions
         self.parent_list = parent_list
         self.event_manager = event_manager
 
         # Add back button
         back_button = discord.ui.Button(
             label="⬅ Back to Events",
-            style=discord.ButtonStyle.secondary,
-            row=0
+            style=discord.ButtonStyle.secondary
         )
         back_button.callback = self.go_back
         self.add_item(back_button)
-
-        # Create buttons for each mission group
-        for idx, group in enumerate(groups[:20]):  # Limit to 20 groups
-            button = discord.ui.Button(
-                label=f"{group['name']} ({group['mission_count']})",
-                style=discord.ButtonStyle.primary,
-                custom_id=f"group_{group['step_group_id']}",
-                row=(idx // 5) + 1
-            )
-            button.callback = self.create_group_callback(group)
-            self.add_item(button)
-
-    def create_group_callback(self, group):
-        """Create a callback for a specific mission group button."""
-        async def callback(interaction: discord.Interaction):
-            # Get missions for this group
-            missions = self.event_manager.get_missions_by_group(
-                self.event['event_id'], group['step_group_id']
-            )
-            view = MissionGroupView(
-                self.event, group, missions, self, self.event_manager
-            )
-            embed = view.create_embed()
-            await interaction.response.edit_message(embed=embed, view=view)
-
-        return callback
 
     async def go_back(self, interaction: discord.Interaction):
         """Go back to event list."""
@@ -126,80 +99,10 @@ class EventDetailView(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=self.parent_list)
 
     def create_embed(self) -> discord.Embed:
-        """Create the event detail embed."""
-        event = self.event
-        embed = discord.Embed(
-            title=f"📅 {event['name']}",
-            description="Select a mission group to view missions:",
-            color=config.EMBED_COLOR
-        )
-
-        # Event dates
-        start_dt = datetime.datetime.fromtimestamp(event['start_date'])
-        end_dt = datetime.datetime.fromtimestamp(event['end_date'])
-        embed.add_field(
-            name="Event Period",
-            value=f"{start_dt.strftime('%Y-%m-%d %H:%M')} to\n{end_dt.strftime('%Y-%m-%d %H:%M')}",
-            inline=False
-        )
-
-        # Mission groups count
-        total_missions = sum(g['mission_count'] for g in self.groups)
-        embed.add_field(
-            name="Mission Groups",
-            value=f"{len(self.groups)} groups | {total_missions} total missions",
-            inline=True
-        )
-
-        # List mission groups
-        if self.groups:
-            groups_text = []
-            for group in self.groups[:10]:  # Show first 10
-                groups_text.append(f"**{group['name']}**: {group['mission_count']} missions")
-
-            if len(self.groups) > 10:
-                groups_text.append(f"... and {len(self.groups) - 10} more groups")
-
-            embed.add_field(
-                name="Available Groups",
-                value="\n".join(groups_text),
-                inline=False
-            )
-
-        embed.set_footer(text="Select a mission group below")
-        return embed
-
-
-class MissionGroupView(discord.ui.View):
-    """View for displaying missions in a mission group."""
-
-    def __init__(self, event: dict, group: dict, missions: List[dict],
-                 parent_detail: EventDetailView, event_manager: EventManager):
-        super().__init__(timeout=180)
-        self.event = event
-        self.group = group
-        self.missions = missions
-        self.parent_detail = parent_detail
-        self.event_manager = event_manager
-
-        # Add back button
-        back_button = discord.ui.Button(
-            label="⬅ Back to Groups",
-            style=discord.ButtonStyle.secondary
-        )
-        back_button.callback = self.go_back
-        self.add_item(back_button)
-
-    async def go_back(self, interaction: discord.Interaction):
-        """Go back to event detail."""
-        embed = self.parent_detail.create_embed()
-        await interaction.response.edit_message(embed=embed, view=self.parent_detail)
-
-    def create_embed(self) -> discord.Embed:
-        """Create the mission group embed."""
+        """Create the mission detail embed."""
         embed = discord.Embed(
             title=f"📋 {self.event['name']}",
-            description=f"**{self.group['name']}**",
+            description=f"Active missions for this event",
             color=config.EMBED_COLOR
         )
 
