@@ -3,6 +3,7 @@ from typing import List, Dict, Optional
 from utils.db_reader import MasterDBReader
 import time
 import datetime
+from pathlib import Path
 
 
 class EventManager:
@@ -10,6 +11,40 @@ class EventManager:
 
     def __init__(self, db_path: str = "./data/master.mdb"):
         self.db_path = db_path
+        self._emoji_cache = None
+
+    def _load_emoji_mappings(self) -> Dict[int, str]:
+        """Load emoji mappings from emoji_codes.txt."""
+        if self._emoji_cache is not None:
+            return self._emoji_cache
+
+        emoji_file = Path(__file__).parent.parent / "emoji_codes.txt"
+        emoji_map = {}
+
+        try:
+            with open(emoji_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and line.startswith('<:item_icon_'):
+                        # Extract item ID from emoji name
+                        # Format: <:item_icon_00110:1442616043070558270>
+                        try:
+                            emoji_name = line.split(':')[1]  # Get "item_icon_00110"
+                            item_id_str = emoji_name.replace('item_icon_', '')  # Get "00110"
+                            item_id = int(item_id_str)  # Convert to 110
+                            emoji_map[item_id] = line
+                        except (IndexError, ValueError):
+                            continue
+        except FileNotFoundError:
+            pass
+
+        self._emoji_cache = emoji_map
+        return emoji_map
+
+    def get_item_emoji(self, item_id: int) -> str:
+        """Get emoji for an item ID, or ❓ if not found."""
+        emoji_map = self._load_emoji_mappings()
+        return emoji_map.get(item_id, f"❓ Item {item_id}")
 
     def _parse_datetime(self, date_str: str) -> int:
         """Parse datetime string from database to Unix timestamp."""
