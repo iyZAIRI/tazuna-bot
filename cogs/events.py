@@ -93,34 +93,11 @@ class MissionDetailView(discord.ui.View):
         self._add_buttons()
 
     def _group_missions(self) -> List[List[dict]]:
-        """Group missions by part number or chunks of 10."""
-        # Try to detect parts in mission descriptions
-        parts_dict = {}
-        missions_without_parts = []
-
-        import re
-        for mission in self.missions:
-            desc = mission['description']
-            # Look for "Pt X" or "Part X" pattern
-            match = re.search(r'(?:Pt|Part)\s+(\d+)', desc, re.IGNORECASE)
-            if match:
-                part_num = int(match.group(1))
-                if part_num not in parts_dict:
-                    parts_dict[part_num] = []
-                parts_dict[part_num].append(mission)
-            else:
-                missions_without_parts.append(mission)
-
-        # If we found parts, use them
-        if parts_dict:
-            pages = [parts_dict[key] for key in sorted(parts_dict.keys())]
-            # Add missions without parts as last page if any exist
-            if missions_without_parts:
-                pages.append(missions_without_parts)
-            return pages
-
-        # Otherwise, chunk by 10 missions
+        """Group missions into chunks of 10."""
+        # Simply chunk by 10 missions
         chunk_size = 10
+        if not self.missions:
+            return []
         return [self.missions[i:i+chunk_size] for i in range(0, len(self.missions), chunk_size)]
 
     def _add_buttons(self):
@@ -177,17 +154,8 @@ class MissionDetailView(discord.ui.View):
         # Get current page missions
         current_missions = self.pages[self.current_page] if self.pages else []
 
-        # Try to detect part name from first mission
-        page_title = f"📋 {self.event['name']}"
-        if current_missions:
-            import re
-            first_desc = current_missions[0]['description']
-            match = re.search(r'((?:Pt|Part)\s+\d+)', first_desc, re.IGNORECASE)
-            if match:
-                page_title = f"📋 {self.event['name']} - {match.group(1)}"
-
         embed = discord.Embed(
-            title=page_title,
+            title=f"📋 {self.event['name']}",
             description=f"Active missions for this event",
             color=config.EMBED_COLOR
         )
