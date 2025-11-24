@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from utils.db_reader import MasterDBReader
 from models.support_card import SupportCard
+from models.skill import Skill
 
 logger = logging.getLogger('UmaMusumeBot.SupportCardManager')
 
@@ -134,6 +135,83 @@ class SupportCardManager:
         if not self._loaded:
             self.load()
         return [c for c in self.cards.values() if c.is_pal]
+
+    def get_skills_for_skill_set(self, skill_set_id: int, skill_manager, support_card_id: int) -> List[Skill]:
+        """Get hint skills for a given support card.
+
+        Support cards provide skill hints through the single_mode_hint_gain table.
+        The skill_set_id corresponds to hint_id in that table.
+        """
+        if not skill_set_id:
+            return []
+
+        try:
+            query = """
+            SELECT DISTINCT hint_value_1 as skill_id
+            FROM single_mode_hint_gain
+            WHERE hint_id = ?
+            AND support_card_id = ?
+            AND hint_gain_type = 0
+            ORDER BY hint_group
+            """
+            results = self.db.query(query, (skill_set_id, support_card_id))
+
+            if not results:
+                return []
+
+            skills = []
+            # Get each skill from the skill manager
+            for row in results:
+                skill_id = row.get('skill_id')
+                if skill_id and skill_id > 0:
+                    skill = skill_manager.get_by_id(skill_id)
+                    if skill:
+                        skills.append(skill)
+
+            return skills
+
+        except Exception as e:
+            logger.error(f"Failed to get skills for skill_set_id {skill_set_id}: {e}")
+            return []
+
+    def get_training_effects(self, effect_table_id: int) -> List[Dict]:
+        """Get training bonuses for a support card."""
+        if not effect_table_id:
+            return []
+
+        try:
+            query = """
+            SELECT type, init, limit_lv5, limit_lv10, limit_lv15, limit_lv20,
+                   limit_lv25, limit_lv30, limit_lv35, limit_lv40, limit_lv45, limit_lv50
+            FROM support_card_effect_table
+            WHERE id = ?
+            ORDER BY type
+            """
+            results = self.db.query(query, (effect_table_id,))
+            return results if results else []
+
+        except Exception as e:
+            logger.error(f"Failed to get training effects for effect_table_id {effect_table_id}: {e}")
+            return []
+
+    def get_unique_effects(self, unique_effect_id: int) -> List[Dict]:
+        """Get unique effects for a support card."""
+        if not unique_effect_id:
+            return []
+
+        try:
+            query = """
+            SELECT lv, type_0, value_0, value_0_1, value_0_2, value_0_3, value_0_4,
+                   type_1, value_1, value_1_1, value_1_2, value_1_3, value_1_4
+            FROM support_card_unique_effect
+            WHERE id = ?
+            """
+            results = self.db.query(query, (unique_effect_id,))
+            return results if results else []
+
+        except Exception as e:
+            logger.error(f"Failed to get unique effects for unique_effect_id {unique_effect_id}: {e}")
+            return []
 
     def close(self):
         """Close database connection."""

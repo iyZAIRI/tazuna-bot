@@ -155,3 +155,58 @@ def get_rarity_emoji(rarity: int) -> str:
     elif rarity == 1:
         return EMOJI_R
     return f"★{rarity}"  # Fallback for unexpected rarities
+
+# Support Card Effect Types - Loaded from text_data category 151
+# This cache will be populated on first use from the database
+_SUPPORT_EFFECT_NAMES_CACHE = None
+
+def _load_effect_names():
+    """Load effect names from database (category 151 for official names)."""
+    global _SUPPORT_EFFECT_NAMES_CACHE
+    if _SUPPORT_EFFECT_NAMES_CACHE is not None:
+        return _SUPPORT_EFFECT_NAMES_CACHE
+
+    try:
+        from utils.db_reader import MasterDBReader
+        db = MasterDBReader("./data/master.mdb")
+        if db.connect():
+            # Category 151 has official short effect names
+            results = db.query("SELECT [index], text FROM text_data WHERE category = 151")
+            _SUPPORT_EFFECT_NAMES_CACHE = {row['index']: row['text'] for row in results}
+            db.close()
+            return _SUPPORT_EFFECT_NAMES_CACHE
+    except Exception as e:
+        print(f"⚠️  Failed to load effect names from database: {e}")
+
+    # Fallback to empty dict if loading fails
+    _SUPPORT_EFFECT_NAMES_CACHE = {}
+    return _SUPPORT_EFFECT_NAMES_CACHE
+
+def get_effect_type_name(effect_type: int) -> str:
+    """Get training effect type name from database."""
+    names = _load_effect_names()
+    return names.get(effect_type, f"Effect {effect_type}")
+
+def get_unique_effect_name(effect_type: int) -> str:
+    """Get unique effect type name from database."""
+    names = _load_effect_names()
+    return names.get(effect_type, f"Effect {effect_type}")
+
+# Effect types that should be displayed as flat values (not percentages)
+# According to game mechanics:
+# - Initial Stats (9-13), Max Stats (20-24), Hint Levels (17),
+# - Stat Bonuses (3-7), Specialty Priority (19)
+FLAT_VALUE_EFFECT_TYPES = {
+    3, 4, 5, 6, 7,      # Speed/Stamina/Power/Guts/Wit Bonus
+    9, 10, 11, 12, 13,  # Initial Stats
+    17,                  # Hint Levels
+    19,                  # Specialty Priority
+    20, 21, 22, 23, 24, # Max Stats
+}
+
+def format_effect_value(effect_type: int, value: int) -> str:
+    """Format effect value with appropriate suffix (% or flat)."""
+    if effect_type in FLAT_VALUE_EFFECT_TYPES:
+        return str(value)
+    else:
+        return f"{value}%"
