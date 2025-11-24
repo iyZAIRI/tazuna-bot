@@ -106,6 +106,10 @@ class MissionDetailView(discord.ui.View):
             color=config.EMBED_COLOR
         )
 
+        # Add mission logo thumbnail (top right)
+        logo_url = f"https://gametora.com/images/umamusume/en/missions/tex_campaign_mission_logo_{self.event['event_id']:05d}.png"
+        embed.set_thumbnail(url=logo_url)
+
         # Group missions
         mission_text = []
         for idx, mission in enumerate(self.missions[:25], 1):  # Limit to 25 to avoid embed size issues
