@@ -167,9 +167,12 @@ class MissionDetailView(discord.ui.View):
         # Format missions for current page
         mission_text = []
         for idx, mission in enumerate(current_missions, 1):
-            # Format reward with emoji
-            item_emoji = self.event_manager.get_item_emoji(mission['reward_item_id'])
-            reward = f"{item_emoji} x{mission['reward_amount']}"
+            # Format reward (handles both items and support cards)
+            reward = self.event_manager.format_reward(
+                mission['reward_category'],
+                mission['reward_item_id'],
+                mission['reward_amount']
+            )
             mission_text.append(f"{idx}. {mission['description']}\n   → {reward}")
 
         if mission_text:

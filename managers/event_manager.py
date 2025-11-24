@@ -46,6 +46,47 @@ class EventManager:
         emoji_map = self._load_emoji_mappings()
         return emoji_map.get(item_id, f"❓ Item {item_id}")
 
+    def format_reward(self, reward_category: int, reward_item_id: int, reward_amount: int) -> str:
+        """Format a mission reward based on its category."""
+        # Category 51 = Support Cards
+        if reward_category == 51:
+            db = MasterDBReader(self.db_path)
+            if db.connect():
+                # Get support card info
+                card_query = db.query(f'''
+                    SELECT id, chara_id, rarity
+                    FROM support_card_data
+                    WHERE id = {reward_item_id}
+                ''')
+
+                if card_query:
+                    card = card_query[0]
+                    # Get card name from text_data category 6
+                    name_query = db.query(f'''
+                        SELECT text FROM text_data
+                        WHERE category = 6 AND [index] = {card['id']}
+                    ''')
+
+                    card_name = name_query[0]['text'] if name_query and name_query[0]['text'] else f"Card {reward_item_id}"
+
+                    # Get rarity emoji
+                    from constants import get_rarity_emoji
+                    rarity_emoji = get_rarity_emoji(card['rarity'])
+
+                    db.close()
+                    if reward_amount > 1:
+                        return f"{rarity_emoji} {card_name} x{reward_amount}"
+                    return f"{rarity_emoji} {card_name}"
+
+                db.close()
+
+            # Fallback if card not found
+            return f"🎴 Support Card {reward_item_id} x{reward_amount}"
+
+        # Otherwise, it's an item - use emoji
+        item_emoji = self.get_item_emoji(reward_item_id)
+        return f"{item_emoji} x{reward_amount}"
+
     def _parse_datetime(self, date_str: str) -> int:
         """Parse datetime string from database to Unix timestamp."""
         try:
