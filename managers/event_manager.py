@@ -54,29 +54,30 @@ class EventManager:
             if db.connect():
                 # Get support card info
                 card_query = db.query(f'''
-                    SELECT id, chara_id, rarity
+                    SELECT id, chara_id, rarity, command_id
                     FROM support_card_data
                     WHERE id = {reward_item_id}
                 ''')
 
                 if card_query:
                     card = card_query[0]
-                    # Get card name from text_data category 6
+                    # Get card name from text_data category 75 (full name with title)
                     name_query = db.query(f'''
                         SELECT text FROM text_data
-                        WHERE category = 6 AND [index] = {card['id']}
+                        WHERE category = 75 AND [index] = {card['id']}
                     ''')
 
-                    card_name = name_query[0]['text'] if name_query and name_query[0]['text'] else f"Card {reward_item_id}"
+                    card_name = name_query[0]['text'] if name_query and name_query[0]['text'] else f"Support Card {reward_item_id}"
 
-                    # Get rarity emoji
-                    from constants import get_rarity_emoji
+                    # Get rarity and type emojis
+                    from constants import get_rarity_emoji, get_support_card_type_emoji
                     rarity_emoji = get_rarity_emoji(card['rarity'])
+                    type_emoji = get_support_card_type_emoji(card['command_id'])
 
                     db.close()
                     if reward_amount > 1:
-                        return f"{rarity_emoji} {card_name} x{reward_amount}"
-                    return f"{rarity_emoji} {card_name}"
+                        return f"{rarity_emoji} {type_emoji} {card_name} x{reward_amount}"
+                    return f"{rarity_emoji} {type_emoji} {card_name}"
 
                 db.close()
 
