@@ -13,6 +13,9 @@ class EventManager:
         self.db_path = db_path
         self._emoji_cache = None
         self._support_card_cache = None
+        self._mission_cache = {}  # Cache missions per event_id
+        self._mission_cache_time = 0  # Timestamp of last cache load
+        self.CACHE_TTL = 3600  # Cache time-to-live: 1 hour in seconds
 
     def _load_emoji_mappings(self) -> Dict[int, str]:
         """Load emoji mappings from emoji_codes.txt."""
@@ -101,6 +104,16 @@ class EventManager:
         # Otherwise, it's an item - use emoji
         item_emoji = self.get_item_emoji(reward_item_id)
         return f"{item_emoji} x{reward_amount}"
+
+    def _is_cache_valid(self) -> bool:
+        """Check if mission cache is still valid (less than 1 hour old)."""
+        current_time = int(time.time())
+        return (current_time - self._mission_cache_time) < self.CACHE_TTL
+
+    def _invalidate_mission_cache(self):
+        """Clear mission cache and reset timestamp."""
+        self._mission_cache = {}
+        self._mission_cache_time = 0
 
     def _parse_datetime(self, date_str: str) -> int:
         """Parse datetime string from database to Unix timestamp."""
@@ -303,11 +316,18 @@ class EventManager:
 
     def get_event_missions(self, event_id: int) -> List[Dict]:
         """Get all missions for an event directly (simplified - no groups)."""
+        # Check cache validity
+        if not self._is_cache_valid():
+            self._invalidate_mission_cache()
+
+        # Return cached missions if available
+        if event_id in self._mission_cache:
+            return self._filter_active_missions(self._mission_cache[event_id])
+
+        # Load missions from database
         db = MasterDBReader(self.db_path)
         if not db.connect():
             return []
-
-        current_time = int(time.time())
 
         missions = db.query(f'''
             SELECT id, mission_type, condition_type, condition_num,
@@ -319,7 +339,49 @@ class EventManager:
             ORDER BY disp_order, step_order
         ''')
 
+        # Get descriptions for all missions at once (more efficient)
+        mission_ids = [str(m['id']) for m in missions]
+        if mission_ids:
+            desc_query = db.query(f'''
+                SELECT [index], text FROM text_data
+                WHERE category = 67 AND [index] IN ({','.join(mission_ids)})
+            ''')
+            desc_map = {row['index']: row['text'] for row in desc_query}
+        else:
+            desc_map = {}
+
+        db.close()
+
+        # Build mission list with all data (not filtered by time yet)
+        all_missions = []
+        for mission in missions:
+            description = desc_map.get(mission['id'], f"Mission {mission['id']}")
+
+            all_missions.append({
+                'mission_id': mission['id'],
+                'type': mission['mission_type'],
+                'condition_type': mission['condition_type'],
+                'condition_num': mission['condition_num'],
+                'description': description,
+                'reward_category': mission['item_category'],
+                'reward_item_id': mission['item_id'],
+                'reward_amount': mission['item_num'],
+                'start_date': mission['start_date'],
+                'end_date': mission['end_date']
+            })
+
+        # Cache all missions for this event
+        self._mission_cache[event_id] = all_missions
+        self._mission_cache_time = int(time.time())
+
+        # Return filtered active missions
+        return self._filter_active_missions(all_missions)
+
+    def _filter_active_missions(self, missions: List[Dict]) -> List[Dict]:
+        """Filter missions to only include currently active ones."""
+        current_time = int(time.time())
         result = []
+
         for mission in missions:
             # Parse dates and check if active
             start_ts = self._parse_datetime(mission['start_date'])
@@ -333,27 +395,6 @@ class EventManager:
             if not (start_ts <= current_time <= end_ts):
                 continue
 
-            # Get mission description from text_data category 67
-            desc_query = db.query(f'''
-                SELECT text FROM text_data
-                WHERE category = 67 AND [index] = {mission['id']}
-            ''')
+            result.append(mission)
 
-            if desc_query and desc_query[0]['text']:
-                description = desc_query[0]['text']
-            else:
-                description = f"Mission {mission['id']}"
-
-            result.append({
-                'mission_id': mission['id'],
-                'type': mission['mission_type'],
-                'condition_type': mission['condition_type'],
-                'condition_num': mission['condition_num'],
-                'description': description,
-                'reward_category': mission['item_category'],
-                'reward_item_id': mission['item_id'],
-                'reward_amount': mission['item_num']
-            })
-
-        db.close()
         return result
