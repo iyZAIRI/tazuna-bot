@@ -1,7 +1,7 @@
 """Manager for handling time-limited mission events."""
 from typing import List, Dict, Optional
 from utils.db_reader import MasterDBReader
-import datetime
+import time
 
 
 class EventManager:
@@ -10,138 +10,177 @@ class EventManager:
     def __init__(self, db_path: str = "./data/master.mdb"):
         self.db_path = db_path
 
-    def get_all_events(self) -> List[Dict]:
-        """Get all story events with basic info."""
+    def get_active_events(self) -> List[Dict]:
+        """Get all currently active mission events."""
         db = MasterDBReader(self.db_path)
         if not db.connect():
             return []
 
-        events = db.query('''
-            SELECT story_event_id, start_date, end_date
-            FROM story_event_data
-            ORDER BY start_date
+        current_time = int(time.time())
+
+        # Get unique event_ids from mission_data that are currently active
+        events = db.query(f'''
+            SELECT DISTINCT event_id
+            FROM mission_data
+            WHERE event_id > 0
+              AND start_date <= {current_time}
+              AND end_date >= {current_time}
+            ORDER BY event_id
         ''')
 
         result = []
         for event in events:
-            # Get event name from text_data category 221
-            name_query = db.query(f'''
-                SELECT text FROM text_data
-                WHERE category = 221 AND [index] = {event['story_event_id']}
+            event_id = event['event_id']
+
+            # Get event name from the first mission in this event
+            # Event names are usually in mission descriptions
+            first_mission = db.query(f'''
+                SELECT id, start_date, end_date
+                FROM mission_data
+                WHERE event_id = {event_id}
+                ORDER BY id
+                LIMIT 1
             ''')
-            name = name_query[0]['text'] if name_query else f"Event {event['story_event_id']}"
+
+            if not first_mission:
+                continue
+
+            # Extract event name from mission ID description
+            mission_id = first_mission[0]['id']
+            desc_query = db.query(f'''
+                SELECT text FROM text_data
+                WHERE category = 67 AND [index] = {mission_id}
+            ''')
+
+            # Parse event name from description (e.g., "Half Anni Pt 1: ..." -> "Half Anniversary")
+            if desc_query and desc_query[0]['text']:
+                desc = desc_query[0]['text']
+                # Extract the main event name before ":"
+                event_name = desc.split(':')[0].strip()
+                # Clean up common prefixes
+                if 'Pt ' in event_name:
+                    event_name = event_name.split('Pt ')[0].strip()
+                elif 'Day ' in event_name:
+                    event_name = event_name.split('Day ')[0].strip()
+            else:
+                event_name = f"Event {event_id}"
 
             result.append({
-                'event_id': event['story_event_id'],
-                'name': name,
-                'start_date': event['start_date'],
-                'end_date': event['end_date']
+                'event_id': event_id,
+                'name': event_name,
+                'start_date': first_mission[0]['start_date'],
+                'end_date': first_mission[0]['end_date']
             })
 
         db.close()
         return result
 
-    def get_event_details(self, event_id: int) -> Optional[Dict]:
-        """Get detailed information about a specific event."""
-        db = MasterDBReader(self.db_path)
-        if not db.connect():
-            return None
-
-        # Get basic event info
-        event = db.query(f'''
-            SELECT * FROM story_event_data
-            WHERE story_event_id = {event_id}
-        ''')
-
-        if not event:
-            db.close()
-            return None
-
-        event_data = event[0]
-
-        # Get event name
-        name_query = db.query(f'''
-            SELECT text FROM text_data
-            WHERE category = 221 AND [index] = {event_id}
-        ''')
-        name = name_query[0]['text'] if name_query else f"Event {event_id}"
-
-        # Get mission groups (step groups)
-        missions = db.query(f'''
-            SELECT DISTINCT step_group_id
-            FROM story_event_mission
-            WHERE story_event_id = {event_id}
-            ORDER BY step_group_id
-        ''')
-
-        mission_groups = [m['step_group_id'] for m in missions]
-
-        # Get bonus support cards
-        bonus_cards = db.query(f'''
-            SELECT support_card_id, chara_id, rarity, limit_0, limit_4
-            FROM story_event_bonus_support_card
-            WHERE story_event_id = {event_id}
-            ORDER BY rarity DESC, chara_id
-        ''')
-
-        bonus_list = []
-        for card in bonus_cards:
-            chara_name = db.query(f'''
-                SELECT text FROM text_data
-                WHERE category = 6 AND [index] = {card['chara_id']}
-            ''')
-            name_text = chara_name[0]['text'] if chara_name else 'Unknown'
-
-            bonus_list.append({
-                'card_id': card['support_card_id'],
-                'name': name_text,
-                'rarity': card['rarity'],
-                'bonus_min': card['limit_0'],
-                'bonus_max': card['limit_4']
-            })
-
-        db.close()
-
-        return {
-            'event_id': event_id,
-            'name': name,
-            'start_date': event_data['start_date'],
-            'end_date': event_data['end_date'],
-            'mission_groups': mission_groups,
-            'bonus_cards': bonus_list
-        }
-
-    def get_mission_group_missions(self, event_id: int, step_group_id: int) -> List[Dict]:
-        """Get all missions in a specific mission group."""
+    def get_event_mission_groups(self, event_id: int) -> List[Dict]:
+        """Get mission groups for a specific event."""
         db = MasterDBReader(self.db_path)
         if not db.connect():
             return []
+
+        current_time = int(time.time())
+
+        # Get unique step_group_ids for this event
+        groups = db.query(f'''
+            SELECT DISTINCT step_group_id
+            FROM mission_data
+            WHERE event_id = {event_id}
+              AND start_date <= {current_time}
+              AND end_date >= {current_time}
+            ORDER BY step_group_id
+        ''')
+
+        result = []
+        for group in groups:
+            step_group_id = group['step_group_id']
+
+            # Get a representative mission to extract group name
+            sample = db.query(f'''
+                SELECT id
+                FROM mission_data
+                WHERE event_id = {event_id}
+                  AND step_group_id = {step_group_id}
+                ORDER BY id
+                LIMIT 1
+            ''')
+
+            if sample:
+                mission_id = sample[0]['id']
+                desc_query = db.query(f'''
+                    SELECT text FROM text_data
+                    WHERE category = 67 AND [index] = {mission_id}
+                ''')
+
+                if desc_query and desc_query[0]['text']:
+                    desc = desc_query[0]['text']
+                    # Extract group name (e.g., "Half Anni Pt 1" or "Pt 1 Day 1")
+                    group_name = desc.split(':')[0].strip()
+                else:
+                    group_name = f"Group {step_group_id}"
+            else:
+                group_name = f"Group {step_group_id}"
+
+            # Count missions in this group
+            count_query = db.query(f'''
+                SELECT COUNT(*) as count
+                FROM mission_data
+                WHERE event_id = {event_id}
+                  AND step_group_id = {step_group_id}
+                  AND start_date <= {current_time}
+                  AND end_date >= {current_time}
+            ''')
+            mission_count = count_query[0]['count'] if count_query else 0
+
+            result.append({
+                'step_group_id': step_group_id,
+                'name': group_name,
+                'mission_count': mission_count
+            })
+
+        db.close()
+        return result
+
+    def get_missions_by_group(self, event_id: int, step_group_id: int) -> List[Dict]:
+        """Get all missions in a specific group."""
+        db = MasterDBReader(self.db_path)
+        if not db.connect():
+            return []
+
+        current_time = int(time.time())
 
         missions = db.query(f'''
             SELECT id, mission_type, condition_type, condition_num,
                    step_order, disp_order,
                    item_category, item_id, item_num
-            FROM story_event_mission
-            WHERE story_event_id = {event_id}
+            FROM mission_data
+            WHERE event_id = {event_id}
               AND step_group_id = {step_group_id}
-            ORDER BY step_order, disp_order
+              AND start_date <= {current_time}
+              AND end_date >= {current_time}
+            ORDER BY disp_order, step_order
         ''')
 
         result = []
         for mission in missions:
-            # Try to get mission description from text_data category 67
+            # Get mission description from text_data category 67
             desc_query = db.query(f'''
                 SELECT text FROM text_data
-                WHERE category = 67 AND [index] = {mission['condition_type']}
+                WHERE category = 67 AND [index] = {mission['id']}
             ''')
-            description = desc_query[0]['text'] if desc_query else f"Mission Type {mission['mission_type']}"
+
+            if desc_query and desc_query[0]['text']:
+                description = desc_query[0]['text']
+            else:
+                description = f"Mission {mission['id']}"
 
             result.append({
                 'mission_id': mission['id'],
                 'type': mission['mission_type'],
                 'condition_type': mission['condition_type'],
                 'condition_num': mission['condition_num'],
-                'step_order': mission['step_order'],
                 'description': description,
                 'reward_category': mission['item_category'],
                 'reward_item_id': mission['item_id'],
@@ -150,19 +189,3 @@ class EventManager:
 
         db.close()
         return result
-
-    def get_point_rewards(self, event_id: int) -> List[Dict]:
-        """Get point milestone rewards for an event."""
-        db = MasterDBReader(self.db_path)
-        if not db.connect():
-            return []
-
-        rewards = db.query(f'''
-            SELECT point, item_category, item_id, item_num
-            FROM story_event_point_reward
-            WHERE story_event_id = {event_id}
-            ORDER BY point
-        ''')
-
-        db.close()
-        return [dict(r) for r in rewards]

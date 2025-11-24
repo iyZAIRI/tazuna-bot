@@ -35,20 +35,19 @@ class EventListView(discord.ui.View):
     def create_event_callback(self, event):
         """Create a callback for a specific event button."""
         async def callback(interaction: discord.Interaction):
-            # Get event details and show mission groups
-            event_detail = self.event_manager.get_event_details(event['event_id'])
-            if event_detail:
-                view = EventDetailView(event_detail, self, self.event_manager)
-                embed = view.create_embed()
-                await interaction.response.edit_message(embed=embed, view=view)
+            # Get mission groups for this event
+            groups = self.event_manager.get_event_mission_groups(event['event_id'])
+            view = EventDetailView(event, groups, self, self.event_manager)
+            embed = view.create_embed()
+            await interaction.response.edit_message(embed=embed, view=view)
 
         return callback
 
     def create_embed(self) -> discord.Embed:
         """Create the event list embed."""
         embed = discord.Embed(
-            title="📅 Time-Limited Mission Events",
-            description="Select an event to view details and missions:",
+            title="📅 Active Mission Events",
+            description="Currently active time-limited missions. Select an event to view mission groups:",
             color=config.EMBED_COLOR
         )
 
@@ -65,6 +64,8 @@ class EventListView(discord.ui.View):
                 value="\n\n".join(events_text),
                 inline=False
             )
+        else:
+            embed.description = "No active mission events at this time."
 
         embed.set_footer(text="Uma Musume Pretty Derby • Select an event below")
         return embed
@@ -73,9 +74,11 @@ class EventListView(discord.ui.View):
 class EventDetailView(discord.ui.View):
     """View for displaying event details with mission group buttons."""
 
-    def __init__(self, event: dict, parent_list: EventListView, event_manager: EventManager):
+    def __init__(self, event: dict, groups: List[dict], parent_list: EventListView,
+                 event_manager: EventManager):
         super().__init__(timeout=180)
         self.event = event
+        self.groups = groups
         self.parent_list = parent_list
         self.event_manager = event_manager
 
@@ -89,41 +92,25 @@ class EventDetailView(discord.ui.View):
         self.add_item(back_button)
 
         # Create buttons for each mission group
-        for idx, group_id in enumerate(event['mission_groups'][:20], 1):
-            # Try to get group name from text_data
-            group_name = self.get_mission_group_name(event['event_id'], group_id)
-
+        for idx, group in enumerate(groups[:20]):  # Limit to 20 groups
             button = discord.ui.Button(
-                label=group_name,
+                label=f"{group['name']} ({group['mission_count']})",
                 style=discord.ButtonStyle.primary,
-                custom_id=f"group_{group_id}",
+                custom_id=f"group_{group['step_group_id']}",
                 row=(idx // 5) + 1
             )
-            button.callback = self.create_group_callback(group_id, group_name)
+            button.callback = self.create_group_callback(group)
             self.add_item(button)
 
-    def get_mission_group_name(self, event_id: int, group_id: int) -> str:
-        """Get a readable name for the mission group."""
-        # For Half Anniversary, groups might map to Part 1, 2, 3
-        if event_id == 1001:  # Half Anniversary
-            if group_id <= 5:
-                return f"Part 1 - Group {group_id}"
-            elif group_id <= 15:
-                return f"Part 2 - Group {group_id}"
-            else:
-                return f"Part 3 - Group {group_id}"
-        else:
-            return f"Mission Group {group_id}"
-
-    def create_group_callback(self, group_id: int, group_name: str):
+    def create_group_callback(self, group):
         """Create a callback for a specific mission group button."""
         async def callback(interaction: discord.Interaction):
             # Get missions for this group
-            missions = self.event_manager.get_mission_group_missions(
-                self.event['event_id'], group_id
+            missions = self.event_manager.get_missions_by_group(
+                self.event['event_id'], group['step_group_id']
             )
             view = MissionGroupView(
-                self.event, group_id, group_name, missions, self, self.event_manager
+                self.event, group, missions, self, self.event_manager
             )
             embed = view.create_embed()
             await interaction.response.edit_message(embed=embed, view=view)
@@ -140,7 +127,7 @@ class EventDetailView(discord.ui.View):
         event = self.event
         embed = discord.Embed(
             title=f"📅 {event['name']}",
-            description="Select a mission group to view details:",
+            description="Select a mission group to view missions:",
             color=config.EMBED_COLOR
         )
 
@@ -154,27 +141,25 @@ class EventDetailView(discord.ui.View):
         )
 
         # Mission groups count
+        total_missions = sum(g['mission_count'] for g in self.groups)
         embed.add_field(
             name="Mission Groups",
-            value=f"{len(event['mission_groups'])} groups available",
+            value=f"{len(self.groups)} groups | {total_missions} total missions",
             inline=True
         )
 
-        # Bonus support cards (show top 5)
-        if event['bonus_cards']:
-            bonus_text = []
-            for card in event['bonus_cards'][:5]:
-                rarity_str = '★' * card['rarity']
-                bonus_text.append(
-                    f"{card['name']} ({rarity_str}): +{card['bonus_min']}% to +{card['bonus_max']}%"
-                )
+        # List mission groups
+        if self.groups:
+            groups_text = []
+            for group in self.groups[:10]:  # Show first 10
+                groups_text.append(f"**{group['name']}**: {group['mission_count']} missions")
 
-            if len(event['bonus_cards']) > 5:
-                bonus_text.append(f"... and {len(event['bonus_cards']) - 5} more")
+            if len(self.groups) > 10:
+                groups_text.append(f"... and {len(self.groups) - 10} more groups")
 
             embed.add_field(
-                name="Bonus Support Cards",
-                value="\n".join(bonus_text),
+                name="Available Groups",
+                value="\n".join(groups_text),
                 inline=False
             )
 
@@ -185,20 +170,18 @@ class EventDetailView(discord.ui.View):
 class MissionGroupView(discord.ui.View):
     """View for displaying missions in a mission group."""
 
-    def __init__(self, event: dict, group_id: int, group_name: str,
-                 missions: List[dict], parent_detail: EventDetailView,
-                 event_manager: EventManager):
+    def __init__(self, event: dict, group: dict, missions: List[dict],
+                 parent_detail: EventDetailView, event_manager: EventManager):
         super().__init__(timeout=180)
         self.event = event
-        self.group_id = group_id
-        self.group_name = group_name
+        self.group = group
         self.missions = missions
         self.parent_detail = parent_detail
         self.event_manager = event_manager
 
         # Add back button
         back_button = discord.ui.Button(
-            label="⬅ Back to Event",
+            label="⬅ Back to Groups",
             style=discord.ButtonStyle.secondary
         )
         back_button.callback = self.go_back
@@ -212,40 +195,51 @@ class MissionGroupView(discord.ui.View):
     def create_embed(self) -> discord.Embed:
         """Create the mission group embed."""
         embed = discord.Embed(
-            title=f"📋 {self.event['name']} - {self.group_name}",
-            description=f"Mission Group {self.group_id}",
+            title=f"📋 {self.event['name']}",
+            description=f"**{self.group['name']}**",
             color=config.EMBED_COLOR
         )
 
-        # Group missions by step order
+        # Group missions
         mission_text = []
-        for mission in self.missions[:20]:  # Limit to avoid embed size issues
-            # Format mission info
-            desc = mission['description'] if mission['description'] else f"Mission {mission['mission_id']}"
-
-            # Add condition number if relevant
-            if mission['condition_num'] > 1:
-                desc += f" (x{mission['condition_num']})"
-
+        for idx, mission in enumerate(self.missions[:25], 1):  # Limit to 25 to avoid embed size issues
             # Format reward
-            reward = f"Reward: Item {mission['reward_item_id']} x{mission['reward_amount']}"
+            reward = f"Item {mission['reward_item_id']} x{mission['reward_amount']}"
 
-            mission_text.append(f"**{desc}**\n  {reward}")
+            mission_text.append(f"{idx}. {mission['description']}\n   → {reward}")
 
         if mission_text:
-            # Split into chunks if too long
-            chunk_size = 10
-            for i in range(0, len(mission_text), chunk_size):
-                chunk = mission_text[i:i + chunk_size]
-                field_name = f"Missions {i+1}-{min(i+chunk_size, len(mission_text))}" if len(mission_text) > chunk_size else "Missions"
+            # Split into chunks if needed (Discord field value limit is 1024 chars)
+            current_chunk = []
+            current_length = 0
+            field_num = 1
+
+            for line in mission_text:
+                line_length = len(line) + 2  # +2 for newlines
+                if current_length + line_length > 1000:  # Leave some margin
+                    # Add current chunk as field
+                    embed.add_field(
+                        name=f"Missions (Part {field_num})" if field_num > 1 else "Missions",
+                        value="\n\n".join(current_chunk),
+                        inline=False
+                    )
+                    current_chunk = [line]
+                    current_length = line_length
+                    field_num += 1
+                else:
+                    current_chunk.append(line)
+                    current_length += line_length
+
+            # Add remaining chunk
+            if current_chunk:
                 embed.add_field(
-                    name=field_name,
-                    value="\n\n".join(chunk),
+                    name=f"Missions (Part {field_num})" if field_num > 1 else "Missions",
+                    value="\n\n".join(current_chunk),
                     inline=False
                 )
 
-        if len(self.missions) > 20:
-            embed.set_footer(text=f"Showing 20 of {len(self.missions)} missions")
+        if len(self.missions) > 25:
+            embed.set_footer(text=f"Showing 25 of {len(self.missions)} missions")
         else:
             embed.set_footer(text=f"{len(self.missions)} missions")
 
@@ -259,15 +253,15 @@ class Events(commands.Cog):
         self.bot = bot
         self.manager = EventManager()
 
-    @app_commands.command(name="events", description="View time-limited mission events")
+    @app_commands.command(name="events", description="View currently active time-limited mission events")
     async def events(self, interaction: discord.Interaction):
-        """List all available mission events."""
+        """List all currently active mission events."""
         await interaction.response.defer()
 
-        events = self.manager.get_all_events()
+        events = self.manager.get_active_events()
 
         if not events:
-            await interaction.followup.send("No events found in the database.")
+            await interaction.followup.send("No active mission events at this time.")
             return
 
         view = EventListView(events, self.manager)
