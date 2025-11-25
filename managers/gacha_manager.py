@@ -61,7 +61,7 @@ class GachaManager:
         return card_map
 
     def get_active_gacha_banners(self) -> List[Dict]:
-        """Get all currently active gacha banners."""
+        """Get all currently active gacha banners (excluding permanent ones)."""
         db = MasterDBReader(self.db_path)
         if not db.connect():
             return []
@@ -79,6 +79,12 @@ class GachaManager:
 
         result = []
         for gacha in gachas:
+            # Skip permanent gacha (ending in 2050+)
+            import datetime
+            end_dt = datetime.datetime.fromtimestamp(gacha['end_date'])
+            if end_dt.year >= 2050:
+                continue
+
             # Get pickup cards for this gacha
             pickups = db.query(f'''
                 SELECT card_id, card_type, rarity, recommend_order
