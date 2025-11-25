@@ -81,7 +81,7 @@ class GachaListView(discord.ui.View):
 
         # Create embed for this banner
         embed = discord.Embed(
-            title=f"{banner_type} (ID: {gacha['id']})",
+            title=banner_type,
             color=config.EMBED_COLOR
         )
 
@@ -90,9 +90,8 @@ class GachaListView(discord.ui.View):
         end_dt = datetime.datetime.fromtimestamp(gacha['end_date'])
         date_str = f"{start_dt.strftime('%Y-%m-%d %H:%M')} - {end_dt.strftime('%Y-%m-%d %H:%M')}"
 
-        # Add period and cost
+        # Add period
         embed.add_field(name="Period", value=date_str, inline=False)
-        embed.add_field(name="Cost", value=f"{gacha['cost']} gems per pull", inline=False)
 
         # Format pickup cards
         pickup_text = []
