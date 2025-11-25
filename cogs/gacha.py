@@ -15,69 +15,112 @@ import config
 
 
 class GachaListView(discord.ui.View):
-    """View for displaying list of active gacha banners."""
+    """View for displaying list of active gacha banners with navigation."""
 
-    def __init__(self, gachas: List[dict], gacha_manager: GachaManager):
+    def __init__(self, gachas: List[dict], gacha_manager: GachaManager, current_index: int = 0):
         super().__init__(timeout=180)
         self.gachas = gachas
         self.gacha_manager = gacha_manager
+        self.current_index = current_index
 
-    def create_embeds(self) -> List[discord.Embed]:
-        """Create separate embeds for each gacha banner."""
-        embeds = []
+        # Add navigation buttons
+        self._add_buttons()
 
-        for gacha in self.gachas:
-            # Determine banner type
-            if gacha['card_type'] == 1:
-                banner_type = "⭐ Character Banner"
-            elif gacha['card_type'] == 2:
-                banner_type = "🎴 Support Card Banner"
-            else:
-                banner_type = f"Banner Type {gacha['card_type']}"
+    def _add_buttons(self):
+        """Add navigation buttons."""
+        if len(self.gachas) <= 1:
+            return
 
-            # Add "One Time Only" if applicable
-            if gacha.get('only_once', False):
-                banner_type = f"{banner_type} (One Time Only)"
+        # Previous button
+        prev_button = discord.ui.Button(
+            label="◀ Previous",
+            style=discord.ButtonStyle.primary,
+            disabled=(self.current_index == 0)
+        )
+        prev_button.callback = self.previous_banner
+        self.add_item(prev_button)
 
-            # Create embed for this banner
-            embed = discord.Embed(
-                title=f"{banner_type} (ID: {gacha['id']})",
-                color=config.EMBED_COLOR
-            )
+        # Next button
+        next_button = discord.ui.Button(
+            label="Next ▶",
+            style=discord.ButtonStyle.primary,
+            disabled=(self.current_index >= len(self.gachas) - 1)
+        )
+        next_button.callback = self.next_banner
+        self.add_item(next_button)
 
-            # Format dates
-            start_dt = datetime.datetime.fromtimestamp(gacha['start_date'])
-            end_dt = datetime.datetime.fromtimestamp(gacha['end_date'])
-            date_str = f"{start_dt.strftime('%Y-%m-%d %H:%M')} - {end_dt.strftime('%Y-%m-%d %H:%M')}"
+    async def previous_banner(self, interaction: discord.Interaction):
+        """Go to previous banner."""
+        self.current_index = max(0, self.current_index - 1)
+        view = GachaListView(self.gachas, self.gacha_manager, self.current_index)
+        embed = view.create_embed()
+        await interaction.response.edit_message(embed=embed, view=view)
 
-            # Add period and cost
-            embed.add_field(name="Period", value=date_str, inline=False)
-            embed.add_field(name="Cost", value=f"{gacha['cost']} gems per pull", inline=False)
+    async def next_banner(self, interaction: discord.Interaction):
+        """Go to next banner."""
+        self.current_index = min(len(self.gachas) - 1, self.current_index + 1)
+        view = GachaListView(self.gachas, self.gacha_manager, self.current_index)
+        embed = view.create_embed()
+        await interaction.response.edit_message(embed=embed, view=view)
 
-            # Format pickup cards
-            pickup_text = []
-            for pickup in gacha['pickups'][:5]:  # Limit to 5 pickups
-                rarity_emoji = get_rarity_emoji(pickup['rarity'])
+    def create_embed(self) -> discord.Embed:
+        """Create embed for current gacha banner."""
+        gacha = self.gachas[self.current_index]
 
-                if pickup['type'] == 'support':
-                    type_emoji = get_support_card_type_emoji(pickup['command_id'])
-                    pickup_text.append(f"{rarity_emoji} {type_emoji} {pickup['name']}")
-                else:  # character
-                    pickup_text.append(f"{rarity_emoji} {pickup['name']}")
+        # Determine banner type
+        if gacha['card_type'] == 1:
+            banner_type = "⭐ Character Banner"
+        elif gacha['card_type'] == 2:
+            banner_type = "🎴 Support Card Banner"
+        else:
+            banner_type = f"Banner Type {gacha['card_type']}"
 
-            if pickup_text:
-                embed.add_field(name="Featured Cards", value="\n".join(pickup_text), inline=False)
-            else:
-                embed.add_field(name="Featured Cards", value="No featured pickups", inline=False)
+        # Add "One Time Only" if applicable
+        if gacha.get('only_once', False):
+            banner_type = f"{banner_type} (One Time Only)"
 
-            # Add banner image
-            banner_url = f"https://gametora.com/images/umamusume/en/gacha/img_bnr_gacha_{gacha['id']}.png"
-            embed.set_image(url=banner_url)
+        # Create embed for this banner
+        embed = discord.Embed(
+            title=f"{banner_type} (ID: {gacha['id']})",
+            color=config.EMBED_COLOR
+        )
 
+        # Format dates
+        start_dt = datetime.datetime.fromtimestamp(gacha['start_date'])
+        end_dt = datetime.datetime.fromtimestamp(gacha['end_date'])
+        date_str = f"{start_dt.strftime('%Y-%m-%d %H:%M')} - {end_dt.strftime('%Y-%m-%d %H:%M')}"
+
+        # Add period and cost
+        embed.add_field(name="Period", value=date_str, inline=False)
+        embed.add_field(name="Cost", value=f"{gacha['cost']} gems per pull", inline=False)
+
+        # Format pickup cards
+        pickup_text = []
+        for pickup in gacha['pickups'][:5]:  # Limit to 5 pickups
+            rarity_emoji = get_rarity_emoji(pickup['rarity'])
+
+            if pickup['type'] == 'support':
+                type_emoji = get_support_card_type_emoji(pickup['command_id'])
+                pickup_text.append(f"{rarity_emoji} {type_emoji} {pickup['name']}")
+            else:  # character
+                pickup_text.append(f"{rarity_emoji} {pickup['name']}")
+
+        if pickup_text:
+            embed.add_field(name="Featured Cards", value="\n".join(pickup_text), inline=False)
+        else:
+            embed.add_field(name="Featured Cards", value="No featured pickups", inline=False)
+
+        # Add banner image
+        banner_url = f"https://gametora.com/images/umamusume/en/gacha/img_bnr_gacha_{gacha['id']}.png"
+        embed.set_image(url=banner_url)
+
+        # Footer with banner counter
+        if len(self.gachas) > 1:
+            embed.set_footer(text=f"Banner {self.current_index + 1}/{len(self.gachas)} • Uma Musume Pretty Derby")
+        else:
             embed.set_footer(text="Uma Musume Pretty Derby")
-            embeds.append(embed)
 
-        return embeds
+        return embed
 
 
 class Gacha(commands.Cog):
@@ -99,8 +142,8 @@ class Gacha(commands.Cog):
             return
 
         view = GachaListView(gachas, self.manager)
-        embeds = view.create_embeds()
-        await interaction.followup.send(embeds=embeds, view=view)
+        embed = view.create_embed()
+        await interaction.followup.send(embed=embed, view=view)
 
 
 async def setup(bot: commands.Bot):
