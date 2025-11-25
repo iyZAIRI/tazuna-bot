@@ -15,7 +15,6 @@ class EventManager:
         self._support_card_cache = None
         self._mission_cache = {}  # Cache missions per event_id
         self._mission_cache_time = 0  # Timestamp of last cache load
-        self.CACHE_TTL = 3600  # Cache time-to-live: 1 hour in seconds
 
     def _load_emoji_mappings(self) -> Dict[int, str]:
         """Load emoji mappings from emoji_codes.txt."""
@@ -106,9 +105,18 @@ class EventManager:
         return f"{item_emoji} x{reward_amount}"
 
     def _is_cache_valid(self) -> bool:
-        """Check if mission cache is still valid (less than 1 hour old)."""
+        """Check if mission cache is still valid (same hour)."""
+        if self._mission_cache_time == 0:
+            return False
+
         current_time = int(time.time())
-        return (current_time - self._mission_cache_time) < self.CACHE_TTL
+
+        # Round down both timestamps to the nearest hour
+        # If they're in the same hour, cache is valid
+        cache_hour_timestamp = (self._mission_cache_time // 3600) * 3600
+        current_hour_timestamp = (current_time // 3600) * 3600
+
+        return cache_hour_timestamp == current_hour_timestamp
 
     def _invalidate_mission_cache(self):
         """Clear mission cache and reset timestamp."""
