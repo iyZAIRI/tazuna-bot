@@ -94,6 +94,18 @@ class General(commands.Cog):
             inline=False
         )
 
+        embed.add_field(
+            name="📅 Events",
+            value="`/events` - View active events\n`/missions` - View mission events\n`/stories` - View story events",
+            inline=False
+        )
+
+        embed.add_field(
+            name="🎰 Gacha",
+            value="`/gacha` - View active gacha banners",
+            inline=False
+        )
+
         embed.set_footer(text="💡 Tip: Start typing / and Discord will show you all commands!")
         await interaction.response.send_message(embed=embed)
 

@@ -4,7 +4,7 @@ from discord import app_commands
 from discord.ext import commands
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 import datetime
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
