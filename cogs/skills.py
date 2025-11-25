@@ -261,42 +261,6 @@ class Skills(commands.Cog):
 
         await interaction.followup.send(embed=embed)
 
-    @app_commands.command(name="topskills", description="Show top skills by grade value")
-    @app_commands.describe(limit="Number of skills to show (max 50)")
-    async def top_skills(self, interaction: discord.Interaction, limit: Optional[int] = 10):
-        """Show top skills by grade value."""
-        await interaction.response.defer()
-
-        if limit < 1 or limit > 50:
-            await interaction.followup.send("❌ Limit must be between 1 and 50")
-            return
-
-        skills = self.manager.get_top(limit)
-
-        if not skills:
-            await interaction.followup.send("❌ No skills available")
-            return
-
-        embed = discord.Embed(
-            title=f"🏆 Top {len(skills)} Skills",
-            description="Sorted by rarity and grade value",
-            color=0xFFD700
-        )
-
-        skill_list = []
-        for i, skill in enumerate(skills, 1):
-            skill_list.append(
-                f"{i}. {skill.icon_emoji} {skill.rarity_stars} **{skill.display_name}** ({skill.grade_value})"
-            )
-
-        embed.add_field(
-            name="Skills",
-            value="\n".join(skill_list),
-            inline=False
-        )
-
-        await interaction.followup.send(embed=embed)
-
 async def setup(bot):
     """Setup function for cog."""
     await bot.add_cog(Skills(bot))

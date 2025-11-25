@@ -4,6 +4,7 @@ from utils.db_reader import MasterDBReader
 import time
 import datetime
 from pathlib import Path
+from constants import get_rarity_emoji, get_support_card_type_emoji
 
 
 class EventManager:
@@ -89,7 +90,6 @@ class EventManager:
 
             if card:
                 # Get rarity and type emojis
-                from constants import get_rarity_emoji, get_support_card_type_emoji
                 rarity_emoji = get_rarity_emoji(card['rarity'])
                 type_emoji = get_support_card_type_emoji(card['command_id'])
 

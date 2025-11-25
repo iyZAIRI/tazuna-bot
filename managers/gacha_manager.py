@@ -2,6 +2,7 @@
 from typing import List, Dict, Optional
 from utils.db_reader import MasterDBReader
 import time
+import datetime
 
 
 class GachaManager:
@@ -91,7 +92,6 @@ class GachaManager:
         result = []
         for gacha in gachas:
             # Skip permanent gacha (ending in 2050+)
-            import datetime
             end_dt = datetime.datetime.fromtimestamp(gacha['end_date'])
             if end_dt.year >= 2050:
                 continue

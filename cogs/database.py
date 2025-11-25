@@ -4,6 +4,7 @@ from discord.ext import commands
 import config
 import sys
 from pathlib import Path
+import json
 
 # Add utils to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -141,7 +142,6 @@ class Database(commands.Cog):
             )
 
             # Show first few results
-            import json
             result_text = json.dumps(results[:3], indent=2, ensure_ascii=False)
 
             # Truncate if too long

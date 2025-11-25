@@ -18,6 +18,90 @@ from constants import (
     EMOJI_FRONT_RUNNER, EMOJI_PACE_CHASER, EMOJI_LATE, EMOJI_END_CLOSER
 )
 
+class CharacterListView(discord.ui.View):
+    """Paginated view for displaying character list."""
+
+    def __init__(self, characters: list, page: int = 0, per_page: int = 15):
+        super().__init__(timeout=180)
+        self.characters = characters
+        self.page = page
+        self.per_page = per_page
+        self.total_pages = (len(characters) + per_page - 1) // per_page
+
+        # Update button states
+        self.update_buttons()
+
+    def update_buttons(self):
+        """Update button states based on current page."""
+        # Clear existing items
+        self.clear_items()
+
+        # Previous page button
+        prev_button = discord.ui.Button(
+            label="◀ Previous",
+            style=discord.ButtonStyle.primary,
+            disabled=(self.page == 0)
+        )
+        prev_button.callback = self.previous_page
+        self.add_item(prev_button)
+
+        # Page indicator
+        page_button = discord.ui.Button(
+            label=f"Page {self.page + 1}/{self.total_pages}",
+            style=discord.ButtonStyle.secondary,
+            disabled=True
+        )
+        self.add_item(page_button)
+
+        # Next page button
+        next_button = discord.ui.Button(
+            label="Next ▶",
+            style=discord.ButtonStyle.primary,
+            disabled=(self.page >= self.total_pages - 1)
+        )
+        next_button.callback = self.next_page
+        self.add_item(next_button)
+
+    async def previous_page(self, interaction: discord.Interaction):
+        """Go to previous page."""
+        if self.page > 0:
+            self.page -= 1
+            self.update_buttons()
+            embed = self.create_embed()
+            await interaction.response.edit_message(embed=embed, view=self)
+
+    async def next_page(self, interaction: discord.Interaction):
+        """Go to next page."""
+        if self.page < self.total_pages - 1:
+            self.page += 1
+            self.update_buttons()
+            embed = self.create_embed()
+            await interaction.response.edit_message(embed=embed, view=self)
+
+    def create_embed(self) -> discord.Embed:
+        """Create the character list embed for current page."""
+        embed = discord.Embed(
+            title="🏇 Uma Musume Characters",
+            description=f"Page {self.page + 1}/{self.total_pages} • {len(self.characters)} total characters",
+            color=config.EMBED_COLOR
+        )
+
+        start_idx = self.page * self.per_page
+        end_idx = min(start_idx + self.per_page, len(self.characters))
+        page_chars = self.characters[start_idx:end_idx]
+
+        for char in page_chars:
+            version_text = "version" if char.card_count == 1 else "versions"
+            embed.add_field(
+                name=f"{char.highest_rarity}★ {char.display_name}",
+                value=f"{char.card_count} {version_text}",
+                inline=True
+            )
+
+        embed.set_footer(text=f"Use /character <name> for details • Page {self.page + 1}/{self.total_pages}")
+        return embed
+
+
 class CardSelectorView(discord.ui.View):
     """View for selecting character cards/alts."""
 
@@ -460,14 +544,55 @@ class Characters(commands.Cog):
         self.manager.close()
         self.skill_manager.close()
 
+    async def character_name_autocomplete(
+        self,
+        interaction: discord.Interaction,
+        current: str,
+    ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for character names."""
+        # If no input, show first 25 characters
+        if not current:
+            all_chars = self.manager.get_all()
+            all_chars.sort(key=lambda c: c.display_name)
+            return [
+                app_commands.Choice(name=char.display_name, value=char.display_name)
+                for char in all_chars[:25]
+            ]
+
+        # Search for matching characters
+        matches = self.manager.search(current)
+        matches.sort(key=lambda c: c.display_name)
+
+        # Return up to 25 matches (Discord limit)
+        return [
+            app_commands.Choice(name=char.display_name, value=char.display_name)
+            for char in matches[:25]
+        ]
+
     @app_commands.command(name="character", description="Look up information about a character")
-    @app_commands.describe(name="Character name (partial match supported)")
+    @app_commands.describe(name="Character name")
+    @app_commands.autocomplete(name=character_name_autocomplete)
     async def character(self, interaction: discord.Interaction, name: str):
         """Look up information about a Uma Musume character."""
         await interaction.response.defer()
 
         # Search for character by name
+        # Try exact match first, then partial match
         char = self.manager.get_by_name(name)
+
+        # If partial match returns multiple results, try to find exact match
+        if not char:
+            matches = self.manager.search(name)
+            if len(matches) == 1:
+                char = matches[0]
+            elif len(matches) > 1:
+                # Multiple matches found - list them
+                match_names = ", ".join([c.display_name for c in matches[:10]])
+                await interaction.followup.send(
+                    f"❌ Multiple characters match '{name}': {match_names}\n"
+                    f"Please be more specific or use autocomplete."
+                )
+                return
 
         if not char:
             await interaction.followup.send(f"❌ Character '{name}' not found. Use `/characters` to see all available characters.")
@@ -499,8 +624,7 @@ class Characters(commands.Cog):
         await interaction.followup.send(embed=embed, view=view)
 
     @app_commands.command(name="characters", description="List all available characters")
-    @app_commands.describe(page="Page number (default: 1)")
-    async def characters(self, interaction: discord.Interaction, page: Optional[int] = 1):
+    async def characters(self, interaction: discord.Interaction):
         """List all available Uma Musume characters."""
         await interaction.response.defer()
 
@@ -513,110 +637,10 @@ class Characters(commands.Cog):
         # Sort by ID
         all_chars.sort(key=lambda c: c.chara_id)
 
-        # Pagination
-        per_page = 15
-        total_pages = (len(all_chars) + per_page - 1) // per_page
-
-        if page < 1 or page > total_pages:
-            await interaction.followup.send(f"❌ Invalid page. Available pages: 1-{total_pages}")
-            return
-
-        start_idx = (page - 1) * per_page
-        end_idx = start_idx + per_page
-        page_chars = all_chars[start_idx:end_idx]
-
-        embed = discord.Embed(
-            title="🏇 Uma Musume Characters",
-            description=f"Page {page}/{total_pages} • {len(all_chars)} total characters",
-            color=config.EMBED_COLOR
-        )
-
-        for char in page_chars:
-            embed.add_field(
-                name=f"{char.highest_rarity}★ {char.display_name}",
-                value=f"ID: {char.chara_id} • {char.card_count} card(s)",
-                inline=True
-            )
-
-        embed.set_footer(text=f"Use /character <name> for details • Page {page}/{total_pages}")
-        await interaction.followup.send(embed=embed)
-
-    @app_commands.command(name="randomchar", description="Get a random character")
-    async def random_character(self, interaction: discord.Interaction):
-        """Get a random Uma Musume character."""
-        char = self.manager.get_random()
-
-        if not char:
-            await interaction.response.send_message("❌ No characters available")
-            return
-
-        embed = discord.Embed(
-            title="🎲 Random Uma Musume!",
-            description=f"You got **{char.display_name}**!",
-            color=char.get_hex_color()
-        )
-
-        if char.birth_date:
-            embed.add_field(name="Birthday", value=char.birth_date, inline=True)
-
-        embed.add_field(name="Max Rarity", value=f"{char.highest_rarity}★", inline=True)
-        embed.add_field(name="Total Cards", value=char.card_count, inline=True)
-
-        if char.cards:
-            highest_card = max(char.cards, key=lambda c: c.rarity)
-            embed.add_field(
-                name="Best Running Style",
-                value=f"{highest_card.running_style_emoji} {highest_card.running_style_name}",
-                inline=False
-            )
-
-            # Add character image
-            embed.set_image(url=highest_card.image_url)
-
-        embed.set_footer(text="Uma Musume Pretty Derby")
-        await interaction.response.send_message(embed=embed)
-
-    @app_commands.command(name="ssrchars", description="List all characters with SSR cards")
-    async def ssr_characters(self, interaction: discord.Interaction):
-        """List all characters with SSR cards."""
-        await interaction.response.defer()
-
-        ssr_chars = self.manager.get_by_rarity(3)
-
-        if not ssr_chars:
-            await interaction.followup.send("❌ No SSR characters found")
-            return
-
-        ssr_chars.sort(key=lambda c: c.chara_id)
-
-        embed = discord.Embed(
-            title="✨ SSR Uma Musume Characters",
-            description=f"{len(ssr_chars)} characters with SSR cards",
-            color=0xFFD700  # Gold color
-        )
-
-        char_list = []
-        for char in ssr_chars[:30]:  # Limit to 30
-            char_list.append(f"★★★ {char.display_name}")
-
-        # Split into columns
-        mid = len(char_list) // 2
-        if char_list:
-            embed.add_field(
-                name="Characters (1)",
-                value="\n".join(char_list[:mid]) or "None",
-                inline=True
-            )
-            embed.add_field(
-                name="Characters (2)",
-                value="\n".join(char_list[mid:]) or "None",
-                inline=True
-            )
-
-        if len(ssr_chars) > 30:
-            embed.set_footer(text=f"Showing 30 of {len(ssr_chars)} SSR characters")
-
-        await interaction.followup.send(embed=embed)
+        # Create paginated view
+        view = CharacterListView(all_chars)
+        embed = view.create_embed()
+        await interaction.followup.send(embed=embed, view=view)
 
 async def setup(bot):
     """Setup function for cog."""
