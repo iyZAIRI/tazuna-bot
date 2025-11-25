@@ -417,8 +417,47 @@ class SupportCards(commands.Cog):
         self.manager.close()
         self.skill_manager.close()
 
+    async def support_name_autocomplete(
+        self,
+        interaction: discord.Interaction,
+        current: str,
+    ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for support card character names."""
+        # Get all support cards
+        all_cards = self.manager.get_all()
+
+        # Extract unique character names
+        character_names = {}
+        for card in all_cards:
+            if card.character_name:
+                character_names[card.character_name.lower()] = card.character_name
+
+        # If no input, show first 25 character names alphabetically
+        if not current:
+            sorted_names = sorted(character_names.values())
+            return [
+                app_commands.Choice(name=name, value=name)
+                for name in sorted_names[:25]
+            ]
+
+        # Search for matching character names
+        current_lower = current.lower()
+        matches = []
+        for name_lower, name_display in character_names.items():
+            if current_lower in name_lower:
+                matches.append(name_display)
+
+        matches.sort()
+
+        # Return up to 25 matches (Discord limit)
+        return [
+            app_commands.Choice(name=name, value=name)
+            for name in matches[:25]
+        ]
+
     @app_commands.command(name="support", description="Look up a specific support card")
     @app_commands.describe(name="Character name to search for")
+    @app_commands.autocomplete(name=support_name_autocomplete)
     async def support(self, interaction: discord.Interaction, name: str):
         """Look up information about a support card."""
         await interaction.response.defer()
