@@ -9,26 +9,37 @@ class GachaManager:
 
     def __init__(self, db_path: str = "./data/master.mdb"):
         self.db_path = db_path
-        self._character_cache = None
+        self._character_card_cache = None
         self._support_card_cache = None
 
-    def _load_characters(self) -> Dict[int, str]:
-        """Load character names and cache them."""
-        if self._character_cache is not None:
-            return self._character_cache
+    def _load_character_cards(self) -> Dict[int, Dict]:
+        """Load character card data and cache it."""
+        if self._character_card_cache is not None:
+            return self._character_card_cache
 
         db = MasterDBReader(self.db_path)
-        char_map = {}
+        card_map = {}
 
         if db.connect():
-            # Get character names from text_data category 6
-            chars = db.query('SELECT [index], text FROM text_data WHERE category = 6')
-            for char in chars:
-                char_map[char['index']] = char['text']
+            # Get all character cards with their names
+            cards = db.query('''
+                SELECT cd.id, cd.chara_id, cd.default_rarity, t.text as name
+                FROM card_data cd
+                LEFT JOIN text_data t ON t.category = 4 AND t.[index] = cd.id
+            ''')
+
+            for card in cards:
+                card_map[card['id']] = {
+                    'id': card['id'],
+                    'chara_id': card['chara_id'],
+                    'rarity': card['default_rarity'],
+                    'name': card['name'] if card['name'] else f"Character Card {card['id']}"
+                }
+
             db.close()
 
-        self._character_cache = char_map
-        return char_map
+        self._character_card_cache = card_map
+        return card_map
 
     def _load_support_cards(self) -> Dict[int, Dict]:
         """Load support card data and cache it."""
@@ -95,28 +106,28 @@ class GachaManager:
 
             # Format pickup cards
             pickup_cards = []
-            char_cache = self._load_characters()
-            card_cache = self._load_support_cards()
+            char_card_cache = self._load_character_cards()
+            support_card_cache = self._load_support_cards()
 
             for pickup in pickups:
                 if pickup['card_type'] == 1:  # Character card
-                    # Character cards use chara_id directly
-                    char_name = char_cache.get(pickup['card_id'], f"Character {pickup['card_id']}")
-                    pickup_cards.append({
-                        'type': 'character',
-                        'id': pickup['card_id'],
-                        'name': char_name,
-                        'rarity': pickup['rarity']
-                    })
+                    char_card = char_card_cache.get(pickup['card_id'])
+                    if char_card:
+                        pickup_cards.append({
+                            'type': 'character',
+                            'id': char_card['id'],
+                            'name': char_card['name'],
+                            'rarity': char_card['rarity']
+                        })
                 elif pickup['card_type'] == 2:  # Support card
-                    card = card_cache.get(pickup['card_id'])
-                    if card:
+                    support_card = support_card_cache.get(pickup['card_id'])
+                    if support_card:
                         pickup_cards.append({
                             'type': 'support',
-                            'id': card['id'],
-                            'name': card['name'],
-                            'rarity': card['rarity'],
-                            'command_id': card['command_id']
+                            'id': support_card['id'],
+                            'name': support_card['name'],
+                            'rarity': support_card['rarity'],
+                            'command_id': support_card['command_id']
                         })
 
             result.append({
