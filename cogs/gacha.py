@@ -39,6 +39,10 @@ class GachaListView(discord.ui.View):
             else:
                 banner_type = f"Banner Type {gacha['card_type']}"
 
+            # Add "One Time Only" if applicable
+            if gacha.get('only_once', False):
+                banner_type = f"{banner_type} (One Time Only)"
+
             # Format dates
             start_dt = datetime.datetime.fromtimestamp(gacha['start_date'])
             end_dt = datetime.datetime.fromtimestamp(gacha['end_date'])

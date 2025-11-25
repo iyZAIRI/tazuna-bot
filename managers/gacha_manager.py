@@ -82,7 +82,7 @@ class GachaManager:
         # Get all gacha banners
         gachas = db.query('''
             SELECT id, type, card_type, cost_single, cost_type,
-                   start_date, end_date
+                   start_date, end_date, only_once_flag
             FROM gacha_data
             WHERE start_date <= ? AND end_date >= ?
             ORDER BY id DESC
@@ -138,6 +138,7 @@ class GachaManager:
                 'cost_type': gacha['cost_type'],
                 'start_date': gacha['start_date'],
                 'end_date': gacha['end_date'],
+                'only_once': gacha['only_once_flag'] == 1,
                 'pickups': pickup_cards
             })
 
