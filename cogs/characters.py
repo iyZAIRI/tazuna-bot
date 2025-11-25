@@ -460,14 +460,55 @@ class Characters(commands.Cog):
         self.manager.close()
         self.skill_manager.close()
 
+    async def character_name_autocomplete(
+        self,
+        interaction: discord.Interaction,
+        current: str,
+    ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for character names."""
+        # If no input, show first 25 characters
+        if not current:
+            all_chars = self.manager.get_all()
+            all_chars.sort(key=lambda c: c.display_name)
+            return [
+                app_commands.Choice(name=char.display_name, value=char.display_name)
+                for char in all_chars[:25]
+            ]
+
+        # Search for matching characters
+        matches = self.manager.search(current)
+        matches.sort(key=lambda c: c.display_name)
+
+        # Return up to 25 matches (Discord limit)
+        return [
+            app_commands.Choice(name=char.display_name, value=char.display_name)
+            for char in matches[:25]
+        ]
+
     @app_commands.command(name="character", description="Look up information about a character")
-    @app_commands.describe(name="Character name (partial match supported)")
+    @app_commands.describe(name="Character name")
+    @app_commands.autocomplete(name=character_name_autocomplete)
     async def character(self, interaction: discord.Interaction, name: str):
         """Look up information about a Uma Musume character."""
         await interaction.response.defer()
 
         # Search for character by name
+        # Try exact match first, then partial match
         char = self.manager.get_by_name(name)
+
+        # If partial match returns multiple results, try to find exact match
+        if not char:
+            matches = self.manager.search(name)
+            if len(matches) == 1:
+                char = matches[0]
+            elif len(matches) > 1:
+                # Multiple matches found - list them
+                match_names = ", ".join([c.display_name for c in matches[:10]])
+                await interaction.followup.send(
+                    f"❌ Multiple characters match '{name}': {match_names}\n"
+                    f"Please be more specific or use autocomplete."
+                )
+                return
 
         if not char:
             await interaction.followup.send(f"❌ Character '{name}' not found. Use `/characters` to see all available characters.")
