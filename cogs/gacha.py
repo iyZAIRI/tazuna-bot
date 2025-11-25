@@ -22,13 +22,9 @@ class GachaListView(discord.ui.View):
         self.gachas = gachas
         self.gacha_manager = gacha_manager
 
-    def create_embed(self) -> discord.Embed:
-        """Create the gacha list embed."""
-        embed = discord.Embed(
-            title="🎰 Active Gacha Banners",
-            description="Currently available gacha banners:",
-            color=config.EMBED_COLOR
-        )
+    def create_embeds(self) -> List[discord.Embed]:
+        """Create separate embeds for each gacha banner."""
+        embeds = []
 
         for gacha in self.gachas:
             # Determine banner type
@@ -43,10 +39,20 @@ class GachaListView(discord.ui.View):
             if gacha.get('only_once', False):
                 banner_type = f"{banner_type} (One Time Only)"
 
+            # Create embed for this banner
+            embed = discord.Embed(
+                title=f"{banner_type} (ID: {gacha['id']})",
+                color=config.EMBED_COLOR
+            )
+
             # Format dates
             start_dt = datetime.datetime.fromtimestamp(gacha['start_date'])
             end_dt = datetime.datetime.fromtimestamp(gacha['end_date'])
             date_str = f"{start_dt.strftime('%Y-%m-%d %H:%M')} - {end_dt.strftime('%Y-%m-%d %H:%M')}"
+
+            # Add period and cost
+            embed.add_field(name="Period", value=date_str, inline=False)
+            embed.add_field(name="Cost", value=f"{gacha['cost']} gems per pull", inline=False)
 
             # Format pickup cards
             pickup_text = []
@@ -59,19 +65,19 @@ class GachaListView(discord.ui.View):
                 else:  # character
                     pickup_text.append(f"{rarity_emoji} {pickup['name']}")
 
-            if not pickup_text:
-                pickup_text.append("No featured pickups")
+            if pickup_text:
+                embed.add_field(name="Featured Cards", value="\n".join(pickup_text), inline=False)
+            else:
+                embed.add_field(name="Featured Cards", value="No featured pickups", inline=False)
 
-            field_value = f"**Period:** {date_str}\n**Cost:** {gacha['cost']} gems\n\n**Featured:**\n" + "\n".join(pickup_text)
+            # Add banner image
+            banner_url = f"https://gametora.com/images/umamusume/en/gacha/img_bnr_gacha_{gacha['id']}.png"
+            embed.set_image(url=banner_url)
 
-            embed.add_field(
-                name=f"{banner_type} (ID: {gacha['id']})",
-                value=field_value,
-                inline=False
-            )
+            embed.set_footer(text="Uma Musume Pretty Derby")
+            embeds.append(embed)
 
-        embed.set_footer(text="Uma Musume Pretty Derby")
-        return embed
+        return embeds
 
 
 class Gacha(commands.Cog):
@@ -93,8 +99,8 @@ class Gacha(commands.Cog):
             return
 
         view = GachaListView(gachas, self.manager)
-        embed = view.create_embed()
-        await interaction.followup.send(embed=embed, view=view)
+        embeds = view.create_embeds()
+        await interaction.followup.send(embeds=embeds, view=view)
 
 
 async def setup(bot: commands.Bot):
